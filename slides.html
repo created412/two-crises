@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>두 번의 위기 · 내 통계로 투자하기 · 수업 안내</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* ===========================================
+   THEME · 경제신문 호외 + 증권 시세판
+   색을 바꾸려면 아래 변수만 수정하세요.
+   =========================================== */
+:root{
+  --paper:#f4efe4;      /* 신문 종이 */
+  --paper-2:#ebe3d2;
+  --ink:#16130f;        /* 먹색 */
+  --ink-2:#4a4339;
+  --red:#d6281b;        /* 하락·경고 */
+  --blue:#1d4ed8;       /* 상승(한국식 색 반대 주의: 여기선 강조색) */
+  --board:#0f1411;      /* 시세판 */
+  --led:#ffb020;        /* 시세판 글자 */
+  --green:#2fa86b;
+  --font-display:'Black Han Sans',sans-serif;
+  --font-body:'IBM Plex Sans KR',sans-serif;
+  --font-mono:'IBM Plex Mono',monospace;
+  --pad:96px;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --stage-bg:#0b0b0a;
+  --slide-bg:var(--paper);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+
+/* ===========================================
+   FIXED 16:9 STAGE: MANDATORY BASE STYLES (viewport-base.css 전체)
+   =========================================== */
+html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--stage-bg,#000)}
+.deck-viewport{position:fixed;inset:0;overflow:hidden;background:var(--stage-bg,#000)}
+.deck-stage{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:hidden;transform-origin:0 0;background:var(--slide-bg,#fff)}
+.slide{position:absolute;inset:0;width:1920px;height:1080px;overflow:hidden;display:block;visibility:hidden;opacity:0;pointer-events:none;background:var(--slide-bg,#fff)}
+.slide.active,.slide.visible{visibility:visible;opacity:1;pointer-events:auto;z-index:1}
+img,video,canvas,svg{max-width:100%;max-height:100%}
+.deck-controls{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:1000}
+.deck-controls{display:none}
+@page{size:1920px 1080px;margin:0}
+@media print{
+  html,body{width:1920px;height:auto;overflow:visible;background:#fff}
+  .reveal{opacity:1!important;transform:none!important}
+  .ticker span{animation:none;padding-left:40px}
+  .deck-viewport{position:static;overflow:visible;background:#fff}
+  .deck-stage{position:static;width:auto;height:auto;transform:none!important;background:none}
+  .slide{position:relative;display:block!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;width:1920px;height:1080px;break-after:page;page-break-after:always}
+  .slide:last-child{break-after:auto;page-break-after:auto}
+  .deck-controls{display:none!important}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.2s!important}}
+
+/* ===========================================
+   공통 슬라이드 요소
+   =========================================== */
+.slide{font-family:var(--font-body);color:var(--ink);
+  background:
+    radial-gradient(circle at 20% 10%,rgba(255,255,255,.55),transparent 40%),
+    repeating-linear-gradient(0deg,rgba(0,0,0,.018) 0 2px,transparent 2px 5px),
+    var(--paper);}
+.masthead{position:absolute;left:var(--pad);right:var(--pad);top:52px;display:flex;justify-content:space-between;align-items:flex-end;
+  border-bottom:6px double var(--ink);padding-bottom:14px;font-family:var(--font-mono);font-size:22px;letter-spacing:.06em;color:var(--ink-2)}
+.masthead b{font-family:var(--font-display);font-size:30px;color:var(--ink);letter-spacing:0;font-weight:400}
+.body{position:absolute;left:var(--pad);right:var(--pad);top:170px;bottom:90px}
+.foot{position:absolute;left:var(--pad);right:var(--pad);bottom:40px;display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:20px;color:var(--ink-2)}
+h1,h2{font-family:var(--font-display);font-weight:400;line-height:1.08;letter-spacing:-.01em}
+h2{font-size:88px;margin-bottom:34px}
+h2 .tag{display:inline-block;vertical-align:middle;font-family:var(--font-mono);font-size:28px;background:var(--ink);color:var(--paper);padding:8px 16px;margin-right:22px;transform:translateY(-10px)}
+p,li{font-size:36px;line-height:1.5}
+.lead{font-size:40px;color:var(--ink-2);margin-bottom:36px}
+.red{color:var(--red)}
+.mark{background:linear-gradient(transparent 58%,rgba(214,40,27,.28) 58%)}
+.mono{font-family:var(--font-mono)}
+.stamp{position:absolute;font-family:var(--font-display);color:var(--red);border:7px solid var(--red);padding:10px 26px;font-size:56px;transform:rotate(-8deg);opacity:.9}
+
+/* 할 일 목록 (번호 큰 숫자) */
+.todo{list-style:none;display:grid;gap:26px}
+.todo li{display:grid;grid-template-columns:96px 1fr;align-items:start;font-size:40px}
+.todo li::before{counter-increment:t;content:counter(t);font-family:var(--font-display);font-size:72px;line-height:.9;color:var(--red)}
+.todo{counter-reset:t}
+.todo small{display:block;font-size:30px;color:var(--ink-2);margin-top:4px}
+
+/* 카드 */
+.cards{display:grid;gap:28px}
+.card{background:#fffdf7;border:3px solid var(--ink);padding:30px 32px;box-shadow:10px 10px 0 var(--ink)}
+.card h3{font-family:var(--font-display);font-weight:400;font-size:46px;margin-bottom:12px}
+.card p{font-size:30px}
+.card .k{font-family:var(--font-mono);font-size:24px;color:var(--red);letter-spacing:.08em}
+
+/* 예시 박스 (말풍선) */
+.example{border-left:12px solid var(--red);background:#fffdf7;padding:24px 32px;font-size:34px;line-height:1.5}
+.example .lab{font-family:var(--font-mono);font-size:22px;color:var(--red);letter-spacing:.1em;display:block;margin-bottom:6px}
+
+/* 표 */
+table{border-collapse:collapse;width:100%;font-size:30px;background:#fffdf7}
+th,td{border:3px solid var(--ink);padding:16px 22px;text-align:left;vertical-align:top}
+th{background:var(--ink);color:var(--paper);font-weight:700}
+
+/* 시세판 */
+.board{background:var(--board);color:var(--led);font-family:var(--font-mono);border-radius:6px;padding:26px 34px;box-shadow:inset 0 0 0 4px #222,0 20px 40px rgba(0,0,0,.25)}
+.ticker{position:absolute;left:0;right:0;bottom:0;height:78px;background:var(--board);color:var(--led);font-family:var(--font-mono);font-size:30px;display:flex;align-items:center;overflow:hidden;white-space:nowrap}
+.ticker span{display:inline-block;padding-left:100%;animation:tick 38s linear infinite}
+.ticker em{font-style:normal;margin:0 34px}
+.ticker .dn{color:#ff5a4e}.ticker .up{color:#53d18f}
+@keyframes tick{to{transform:translateX(-100%)}}
+
+/* 타임라인 */
+.tl{display:grid;grid-template-columns:repeat(9,1fr);gap:0;margin-top:30px}
+.tl>div{border-top:12px solid var(--ink);padding:18px 14px 0 0;position:relative}
+.tl>div.hot{border-top-color:var(--red)}
+.tl .t{font-family:var(--font-mono);font-size:24px;color:var(--ink-2)}
+.tl .n{font-family:var(--font-display);font-size:36px;line-height:1.15;margin-top:8px}
+.tl .d{font-size:24px;color:var(--ink-2);margin-top:6px;line-height:1.35}
+
+/* 섹션 표지 (시세판 배경) */
+.section{background:var(--board);color:var(--paper)}
+.section .masthead{border-bottom-color:var(--led);color:#b9b2a2}
+.section .masthead b{color:var(--led)}
+.section .foot{color:#8d877a}
+.section h1{font-size:200px;color:var(--led);line-height:1}
+.section .sub{font-size:48px;margin-top:30px;color:var(--paper)}
+
+/* 등장 애니메이션 */
+.reveal{opacity:0;transform:translateY(34px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.slide.visible .reveal{opacity:1;transform:none}
+.slide.visible .reveal:nth-child(2){transition-delay:.1s}
+.slide.visible .reveal:nth-child(3){transition-delay:.2s}
+.slide.visible .reveal:nth-child(4){transition-delay:.3s}
+.slide.visible .reveal:nth-child(5){transition-delay:.4s}
+
+/* ===========================================
+   덱 바깥 UI: 진행 막대 · 쪽수 · 편집 버튼
+   =========================================== */
+.progress{position:fixed;left:0;top:0;height:5px;background:var(--red);z-index:999;transition:width .4s var(--ease)}
+.pager{font-family:'IBM Plex Mono',monospace;font-size:14px;color:#cfc8b8;background:rgba(0,0,0,.55);padding:6px 12px;border-radius:99px}
+.edit-hotzone{position:fixed;top:0;left:0;width:80px;height:80px;z-index:10000;cursor:pointer}
+.edit-toggle{position:fixed;top:14px;left:14px;z-index:10001;opacity:0;pointer-events:none;transition:opacity .3s;border:0;border-radius:8px;padding:8px 12px;background:#16130f;color:#ffb020;font:600 14px 'IBM Plex Sans KR',sans-serif;cursor:pointer}
+.edit-toggle.show,.edit-toggle.active{opacity:1;pointer-events:auto}
+body.editing [data-edit]{outline:2px dashed rgba(214,40,27,.6);outline-offset:4px}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<div class="edit-hotzone"></div>
+<button class="edit-toggle" id="editToggle" title="편집 모드 (E)">편집 모드</button>
+
+<div class="deck-viewport">
+<main class="deck-stage" id="deckStage">
+
+<!-- ===== 1. 표지 ===== -->
+<section class="slide active">
+  <div class="masthead"><b>국제관계와 국제기구</b><span>2학기 수행평가 · 개인</span></div>
+  <div class="body" style="top:230px">
+    <p class="mono reveal" style="font-size:30px;color:var(--red);letter-spacing:.2em">EXTRA · 호외</p>
+    <h1 class="reveal" style="font-size:168px;margin:18px 0 30px">두 번의 위기,<br>내 통계로 투자하기</h1>
+    <p class="lead reveal" style="font-size:46px">1997 외환위기와 2008 세계 금융위기를 1억 원으로 통과한다</p>
+  </div>
+  <div class="stamp" style="right:150px;top:300px">수익률 ≠ 점수</div>
+  <div class="ticker"><span>
+    <em>원/달러 1996 <b>804.46</b></em><em class="dn">1998 <b>1,403.18</b> ▲74%</em>
+    <em>한국 실질성장률 1998 <b class="dn">-4.94%</b></em><em>태국 1998 <b class="dn">-7.63%</b></em>
+    <em>대출금리 1998 <b>15.28%</b></em><em>원/달러 2009 <b>1,277.25</b></em><em class="up">한국 성장률 2009 +0.82%</em><em>출처 World Bank WDI</em>
+  </span></div>
+</section>
+
+<!-- ===== 2. 지금까지 한 것 ===== -->
+<section class="slide">
+  <div class="masthead"><b>지난 3주를 돌아보면</b><span>02</span></div>
+  <div class="body">
+    <h2 class="reveal">오늘은 <span class="mark">이미 배운 것</span>을 써먹는 날</h2>
+    <div class="cards reveal" style="grid-template-columns:repeat(4,1fr);margin-top:20px">
+      <div class="card"><div class="k">10/29</div><h3>바나나 협상</h3><p>같은 거래에서도 역할마다 이익과 부담이 다르다</p></div>
+      <div class="card"><div class="k">11/5</div><h3>ODA 제안</h3><p>한 정책에는 경제·외교·인도적 효과가 함께 있다</p></div>
+      <div class="card"><div class="k">11/12</div><h3>ECOS 통계</h3><p>위기 때 환율·외채·금리는 이렇게 움직였다</p></div>
+      <div class="card" style="background:var(--ink);color:var(--paper)"><div class="k" style="color:var(--led)">오늘</div><h3 style="color:var(--led)">투자 판단</h3><p>내 통계를 근거로 결정하고, 결과를 보고 고친다</p></div>
+    </div>
+  </div>
+  <div class="foot"><span>두 번의 위기 · 수업 안내</span><span>지난 활동 → 오늘 활동</span></div>
+</section>
+
+<!-- ===== 3. 오늘의 규칙 ===== -->
+<section class="slide">
+  <div class="masthead"><b>게임 규칙</b><span>03</span></div>
+  <div class="body">
+    <h2 class="reveal">규칙은 다섯 개</h2>
+    <ol class="todo reveal">
+      <li><div><b>혼자 합니다.</b><small>개인 평가. 답을 같이 쓰지 않습니다.</small></div></li>
+      <li><div><b>1억 원으로 시작합니다.</b><small>2008년 게임에서는 다시 1억 원. 빚·공매도 없음, 현금 보유 가능.</small></div></li>
+      <li><div><b class="red">근거를 적어야 주문이 됩니다.</b><small>근거 지표 · 새 정보 · 기업 영향 · 선택 이유</small></div></li>
+      <li><div><b>확정한 주문은 되돌릴 수 없습니다.</b><small>선생님 신호에 맞춰 함께 다음 단계로.</small></div></li>
+      <li><div><b>수익률은 점수가 아닙니다.</b><small>판단의 근거와, 결과를 보고 고친 과정이 점수입니다.</small></div></li>
+    </ol>
+  </div>
+  <div class="foot"><span>파일: 금융위기_투자게임.html</span><span>내 브라우저에만 저장됩니다 · 한 사람 한 기기</span></div>
+</section>
+
+<!-- ===== 4. 180분 흐름 ===== -->
+<section class="slide">
+  <div class="masthead"><b>오늘의 흐름 · 180분</b><span>04</span></div>
+  <div class="body">
+    <h2 class="reveal">게임은 앞 1시간, 나머지는 보고서</h2>
+    <div class="tl reveal">
+      <div><div class="t">0–10</div><div class="n">안내</div><div class="d">규칙·회사 소개</div></div>
+      <div class="hot"><div class="t">10–25</div><div class="n">내 자료 다시보기</div><div class="d">ECOS 자료 고치기·전략</div></div>
+      <div class="hot"><div class="t">25–42</div><div class="n">1997 게임</div><div class="d">주문 2번 + 결과</div></div>
+      <div class="hot"><div class="t">42–59</div><div class="n">2008 게임</div><div class="d">다시 1억 원</div></div>
+      <div><div class="t">59–69</div><div class="n">휴식</div><div class="d">저장 확인</div></div>
+      <div class="hot"><div class="t">69–121</div><div class="n">보고서</div><div class="d">지표 비교·득실표·AI 검증</div></div>
+      <div class="hot"><div class="t">121–141</div><div class="n">발표·피드백</div><div class="d">1분 발표</div></div>
+      <div><div class="t">141–151</div><div class="n">수정</div><div class="d">추적 로그 2회차</div></div>
+      <div><div class="t">151–180</div><div class="n">제출·구술</div><div class="d">151분 전원 마감</div></div>
+    </div>
+    <div class="example reveal" style="margin-top:56px"><span class="lab">기억할 것</span>모든 과정은 <b>게임 화면 하나</b>에서 이어집니다. 단계가 끝나면 다음 단계 버튼이 열립니다.</div>
+  </div>
+  <div class="foot"><span>시간은 학급 상황에 맞게 조정 가능</span><span>13명 기준</span></div>
+</section>
+
+<!-- ===== 5. 네 회사 ===== -->
+<section class="slide">
+  <div class="masthead"><b>투자할 수 있는 회사</b><span>05</span></div>
+  <div class="body">
+    <h2 class="reveal">네 회사는 <span class="mark">달러·금리</span>에 반응이 다르다</h2>
+    <div class="cards reveal" style="grid-template-columns:repeat(4,1fr)">
+      <div class="card"><div class="k">A · 수출 제조업</div><h3>한빛수출</h3><p>반도체·자동차 부품 수출.<br>매출은 <b>달러로 받음</b>.<br>원료 일부 수입.</p></div>
+      <div class="card"><div class="k">B · 수입 유통업</div><h3>바다유통</h3><p>바나나·생활용품 수입.<br>물건값을 <b>달러로 지불</b>.</p></div>
+      <div class="card"><div class="k">C · 빚 많은 내수 기업</div><h3>튼튼건설</h3><p>아파트·공장 건설.<br><b>대출과 단기 외화 차입</b>이 많음.</p></div>
+      <div class="card"><div class="k">D · 금융기관</div><h3>믿음은행</h3><p>해외에서 <b>단기로 달러</b>를 빌려 국내 기업에 대출.</p></div>
+    </div>
+    <p class="reveal" style="margin-top:44px;font-size:32px;color:var(--ink-2)">시작가는 모두 1주 100만원 · 가상 회사·가상 주가 · 위기 상황과 통계는 실제 자료</p>
+  </div>
+  <div class="foot"><span>질문: 환율이 오르면 누가 웃고 누가 울까?</span><span>05</span></div>
+</section>
+
+<!-- ===== 6. STEP 1 ===== -->
+<section class="slide">
+  <div class="masthead"><b>STEP 1 · 15분</b><span>06</span></div>
+  <div class="body">
+    <h2 class="reveal"><span class="tag">STEP 1</span>지난번 내 통계 자료를 다시 연다</h2>
+    <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:60px">
+      <ol class="todo reveal">
+        <li><div>게임에서 <b>내 ECOS 주제</b>를 고른다<small>환율, 외환보유액, 단기외채, 기준금리 …</small></div></li>
+        <li><div>받은 피드백대로 <b>한 군데 고친다</b><small>원래 어떻게 썼나 → 어떻게 고쳤나</small></div></li>
+        <li><div>내 통계가 말하는 <b>위기 신호</b>를 한 문장으로<small>이 문장이 투자 전략의 출발점</small></div></li>
+      </ol>
+      <div class="reveal">
+        <div class="example"><span class="lab">예시 · 단기외채 담당</span><b>고칠 곳:</b> 범례가 없어 네 선이 무엇인지 몰랐다.<br><b>고친 것:</b> 단기외채 선을 표시하고 1994년 4분기와 1997년 2분기 값을 비교.<br><b>위기 신호:</b> 1년 안에 갚을 달러 빚이 2배 넘게 늘었다.</div>
+        <p style="font-size:28px;color:var(--ink-2);margin-top:22px">자료가 없으면 주제 하나를 골라 오늘 공통 지표로 시작합니다.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>시작 후 10–25분</span><span>06</span></div>
+</section>
+
+<!-- ===== 7. 피드백 모음 ===== -->
+<section class="slide">
+  <div class="masthead"><b>STEP 1 · 이렇게 고친다</b><span>07</span></div>
+  <div class="body">
+    <h2 class="reveal" style="font-size:72px">지난번 피드백, 대부분 이 네 가지였다</h2>
+    <table class="reveal">
+      <tr><th style="width:26%">자주 받은 피드백</th><th>이렇게 고친다</th><th style="width:30%">해당 주제 예</th></tr>
+      <tr><td><b>시점을 특정하라</b></td><td>"위기 때 빠져나갔다" → "1997년 ○월, 1998년 ○월에 음수"</td><td>증권투자, 직접투자</td></tr>
+      <tr><td><b>기간을 맞춰라</b></td><td>1971–2026 전체 대신 위기 앞뒤 5년만 잘라 비교</td><td>외환보유액, 준비자산, 환율</td></tr>
+      <tr><td><b>범례·단위를 달아라</b></td><td>여러 선이 각각 무엇인지, 단위가 무엇인지 글로 설명</td><td>단기외채, 원/엔 환율</td></tr>
+      <tr><td><b>방향과 비교 기준</b></td><td>올랐나 내렸나, 무엇과 비교해 "빠르다·크다"인가</td><td>경상수지, GDP, 물가</td></tr>
+    </table>
+  </div>
+  <div class="foot"><span>출처: 11/12 ECOS 통계 발표 교사 피드백</span><span>07</span></div>
+</section>
+
+<!-- ===== 8. 주문하는 법 ===== -->
+<section class="slide">
+  <div class="masthead"><b>STEP 2 · 주문하는 법</b><span>08</span></div>
+  <div class="body">
+    <h2 class="reveal"><span class="tag">STEP 2</span>주문 = 숫자 + 네 칸</h2>
+    <div class="cards reveal" style="grid-template-columns:repeat(4,1fr)">
+      <div class="card"><div class="k">① 근거 지표</div><h3>무엇을 보고</h3><p>내 ECOS 주제 또는 공통지표 ①②③</p></div>
+      <div class="card"><div class="k">② 새 정보</div><h3>무엇을 알았나</h3><p>뉴스·시세·표에서 새로 본 것</p></div>
+      <div class="card"><div class="k">③ 기업 영향</div><h3>누구에게 어떻게</h3><p>그 정보가 A~D 중 어디에 유리·불리한가</p></div>
+      <div class="card"><div class="k">④ 선택</div><h3>그래서 나는</h3><p>사고·팔고·유지하는 이유</p></div>
+    </div>
+    <div class="example reveal" style="margin-top:40px"><span class="lab">좋은 기록 예</span>① 단기외채 ② 외국 은행이 만기 연장을 거부 ③ 달러를 단기로 빌린 <b>믿음은행</b>은 갚을 달러가 부족해짐 ④ 믿음은행을 전부 팔고 현금을 늘림</div>
+  </div>
+  <div class="foot"><span>한 칸이라도 비면 주문 버튼이 작동하지 않습니다</span><span>08</span></div>
+</section>
+
+<!-- ===== 9. 1997 섹션 ===== -->
+<section class="slide section">
+  <div class="masthead"><b>GAME 1</b><span>09</span></div>
+  <div class="body" style="top:260px">
+    <p class="mono reveal" style="font-size:34px;color:#b9b2a2;letter-spacing:.2em">1996년 말 · 시작가 각 100만원</p>
+    <h1 class="reveal">1997</h1>
+    <p class="sub reveal">다음에 무슨 일이 생길지 모르는 상태에서<br>첫 전략을 세우고 주문을 확정하세요.</p>
+  </div>
+  <div class="foot"><span>주문 → 재조정 1번 → 결과 · 결과를 보고 "맞았던 근거, 빗나간 근거"</span><span>25–42분</span></div>
+</section>
+
+<!-- ===== 10. 2008 섹션 ===== -->
+<section class="slide section">
+  <div class="masthead"><b>GAME 2</b><span>10</span></div>
+  <div class="body" style="top:260px">
+    <p class="mono reveal" style="font-size:34px;color:#b9b2a2;letter-spacing:.2em">2007년 · 다시 1억 원</p>
+    <h1 class="reveal">2008</h1>
+    <p class="sub reveal">1997년과 <span style="color:var(--led)">무엇이 같고 무엇이 다른가?</span><br>지난 게임의 판단을 이번엔 어떻게 바꿀까?</p>
+  </div>
+  <div class="foot"><span>게임이 끝나면 휴식 10분 · 화면을 닫지 마세요</span><span>42–59분</span></div>
+</section>
+
+<!-- ===== 11. STEP 3 지표 비교 ===== -->
+<section class="slide">
+  <div class="masthead"><b>STEP 3 · 보고서 ① · 8점</b><span>11</span></div>
+  <div class="body">
+    <h2 class="reveal"><span class="tag">STEP 3</span>세 지표로 두 위기를 비교한다</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:56px">
+      <ol class="todo reveal">
+        <li><div><b>공통지표 ①②③ 모두</b> 사용<small>환율 · 대출금리 · 실질 GDP 성장률</small></div></li>
+        <li><div><b>1997 vs 2008</b> 정부 대응 비교<small>IMF 고금리 vs 금리 인하·통화스와프</small></div></li>
+        <li><div><b>한국 vs 태국</b> 비교<small>같은 점, 다른 점</small></div></li>
+        <li><div><b>어디서 읽었는지</b> 적기<small>지표 번호 · 연도 · 국가 · 값</small></div></li>
+      </ol>
+      <div class="reveal">
+        <div class="board"><div style="font-size:24px;color:#b9b2a2">근거 위치는 이렇게</div>
+          <div style="font-size:40px;margin-top:14px">공통지표② 한국</div>
+          <div style="font-size:46px;white-space:nowrap">1997 11.88 → 1998 15.28</div>
+          <div style="font-size:26px;color:#b9b2a2;margin-top:10px">"올랐다"가 아니라 숫자와 위치를 적는다</div></div>
+        <p style="font-size:28px;color:var(--ink-2);margin-top:24px">대출금리는 은행 대출금리입니다. 한국은행 기준금리와 다릅니다.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>출처 World Bank WDI · 69분부터</span><span>11</span></div>
+</section>
+
+<!-- ===== 12. STEP 4 득실표 ===== -->
+<section class="slide">
+  <div class="masthead"><b>STEP 4 · 보고서 ② · 6점</b><span>12</span></div>
+  <div class="body">
+    <h2 class="reveal" style="font-size:76px"><span class="tag">STEP 4</span>바나나 협상처럼, 누가 이익이고 누가 부담인가</h2>
+    <div style="display:grid;grid-template-columns:.9fr 1.1fr;gap:56px">
+      <ol class="todo reveal">
+        <li><div><b>내 추적 쟁점</b>을 이어 쓴다</div></li>
+        <li><div>원인을 <b>무역·금융 구조</b>로<small>수출 의존, 단기외채, 자본 이동 …</small></div></li>
+        <li><div><b>대안 두 개</b>를 정한다</div></li>
+        <li><div>득실표로 저울질하고 <b>하나를 고른다</b></div></li>
+      </ol>
+      <table class="reveal" style="font-size:28px">
+        <tr><th>이해관계자</th><th>대안 A: 금리 인상</th><th>대안 B: 금리 인하</th></tr>
+        <tr><td>수출기업</td><td>?</td><td>?</td></tr>
+        <tr><td>빚 많은 기업·노동자</td><td class="red">부담: 이자 급증</td><td>?</td></tr>
+        <tr><td>은행</td><td>?</td><td>?</td></tr>
+        <tr><td>정부</td><td>?</td><td>?</td></tr>
+        <tr><td>외국인 투자자</td><td>?</td><td>?</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="foot"><span>대안은 예시입니다. 자기 쟁점에 맞게 정하세요</span><span>12</span></div>
+</section>
+
+<!-- ===== 13. STEP 5 AI ===== -->
+<section class="slide">
+  <div class="masthead"><b>STEP 5 · 보고서 ③ · 5점</b><span>13</span></div>
+  <div class="body">
+    <h2 class="reveal"><span class="tag">STEP 5</span>AI가 한 말, 그대로 믿지 않는다</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:56px">
+      <div class="reveal">
+        <div class="card" style="box-shadow:10px 10px 0 var(--green)"><h3 style="color:var(--green)">써도 되는 것</h3><p>자료 검색 · 어려운 용어 · 통계 표 정리</p></div>
+        <div class="card" style="margin-top:34px;box-shadow:10px 10px 0 var(--red)"><h3 class="red">쓰면 부정행위</h3><p>지표 해석 · 득실 분석 작성<br>개인정보(학번·이름·학교) 입력</p></div>
+      </div>
+      <ol class="todo reveal">
+        <li><div>게임 속 <b>AI 문장 5개</b>를 읽는다<small>맞는 문장과 틀린 문장이 섞여 있음</small></div></li>
+        <li><div><b>2개 이상</b> 틀린 곳을 찾는다</div></li>
+        <li><div><b>원자료</b>로 교정한다<small>어느 표 몇 년 값인지</small></div></li>
+        <li><div>구술 때 <b>내 말로</b> 설명한다</div></li>
+      </ol>
+    </div>
+  </div>
+  <div class="foot"><span>직접 AI를 쓰지 않았다면 "직접 입력 없음"이라고 정직하게</span><span>13</span></div>
+</section>
+
+<!-- ===== 14. STEP 6 발표 ===== -->
+<section class="slide">
+  <div class="masthead"><b>STEP 6 · 6점</b><span>14</span></div>
+  <div class="body">
+    <h2 class="reveal"><span class="tag">STEP 6</span>1분 발표 → 피드백 → 고치기</h2>
+    <div class="cards reveal" style="grid-template-columns:repeat(3,1fr)">
+      <div class="card"><div class="k">발표 1분</div><h3>세 문장</h3><p>① 내 쟁점은 ___<br>② 근거 지표는 ___<br>③ 나는 대안 ___를 지지한다</p></div>
+      <div class="card"><div class="k">듣는 사람</div><h3>하나만 지적</h3><p>"근거가 불명확한 곳"<br>또는<br>"빠진 이해관계자·대안"</p></div>
+      <div class="card"><div class="k">발표한 사람</div><h3>실제로 고친다</h3><p>수정 전 → 수정 후 → 이유<br><b class="red">추적 로그 2회차</b> 작성</p></div>
+    </div>
+    <p class="reveal" style="margin-top:44px;font-size:32px"><b class="red">추적 로그 2회차가 없으면</b> 이 영역은 최저점입니다.</p>
+  </div>
+  <div class="foot"><span>121–151분</span><span>14</span></div>
+</section>
+
+<!-- ===== 15. 제출·구술 ===== -->
+<section class="slide">
+  <div class="masthead"><b>STEP 7 · 제출과 구술</b><span>15</span></div>
+  <div class="body">
+    <h2 class="reveal"><span class="tag">STEP 7</span>151분, 모두 손을 뗀다</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:56px">
+      <ol class="todo reveal">
+        <li><div><b>PDF로 저장</b>해 제출<small>백업 파일도 저장</small></div></li>
+        <li><div>151분 이후 <b>수정 금지</b><small>구술 순서가 늦어도 똑같이</small></div></li>
+        <li><div>한 명씩 <b>2분 구술</b>, 질문 2개</div></li>
+      </ol>
+      <div class="reveal">
+        <div class="board"><div style="font-size:24px;color:#b9b2a2">이런 질문이 나올 수 있다</div>
+          <div style="font-size:32px;margin-top:16px;line-height:1.6;color:var(--paper)">· 네 주장을 지탱하는 숫자 하나는?<br>· 1997과 2008 대응은 무엇이 달랐나?<br>· 네 대안으로 부담을 지는 사람은?<br>· AI 문장의 어디가 왜 틀렸나?</div></div>
+        <p style="font-size:28px;color:var(--ink-2);margin-top:22px">설명하지 못한 내용은 채점에서 빠질 수 있습니다.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>151–180분</span><span>15</span></div>
+</section>
+
+<!-- ===== 16. 채점 요약 ===== -->
+<section class="slide">
+  <div class="masthead"><b>이렇게 채점합니다 · 25점</b><span>16</span></div>
+  <div class="body">
+    <h2 class="reveal">점수는 <span class="mark">판단의 근거</span>에서 나온다</h2>
+    <div class="cards reveal" style="grid-template-columns:repeat(4,1fr)">
+      <div class="card"><div class="k">8점</div><h3>지표 비교</h3><p>두 위기 + 타국 비교 + <b>근거 위치</b></p></div>
+      <div class="card"><div class="k">6점</div><h3>구조·득실</h3><p>무역·금융 구조 원인 + <b>이해관계자별 득실표</b></p></div>
+      <div class="card"><div class="k">6점</div><h3>발표·수정</h3><p>피드백으로 <b>실제로 고친 흔적</b> + 추적 로그 2회차</p></div>
+      <div class="card"><div class="k">5점</div><h3>AI 검증</h3><p>오류 <b>2건 이상</b> 원자료 교정 + 구술 설명</p></div>
+    </div>
+    <div class="stamp" style="position:relative;display:inline-block;margin-top:60px;left:0">게임 수익률 · 순위 = 0점</div>
+  </div>
+  <div class="foot"><span>기본점수 10 · 성취기준 [12기구04-04]</span><span>16</span></div>
+</section>
+
+</main>
+</div>
+<div class="deck-controls"><span class="pager" id="pager">1 / 16</span></div>
+
+<script>
+/* ===========================================
+   SLIDE PRESENTATION CONTROLLER
+   방향키 · 스페이스 · PageUp/Down · 휠 · 스와이프
+   =========================================== */
+class SlidePresentation{
+  constructor(){
+    this.slides=[...document.querySelectorAll('.slide')];
+    this.i=0;this.stage=document.getElementById('deckStage');this.lock=false;
+    this.scale();addEventListener('resize',()=>this.scale());
+    document.addEventListener('keydown',e=>{
+      if(document.body.classList.contains('editing'))return;
+      if(['ArrowRight','ArrowDown',' ','PageDown'].includes(e.key)){e.preventDefault();this.go(this.i+1)}
+      if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){e.preventDefault();this.go(this.i-1)}
+      if(e.key==='Home')this.go(0);if(e.key==='End')this.go(this.slides.length-1);
+    });
+    addEventListener('wheel',e=>{if(this.lock||document.body.classList.contains('editing'))return;this.lock=true;this.go(this.i+(e.deltaY>0?1:-1));setTimeout(()=>this.lock=false,700)},{passive:true});
+    let x0=null;addEventListener('touchstart',e=>x0=e.touches[0].clientX,{passive:true});
+    addEventListener('touchend',e=>{if(x0==null)return;const dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>50)this.go(this.i+(dx<0?1:-1));x0=null});
+    const h=parseInt(location.hash.slice(1));this.go(isNaN(h)?0:h-1);
+  }
+  scale(){const f=Math.min(innerWidth/1920,innerHeight/1080);this.stage.style.transform=`translate(${(innerWidth-1920*f)/2}px,${(innerHeight-1080*f)/2}px) scale(${f})`}
+  go(n){
+    this.i=Math.max(0,Math.min(n,this.slides.length-1));
+    this.slides.forEach((s,k)=>{s.classList.toggle('active',k===this.i);s.classList.toggle('visible',k===this.i)});
+    document.getElementById('pager').textContent=`${this.i+1} / ${this.slides.length}`;
+    document.getElementById('progress').style.width=`${(this.i+1)/this.slides.length*100}%`;
+    history.replaceState(null,'','#'+(this.i+1));
+  }
+}
+const deck=new SlidePresentation();
+
+/* ===========================================
+   INLINE EDITING · E 키 또는 왼쪽 위 모서리
+   수정 내용은 이 브라우저에 자동 저장, Ctrl+S로 HTML 파일 저장
+   =========================================== */
+const editor={
+  isActive:false,key:'deck-edit-'+location.pathname,
+  targets(){return document.querySelectorAll('.slide h1,.slide h2,.slide h3,.slide p,.slide li,.slide td,.slide th,.slide .k,.slide .example,.slide .board div,.slide .masthead span')},
+  init(){const saved=JSON.parse(localStorage.getItem(this.key)||'null');if(saved)this.targets().forEach((el,i)=>{if(saved[i]!=null)el.innerHTML=saved[i]})},
+  toggleEditMode(){this.isActive=!this.isActive;document.body.classList.toggle('editing',this.isActive);
+    document.getElementById('editToggle').classList.toggle('active',this.isActive);
+    document.getElementById('editToggle').textContent=this.isActive?'편집 끝내기':'편집 모드';
+    this.targets().forEach(el=>{el.contentEditable=this.isActive;el.toggleAttribute('data-edit',this.isActive)});
+    if(!this.isActive)this.save()},
+  save(){localStorage.setItem(this.key,JSON.stringify([...this.targets()].map(el=>el.innerHTML)))},
+  download(){this.save();const c=document.documentElement.cloneNode(true);c.querySelectorAll('[contenteditable]').forEach(e=>{e.removeAttribute('contenteditable');e.removeAttribute('data-edit')});c.querySelector('body').classList.remove('editing');
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['<!DOCTYPE html>\n'+c.outerHTML],{type:'text/html'}));a.download='수업안내_두번의위기.html';a.click()}
+};
+editor.init();
+const toggle=document.getElementById('editToggle'),hot=document.querySelector('.edit-hotzone');let hideT=null;
+toggle.addEventListener('click',()=>editor.toggleEditMode());
+hot.addEventListener('click',()=>editor.toggleEditMode());
+hot.addEventListener('mouseenter',()=>{clearTimeout(hideT);toggle.classList.add('show')});
+hot.addEventListener('mouseleave',()=>{hideT=setTimeout(()=>{if(!editor.isActive)toggle.classList.remove('show')},400)});
+toggle.addEventListener('mouseenter',()=>clearTimeout(hideT));
+toggle.addEventListener('mouseleave',()=>{hideT=setTimeout(()=>{if(!editor.isActive)toggle.classList.remove('show')},400)});
+document.addEventListener('keydown',e=>{
+  if((e.key==='e'||e.key==='E')&&!e.target.isContentEditable)editor.toggleEditMode();
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();editor.download()}
+});
+document.addEventListener('input',()=>editor.isActive&&editor.save());
+</script>
+</body>
+</html>
