@@ -184,7 +184,7 @@ function wire(){document.querySelectorAll('[data-b]').forEach(el=>bind(el.datase
 function go(n){S.stage=n;save();render();scrollTo(0,0)}
 function filled(...ps){return ps.every(p=>String(get(p)).trim().length>=5)}
 
-function nav(){ $('#steps').innerHTML=STAGES.map((t,i)=>`<span class="${i===S.stage?'on':i<S.stage?'done':''}">${t}</span>`).join(''); $('#who').textContent=S.code?('학생 코드 '+S.code):''}
+function nav(){ $('#steps').innerHTML=STAGES.map((t,i)=>`<span class="${i===S.stage?'on':i<S.stage?'done':''}">${t}</span>`).join(''); $('#who').textContent=S.code||''}
 
 function indTable(maxYear,from){
  const yrs=[1996,1997,1998,1999,2007,2008,2009,2010].filter(y=>y<=maxYear&&y>=from);
@@ -204,11 +204,11 @@ V[0]=()=>`<div class="card"><h2>이 수업에서 하는 일</h2>
 <li><b>지표 비교·득실표·AI 검증</b> 52분 · 보고서 작성</li>
 <li><b>발표·동료 피드백·수정</b> 30분</li>
 <li><b>제출 후 2분 구술</b> · 선생님 질문 2개</li></ol>
-<label>학생 코드 (이름 대신 번호도 됨)</label><input id="code" placeholder="예: 07"></div>
+<label for="code">학번과 이름</label><div class="muted">제출본에 그대로 들어갑니다. 학번과 이름을 정확히 입력하세요.</div><input id="code" placeholder="예: 20315 김민준" autocomplete="off"><div id="codeMsg"></div></div>
 <div class="card"><h3>네 회사</h3><div class="grid">${CO.map(c=>`<div class="co"><b>${c.k} · ${c.name}</b> <span class="badge">${c.type}</span><div class="muted">${c.desc}</div></div>`).join('')}</div>
 <p class="muted">가상 회사·가상 주가입니다. 위기 상황과 공통 통계는 실제 역사 자료를 바탕으로 했습니다. 주식은 정수 단위, 빚·공매도 없음, 현금 보유 가능.</p>
 <button id="next">시작하기</button></div>`;
-V[0].after=()=>{const c=$('#code');c.value=S.code;c.oninput=()=>{S.code=c.value;save();nav()};$('#next').onclick=()=>go(1)};
+V[0].after=()=>{const c=$('#code');c.value=S.code;c.oninput=()=>{S.code=c.value.trim();save();nav()};$('#next').onclick=()=>{const v=c.value.trim().replace(/\s+/g,' ');if(!/^\d{4,5}\s?[가-힣]{2,5}$/.test(v)){$('#codeMsg').innerHTML='<div class="err">학번과 이름을 띄어서 입력하세요. 예: 20315 김민준</div>';c.focus();return}S.code=v.replace(/^(\d{4,5})\s?/,'$1 ');save();go(1)}};
 
 V[1]=()=>`<div class="card"><h2>① 지난번 내 통계 자료를 다시 연다</h2>
 <p>ECOS 탐구에서 내가 맡았던 주제를 고르세요. 그 주제가 오늘 게임에서 <b>나만의 판단 근거</b>가 됩니다.</p>
@@ -316,7 +316,7 @@ V[7].after=()=>{wire();$('#back').onclick=()=>go(6);$('#next').onclick=()=>fille
 
 function report(){
  const t=TOPICS[S.topic]||{};const L=(l,v)=>`<p><b>${l}</b><br>${esc(v).replace(/\n/g,'<br>')}</p>`;
- return `<h2>국제 금융 구조 분석 보고서 · 학생 ${esc(S.code)}</h2><p class="muted">제출 시각 ${new Date().toLocaleString('ko-KR')}</p>
+ return `<h2>국제 금융 구조 분석 보고서 · ${esc(S.code)}</h2><p class="muted">제출 시각 ${new Date().toLocaleString('ko-KR')}</p>
  <h3>내 ECOS 주제: ${esc(t.t)}</h3>${L('고칠 부분',S.fix.before)}${L('고친 내용',S.fix.after)}${L('위기 신호',S.fix.evidence)}
  <h3>투자 전략과 판단 기록</h3>${L('투자 근거',S.strategy.basis)}${L('현금 비중',S.strategy.cash)}${L('판단 변경 조건',S.strategy.change)}
  <table><tr><th>단계</th><th>보유</th><th>근거 지표</th><th>새 정보 → 기업 영향 → 선택</th></tr>${S.logs.map(l=>`<tr><td>${l.id}</td><td>${l.q.map((q,i)=>CO[i].k+q).join(' ')}</td><td>${esc(l.ind)}</td><td>${esc(l.info)} → ${esc(l.impact)} → ${esc(l.why)}</td></tr>`).join('')}</table>
