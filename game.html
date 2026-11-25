@@ -114,6 +114,11 @@ td.n{text-align:right;white-space:nowrap;font-family:var(--mono)}
 @media print{header,nav,main,.noprint{display:none!important}#print{display:block;padding:0 10px;font-size:11pt}body{background:#fff}}
 
 /* ===== 실시간 라운드제 추가 스타일 ===== */
+.topic .tn{display:block;font-family:var(--display);font-size:32px;line-height:1.1;margin-bottom:8px}
+.topic.none .tn{font-family:var(--body);font-size:15px;font-weight:700;color:var(--ink2)}
+.topic b{font-size:15px!important;margin:0!important}
+.topic .tq{display:block;font-size:13px;color:var(--ink2);margin-top:2px}
+.topic.sel .tq,.topic.sel.none .tn{color:#cfc8b8}
 .live{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;background:var(--board);color:var(--paper);padding:12px 18px;margin:0 0 18px;border:2px solid var(--ink)}
 .live b{color:var(--led);font-family:var(--mono)}
 .live .ph{font-weight:700;padding:3px 10px;border:1px solid #556}
@@ -156,19 +161,19 @@ const CO=[
 // 11/12 ECOS 탐구 주제와 발표 슬라이드(구글 슬라이드) 위치
 const TOPICS=[
  {t:'원/달러 환율',q:'1997~98년과 2008년 말에 얼마나 올랐나?',co:'A·B',fb:'비교할 기간을 정하고 위기 전후 값을 숫자로 제시하기',s:null},
- {t:'원/엔 환율',q:'엔화와 원화는 왜 비슷하게 또는 다르게 움직였나?',co:'A',fb:'"왜 이 시점을 보나?" 위기 시점을 기준으로 분석하기',s:'h2ffb0da23b839423_0_47'},
- {t:'원/위안 환율',q:'위안화는 달러·엔과 어떻게 달랐나?',co:'A·B',fb:'통계를 직접 찾아 그래프로 제시하기',s:'h2ffb0da23b839423_0_10'},
- {t:'외환보유액',q:'위기 전후로 어떻게 변했고, 왜 다시 늘렸을까?',co:'D',fb:'위기 앞뒤 5년 정도를 함께 놓고 차이를 보이게 하기',s:'h660d3bbdace5f402_1_92'},
- {t:'준비자산(금융계정)',q:'위기 때 준비자산은 어떻게 쓰였나?',co:'D',fb:'긴 기간 대신 위기 전후 구간으로 끊어 보기 · 흐름(금융계정)과 잔액(외환보유액) 구분',s:'h2ffb0da23b839423_0_15'},
- {t:'경상수지',q:'위기 직전 적자에서 위기 후 흑자로 바뀐 이유는?',co:'A·B',fb:'증가/감소 방향을 분명히 말하기',s:'h2ffb0da23b839423_0_19'},
- {t:'상품수지·서비스수지',q:'경상수지 적자는 상품 때문인가 서비스 때문인가?',co:'A·B',fb:'필요한 연도만 골라 세 통계를 한 그래프에 비교하기',s:'h660d3bbdace5f402_1_84'},
- {t:'직접투자(금융계정)',q:'외국인 직접투자는 위기에도 들어왔나?',co:'A·C',fb:'증권투자(단기 자금)와의 차이를 함께 설명하기',s:'h2ffb0da23b839423_0_6'},
- {t:'증권투자(금융계정)',q:'외국인 자본이 빠져나간 시점은 언제인가?',co:'D',fb:'빠져나간 시점을 월·연도로 특정하기 · 음수의 뜻 밝히기',s:'h6d8ec6e81a385d3_0_16'},
- {t:'대외채무·단기외채',q:'단기외채가 많으면 왜 위험했나?',co:'C·D',fb:'범례를 달고, 여러 계열이 각각 무엇인지 글로 설명하기',s:'h2ffb0da23b839423_0_27'},
- {t:'한국은행 기준금리',q:'위기 때 금리는 왜 올렸고 왜 내렸나?',co:'C·D',fb:'월별을 연별로 바꿔 보면 다른 흐름이 보이는지 확인하기',s:'h2ffb0da23b839423_0_43'},
+ {n:'홍승현',t:'원/엔 환율',q:'엔화와 원화는 왜 비슷하게 또는 다르게 움직였나?',co:'A',fb:'"왜 이 시점을 보나?" 위기 시점을 기준으로 분석하기',s:'h2ffb0da23b839423_0_47'},
+ {n:'박서현',t:'원/위안 환율',q:'위안화는 달러·엔과 어떻게 달랐나?',co:'A·B',fb:'통계를 직접 찾아 그래프로 제시하기',s:'h2ffb0da23b839423_0_10'},
+ {n:'장재혁',t:'외환보유액',q:'위기 전후로 어떻게 변했고, 왜 다시 늘렸을까?',co:'D',fb:'위기 앞뒤 5년 정도를 함께 놓고 차이를 보이게 하기',s:'h660d3bbdace5f402_1_92'},
+ {n:'목서희',t:'준비자산(금융계정)',q:'위기 때 준비자산은 어떻게 쓰였나?',co:'D',fb:'긴 기간 대신 위기 전후 구간으로 끊어 보기 · 흐름(금융계정)과 잔액(외환보유액) 구분',s:'h2ffb0da23b839423_0_15'},
+ {n:'양채원',t:'경상수지',q:'위기 직전 적자에서 위기 후 흑자로 바뀐 이유는?',co:'A·B',fb:'증가/감소 방향을 분명히 말하기',s:'h2ffb0da23b839423_0_19'},
+ {n:'정은우',t:'상품수지·서비스수지',q:'경상수지 적자는 상품 때문인가 서비스 때문인가?',co:'A·B',fb:'필요한 연도만 골라 세 통계를 한 그래프에 비교하기',s:'h660d3bbdace5f402_1_84'},
+ {n:'김채현',t:'직접투자(금융계정)',q:'외국인 직접투자는 위기에도 들어왔나?',co:'A·C',fb:'증권투자(단기 자금)와의 차이를 함께 설명하기',s:'h2ffb0da23b839423_0_6'},
+ {n:'황세영',t:'증권투자(금융계정)',q:'외국인 자본이 빠져나간 시점은 언제인가?',co:'D',fb:'빠져나간 시점을 월·연도로 특정하기 · 음수의 뜻 밝히기',s:'h6d8ec6e81a385d3_0_16'},
+ {n:'고산',t:'대외채무·단기외채',q:'단기외채가 많으면 왜 위험했나?',co:'C·D',fb:'범례를 달고, 여러 계열이 각각 무엇인지 글로 설명하기',s:'h2ffb0da23b839423_0_27'},
+ {n:'김도환',t:'한국은행 기준금리',q:'위기 때 금리는 왜 올렸고 왜 내렸나?',co:'C·D',fb:'월별을 연별로 바꿔 보면 다른 흐름이 보이는지 확인하기',s:'h2ffb0da23b839423_0_43'},
  {t:'시장금리(콜금리·국고채)',q:'금리 인상은 기업에 어떤 부담이었나?',co:'C',fb:'콜금리는 금융기관 사이의 초단기 금리임을 정확히 쓰기',s:'h660d3bbdace5f402_1_125'},
- {t:'소비자물가 상승률',q:'환율 급등이 물가에 어떻게 반영되었나?',co:'B',fb:'환율과 물가를 같은 기간·한 화면에 놓고 비교하기',s:'h2ffb0da23b839423_0_23'},
- {t:'실질 GDP 성장률',q:'위기 후 얼마나 충격을 받고 얼마나 빨리 회복했나?',co:'전체',fb:'"빨리 회복"을 말하려면 비교 기준(평균 성장 등)을 함께 제시하기',s:'h660d3bbdace5f402_1_112'}
+ {n:'배진우',t:'소비자물가 상승률',q:'환율 급등이 물가에 어떻게 반영되었나?',co:'B',fb:'환율과 물가를 같은 기간·한 화면에 놓고 비교하기',s:'h2ffb0da23b839423_0_23'},
+ {n:'김규빈',t:'실질 GDP 성장률',q:'위기 후 얼마나 충격을 받고 얼마나 빨리 회복했나?',co:'전체',fb:'"빨리 회복"을 말하려면 비교 기준(평균 성장 등)을 함께 제시하기',s:'h660d3bbdace5f402_1_112'}
 ];
 const IND={
  fx:{name:'공통지표① 환율',unit:'자국통화/1달러, 연평균',kr:{1996:804.46,1997:949.89,1998:1403.18,1999:1189.44,2007:929.38,2008:1100.13,2009:1277.25,2010:1156.46},th:{1996:25.34,1997:31.36,1998:41.36,1999:37.81,2007:34.52,2008:33.31,2009:34.29,2010:31.69}},
@@ -238,9 +243,9 @@ V[0].after=()=>{const c=$('#code'),r=$('#room');c.value=S.code;r.value=S.room;
 /* ---------- 1. 내 자료 다시보기 (구글 슬라이드) ---------- */
 V[1]=()=>{const t=TOPICS[S.topic];const src=t?.s?`https://docs.google.com/presentation/d/${DECK}/edit#slide=id.${t.s}`:`https://docs.google.com/presentation/d/${DECK}/edit`;
 return `<div class="card"><h2>① 지난번 내 발표 슬라이드를 직접 고친다</h2>
-<p>11월 12일 ECOS 탐구에서 내가 맡았던 주제를 고르면 <b>내 발표 슬라이드</b>가 아래에 열립니다. 선생님 피드백(바로 다음 장)을 읽고 <b>슬라이드를 직접 수정</b>하세요.</p>
-<div class="topics">${TOPICS.map((x,i)=>`<button class="topic ${S.topic===i?'sel':''}" data-t="${i}"><b>${x.t}</b>${x.q}</button>`).join('')}</div>
-${t?`<div class="tip"><b>피드백에서 나온 보완점:</b> ${t.fb}<br><b>게임에서 특히 영향받는 회사:</b> ${t.co}</div>
+<p><b>내 이름</b>을 누르면 11월 12일 ECOS 탐구 때 만든 <b>내 발표 슬라이드</b>가 아래에 열립니다. 발표 슬라이드가 없으면 맨 뒤 「배정 학생 없음」 주제 중 하나를 고릅니다. 선생님 피드백(바로 다음 장)을 읽고 <b>슬라이드를 직접 수정</b>하세요.</p>
+<div class="topics">${TOPICS.map((x,i)=>[x,i]).sort((a,b)=>(a[0].n?0:1)-(b[0].n?0:1)||(a[0].n||'').localeCompare(b[0].n||'','ko')).map(([x,i])=>`<button class="topic ${S.topic===i?'sel':''} ${x.n?'':'none'}" data-t="${i}"><span class="tn">${x.n||'배정 학생 없음'}</span><b>${x.t}</b><span class="tq">${x.q}</span></button>`).join('')}</div>
+${t?`<div class="tip"><b>${t.n?esc(t.n)+' · ':''}${t.t}</b><br><b>피드백에서 나온 보완점:</b> ${t.fb}<br><b>게임에서 특히 영향받는 회사:</b> ${t.co}</div>
 <div class="warn">다른 친구의 슬라이드와 선생님 피드백 장은 고치지 않습니다. 모든 수정은 버전 기록에 남습니다.</div>
 <div class="slidebox"><iframe src="${src}" title="내 발표 슬라이드" allow="clipboard-write"></iframe></div>
 <div class="row"><a href="${src}" target="_blank" rel="noopener"><button class="ghost" type="button">새 창에서 크게 열어 수정하기</button></a>${t.s?'':'<span class="muted">이 주제는 발표 슬라이드가 없습니다. 공통 지표로 시작하세요.</span>'}</div>
