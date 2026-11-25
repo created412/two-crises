@@ -92,6 +92,22 @@ td.n{text-align:right;white-space:nowrap;font-family:var(--mono)}
 .log{font-size:14px;border-top:1px solid var(--rule);padding:10px 0;margin:0}
 .log b{font-family:var(--mono)}
 .flow{padding-left:22px}.flow li{margin:4px 0}
+.co img{display:block;width:calc(100% + 28px);margin:-12px -14px 10px;height:150px;object-fit:cover;border-bottom:1px solid var(--rule)}
+.media{display:grid;gap:14px;margin:14px 0 4px}
+.media.m2{grid-template-columns:1fr 1fr}
+.media figure{margin:0}
+.media figure>img{display:block;width:100%;height:260px;object-fit:cover;border:2px solid var(--ink);filter:saturate(.92)}
+.media.m1 figure>img{height:300px}
+.media figcaption{font-size:12.5px;color:var(--ink2);margin-top:6px;line-height:1.45}
+.vbox{position:relative;aspect-ratio:16/9;background:var(--board);border:2px solid var(--ink);cursor:pointer;overflow:hidden}
+.media.m2 .vbox{aspect-ratio:auto;height:260px}
+.vbox img{width:100%;height:100%;object-fit:cover;opacity:.85;display:block}
+.vbox iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.vbox .play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:68px;height:68px;border-radius:50%;background:var(--red);color:#fff;font-size:28px;display:flex;align-items:center;justify-content:center;padding-left:5px}
+.vbox:hover .play{transform:translate(-50%,-50%) scale(1.06)}
+.sr{position:absolute;left:-9999px}
+.media.m1 .vbox,.media.m1 figure>img{max-width:760px}
+@media(max-width:700px){.media.m2{grid-template-columns:1fr}}
 #print{display:none}
 @media(max-width:700px){.board{grid-template-columns:1fr 1fr}.tile:nth-child(2){border-right:0}.tile:nth-child(-n+2){border-bottom:1px solid #2a302b}.price{font-size:36px}header h1{font-size:24px}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
@@ -111,10 +127,10 @@ td.n{text-align:right;white-space:nowrap;font-family:var(--mono)}
 const KEY='twoCrisisGame_v2';
 const START=10000; // 만원
 const CO=[
- {k:'A',name:'한빛수출',type:'수출 제조업',desc:'반도체·자동차 부품을 만들어 해외에 판다. 원료 일부는 수입한다. 매출은 달러로 받는다.'},
- {k:'B',name:'바다유통',type:'수입 유통업',desc:'바나나·생활용품을 수입해 국내에 판다. 물건값은 달러로 지불한다.'},
- {k:'C',name:'튼튼건설',type:'빚 많은 내수 기업',desc:'국내 아파트·공장을 짓는다. 은행 대출과 단기 외화 차입이 많다.'},
- {k:'D',name:'믿음은행',type:'금융기관',desc:'해외에서 단기로 달러를 빌려 국내 기업에 대출해 준다.'}
+ {k:'A',img:'img/co_a.webp',name:'한빛수출',type:'수출 제조업',desc:'반도체·자동차 부품을 만들어 해외에 판다. 원료 일부는 수입한다. 매출은 달러로 받는다.'},
+ {k:'B',img:'img/co_b.webp',name:'바다유통',type:'수입 유통업',desc:'바나나·생활용품을 수입해 국내에 판다. 물건값은 달러로 지불한다.'},
+ {k:'C',img:'img/co_c.webp',name:'튼튼건설',type:'빚 많은 내수 기업',desc:'국내 아파트·공장을 짓는다. 은행 대출과 단기 외화 차입이 많다.'},
+ {k:'D',img:'img/co_d.webp',name:'믿음은행',type:'금융기관',desc:'해외에서 단기로 달러를 빌려 국내 기업에 대출해 준다.'}
 ];
 // 국제수지·환율 탐구(올해 ECOS 과제 14개 주제)
 const TOPICS=[
@@ -140,22 +156,22 @@ const IND={
  gdp:{name:'공통지표③ 실질 GDP 성장률',unit:'전년 대비 %',kr:{1996:7.99,1997:6.28,1998:-4.94,1999:11.62,2007:5.84,2008:3.00,2009:0.82,2010:6.98},th:{1996:5.65,1997:-2.75,1998:-7.63,1999:4.57,2007:5.44,2008:1.73,2009:-0.69,2010:7.51}}
 };
 const ROUNDS=[
- {id:'97-0',game:'97',year:1996,trade:true,p:[100,100,100,100],title:'1996년 말 · 첫 투자',
+ {id:'97-0',media:[{img:'img/hero.webp',pos:'0% 50%',cap:'1990년대 서울의 은행 창구 (수업용 삽화)'}],game:'97',year:1996,trade:true,p:[100,100,100,100],title:'1996년 말 · 첫 투자',
   news:['한국 경제는 해마다 7% 안팎 성장 중. 기업들은 공장을 늘리고 있다.','은행·종합금융회사는 해외에서 1년 이내에 갚아야 하는 단기 달러를 많이 빌려 국내 기업에 장기로 빌려주고 있다.','수출보다 수입이 많아 경상수지 적자가 이어진다.'],
   ask:'단기외채·경상수지 담당 학생이 조사한 내용이 지금 이 상황입니다. 다음에 무슨 일이 생길지 모르는 상태에서 전략을 세우세요.'},
- {id:'97-1',game:'97',year:1997,trade:true,p:[80,65,55,50],title:'1997년 말 · 달러가 빠져나간다',
+ {id:'97-1',media:[{yt:'t6KZ6MLz0UM',cap:'1997년 11월 21일 정부, IMF에 구제금융 요청 · MBC 뉴스투데이 「오늘 다시보기」'}],game:'97',year:1997,trade:true,p:[80,65,55,50],title:'1997년 말 · 달러가 빠져나간다',
   news:['7월 태국 바트화 폭락 후 아시아 전체로 불안이 번졌다.','외국 금융기관들이 한국에 빌려준 단기 자금의 만기 연장을 거부하고, 외국인 투자자들이 주식·채권을 팔고 떠난다.','외환보유액이 바닥나 한국은 12월 IMF에 구제금융을 받기로 했다. 조건으로 고금리·부실 금융회사 정리가 제시됐다.'],
   ask:'한 번만 재조정할 수 있습니다. 자신이 조사한 통계 중 어떤 것이 지금 상황을 설명하는지 연결해 보세요.'},
- {id:'97-2',game:'97',year:1998,trade:false,p:[110,75,65,80],title:'1998년 · 결과',
+ {id:'97-2',media:[{img:'img/gold.webp',cap:'1998년 금 모으기 운동 · 사진: 국가기록원(National Archives of Korea), CC BY-SA 4.0'},{img:'img/sathorn.webp',pos:'50% 30%',cap:'태국 방콕의 사톤 유니크 타워. 1997년 위기로 공사가 멈춘 채 남았다 · 사진: Supanut Arunoprayote, CC BY 4.0'}],game:'97',year:1998,trade:false,p:[110,75,65,80],title:'1998년 · 결과',
   news:['원화 가치가 크게 떨어져 수출품 가격 경쟁력이 높아졌다. 수입은 급감해 경상수지가 흑자로 바뀌었다.','고금리로 빚 많은 기업이 연쇄 부도, 실업자가 크게 늘었다.','부실 금융회사가 정리되고 외환시장이 안정되면서 금리는 점차 낮아졌다.'],
   ask:'수익률이 아니라, 내 판단 중 맞았던 근거와 빗나간 근거를 기록하세요.'},
- {id:'08-0',game:'08',year:2007,trade:true,p:[100,100,100,100],title:'2007년 · 새로 시작 (다시 1억 원)',
+ {id:'08-0',media:[{img:'img/foreclosure.webp',cap:'2008년 2월 미국 캘리포니아, 대출을 못 갚아 경매에 넘어간 집 · 사진: Brendel, CC BY-SA 3.0'}],game:'08',year:2007,trade:true,p:[100,100,100,100],title:'2007년 · 새로 시작 (다시 1억 원)',
   news:['외환위기 이후 한국은 외환보유액을 크게 늘렸고 경상수지는 흑자다.','미국에서는 신용이 낮은 사람에게 내준 주택담보대출(서브프라임)의 연체가 늘기 시작했다.','한국 은행들도 다시 해외 단기 차입이 늘어난 상태다.'],
   ask:'1997년과 무엇이 같고 무엇이 다른지 생각하고 새 전략을 세우세요.'},
- {id:'08-1',game:'08',year:2008,trade:true,p:[65,70,60,45],title:'2008년 말 · 세계 금융위기',
+ {id:'08-1',media:[{img:'img/lehman.webp',cap:'2008년 9월 15일 밤 뉴욕 리먼 브라더스 본사 앞 취재진 · 사진: Robert Scoble, CC BY 2.0'},{yt:'dGP6vnspW6A',cap:'리먼 브라더스 파산과 2008년 금융위기 · KBS 「한눈에 그때 이슈」'}],game:'08',year:2008,trade:true,p:[65,70,60,45],title:'2008년 말 · 세계 금융위기',
   news:['9월 미국 투자은행 리먼 브라더스 파산. 세계 금융시장이 얼어붙었다.','외국인 투자자가 한국 주식을 대거 팔아 원/달러 환율이 급등했다. 세계 수요가 줄어 수출 주문도 줄었다.','한국은행은 기준금리를 빠르게 내리고, 미국 연준과 300억 달러 통화스와프를 맺었다. (1997년과 반대 방향의 금리 대응)'],
   ask:'1997년 때 판단과 이번 판단은 무엇이 달라졌나요? 근거 지표를 연결하세요.'},
- {id:'08-2',game:'08',year:2009,trade:false,p:[85,80,75,65],title:'2009년 · 결과',
+ {id:'08-2',media:[{img:'img/hero.webp',pos:'100% 50%',cap:'2008년 뉴욕 월가 (수업용 삽화)'}],game:'08',year:2009,trade:false,p:[85,80,75,65],title:'2009년 · 결과',
   news:['금리 인하와 외화 유동성 공급으로 금융시장이 진정됐다.','환율 효과로 수출 기업이 먼저 회복했지만 세계 경기 부진은 이어졌다.','한국은 2009년 플러스 성장을 지켰지만 태국은 마이너스 성장이었다.'],
   ask:'두 위기의 대응을 비교할 준비가 됐습니다. 다음 단계로 이동하세요.'}
 ];
@@ -190,6 +206,8 @@ function indTable(maxYear,from){
  const yrs=[1996,1997,1998,1999,2007,2008,2009,2010].filter(y=>y<=maxYear&&y>=from);
  return Object.values(IND).map(d=>`<h3>${d.name} <span class="badge">${d.unit}</span></h3><table><tr><th>연도</th>${yrs.map(y=>`<th>${y}</th>`).join('')}</tr><tr><td>한국</td>${yrs.map(y=>`<td class="n">${fmt(d.kr[y])}</td>`).join('')}</tr><tr><td>태국</td>${yrs.map(y=>`<td class="n">${fmt(d.th[y])}</td>`).join('')}</tr></table>`).join('')+`<div class="muted">출처: World Bank, World Development Indicators(PA.NUS.FCRF, FR.INR.LEND, NY.GDP.MKTP.KD.ZG). 공개된 연도까지만 보입니다.</div>`;
 }
+function mediaHTML(m){if(!m||!m.length)return '';return '<div class="media m'+m.length+'">'+m.map(x=>x.yt?`<figure><div class="vbox" data-yt="${x.yt}"><img src="https://i.ytimg.com/vi/${x.yt}/hqdefault.jpg" alt="뉴스 영상 미리보기"><span class="play" aria-hidden="true">▶</span><span class="sr">영상 재생</span></div><figcaption>${x.cap}</figcaption></figure>`:`<figure><img src="${x.img}" alt="" loading="lazy" style="object-position:${x.pos||'50% 50%'}"><figcaption>${x.cap}</figcaption></figure>`).join('')+'</div>'}
+document.addEventListener('click',e=>{const b=e.target.closest('.vbox');if(!b||b.querySelector('iframe'))return;b.innerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${b.dataset.yt}?autoplay=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen title="뉴스 영상"></iframe>`});
 function value(g,prices){const G=S.games[g];return G.cash+G.q.reduce((s,q,i)=>s+q*prices[i],0)}
 
 const V={};
@@ -205,7 +223,7 @@ V[0]=()=>`<div class="card"><h2>이 수업에서 하는 일</h2>
 <li><b>발표·동료 피드백·수정</b> 30분</li>
 <li><b>제출 후 2분 구술</b> · 선생님 질문 2개</li></ol>
 <label for="code">학번과 이름</label><div class="muted">제출본에 그대로 들어갑니다. 학번과 이름을 정확히 입력하세요.</div><input id="code" placeholder="예: 20315 김민준" autocomplete="off"><div id="codeMsg"></div></div>
-<div class="card"><h3>네 회사</h3><div class="grid">${CO.map(c=>`<div class="co"><b>${c.k} · ${c.name}</b> <span class="badge">${c.type}</span><div class="muted">${c.desc}</div></div>`).join('')}</div>
+<div class="card"><h3>네 회사</h3><div class="grid">${CO.map(c=>`<div class="co"><img src="${c.img}" alt="${c.name} 그림" loading="lazy"><b>${c.k} · ${c.name}</b> <span class="badge">${c.type}</span><div class="muted">${c.desc}</div></div>`).join('')}</div>
 <p class="muted">가상 회사·가상 주가입니다. 위기 상황과 공통 통계는 실제 역사 자료를 바탕으로 했습니다. 주식은 정수 단위, 빚·공매도 없음, 현금 보유 가능.</p>
 <button id="next">시작하기</button></div>`;
 V[0].after=()=>{const c=$('#code');c.value=S.code;c.oninput=()=>{S.code=c.value.trim();save();nav()};$('#next').onclick=()=>{const v=c.value.trim().replace(/\s+/g,' ');if(!/^\d{4,5}\s?[가-힣]{2,5}$/.test(v)){$('#codeMsg').innerHTML='<div class="err">학번과 이름을 띄어서 입력하세요. 예: 20315 김민준</div>';c.focus();return}S.code=v.replace(/^(\d{4,5})\s?/,'$1 ');save();go(1)}};
@@ -227,7 +245,7 @@ function gameView(g){
  const first=r.id.endsWith('-0');
  const from=g==='97'?1996:(2007);
  return `<div class="card"><h2>${g==='97'?'② 1997년 외환위기':'③ 2008년 세계 금융위기'} · ${r.title}</h2>
- ${r.news.map(n=>`<div class="news">${n}</div>`).join('')}
+ ${r.news.map(n=>`<div class="news">${n}</div>`).join('')}${mediaHTML(r.media)}
  <div class="tip">${r.ask}</div>
  <div class="board">${CO.map((c,i)=>{const ch=prev&&prev.game===g?((r.p[i]/prev.p[i]-1)*100):0;return `<div class="tile"><div class="nm"><b>${c.k} ${c.name}</b> ${c.type}</div><div class="price">${r.p[i]}<small>만원</small></div>${first?'<div class="chg" style="color:#b9b2a2">시작가</div>':`<div class="chg ${ch>=0?'up':'down'}">${ch>=0?'▲ +':'▼ '}${ch.toFixed(1)}%</div>`}<div class="hold">보유 ${G.q[i]}주</div></div>`}).join('')}</div>
  <div class="stat"><div>평가액 <b>${fmt(val)}만원</b></div><div>현금 <b>${fmt(G.cash)}만원</b></div><div>수익률 <b>${((val/START-1)*100).toFixed(1)}%</b> <span class="muted">(점수 아님)</span></div></div>

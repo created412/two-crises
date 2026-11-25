@@ -126,6 +126,24 @@ th{background:var(--ink);color:var(--paper);font-weight:700}
 .section h1{font-size:200px;color:var(--led);line-height:1}
 .section .sub{font-size:48px;margin-top:30px;color:var(--paper)}
 
+/* 그림·사진 */
+.hero-photo{position:absolute;right:0;top:0;width:980px;height:1002px;margin:0;overflow:hidden;border-left:6px solid var(--ink)}
+.hero-photo img{width:100%;height:100%;max-width:none;max-height:none;object-fit:cover;object-position:52% 50%}
+.sec-photo{position:absolute;right:96px;top:170px;width:800px;height:780px;margin:0;border:4px solid var(--led);overflow:hidden}
+.sec-photo img{width:100%;height:100%;max-width:none;max-height:none;object-fit:cover;filter:saturate(.9)}
+.card.co{padding:0 0 24px;overflow:hidden}
+.card.co img{display:block;width:100%;height:250px;max-width:none;object-fit:cover;border-bottom:3px solid var(--ink);margin-bottom:18px}
+.card.co .k,.card.co h3,.card.co p{padding:0 26px}
+.card.co p{font-size:27px}
+.videos{display:grid;grid-template-columns:1fr 1fr;gap:48px}
+.videos figure{margin:0}
+.vlab{font-family:var(--font-display);font-size:44px;color:var(--red);margin-bottom:12px}
+.vbox{position:relative;width:100%;aspect-ratio:16/9;background:var(--board);border:4px solid var(--ink);box-shadow:12px 12px 0 var(--ink);cursor:pointer;overflow:hidden}
+.vbox img{width:100%;height:100%;max-width:none;max-height:none;object-fit:cover;opacity:.85}
+.vbox iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.vbox .play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:150px;height:150px;border-radius:50%;background:var(--red);color:#fff;font-size:64px;display:flex;align-items:center;justify-content:center;padding-left:12px}
+.videos figcaption{font-size:28px;margin-top:22px;color:var(--ink-2)}
+
 /* 등장 애니메이션 */
 .reveal{opacity:0;transform:translateY(34px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
 .slide.visible .reveal{opacity:1;transform:none}
@@ -155,13 +173,14 @@ body.editing [data-edit]{outline:2px dashed rgba(214,40,27,.6);outline-offset:4p
 
 <!-- ===== 1. 표지 ===== -->
 <section class="slide active">
-  <div class="masthead"><b>국제관계와 국제기구</b><span>2학기 수행평가 · 개인</span></div>
-  <div class="body" style="top:230px">
+  <figure class="hero-photo"><img src="img/hero.webp" alt="1997년 서울 은행 로비와 2008년 월가 사이에서 시세판을 보는 학생 삽화"></figure>
+  <div class="masthead" style="right:1040px"><b>국제관계와 국제기구</b><span>2학기 수행평가 · 개인</span></div>
+  <div class="body" style="top:200px;right:1040px">
     <p class="mono reveal" style="font-size:30px;color:var(--red);letter-spacing:.2em">EXTRA · 호외</p>
-    <h1 class="reveal" style="font-size:168px;margin:18px 0 30px">두 번의 위기,<br>내 통계로 투자하기</h1>
-    <p class="lead reveal" style="font-size:46px">1997 외환위기와 2008 세계 금융위기를 1억 원으로 통과한다</p>
+    <h1 class="reveal" style="font-size:150px;margin:14px 0 30px">두 번의 위기,<br>내 통계로<br>투자하기</h1>
+    <p class="lead reveal" style="font-size:40px">1997 외환위기와 2008 세계 금융위기를<br>1억 원으로 통과한다</p>
   </div>
-  <div class="stamp" style="right:150px;top:300px">수익률 ≠ 점수</div>
+  <div class="stamp" style="left:1000px;top:820px;background:var(--paper)">수익률 ≠ 점수</div>
   <div class="ticker"><span>
     <em>원/달러 1996 <b>804.46</b></em><em class="dn">1998 <b>1,403.18</b> ▲74%</em>
     <em>한국 실질성장률 1998 <b class="dn">-4.94%</b></em><em>태국 1998 <b class="dn">-7.63%</b></em>
@@ -227,12 +246,12 @@ body.editing [data-edit]{outline:2px dashed rgba(214,40,27,.6);outline-offset:4p
   <div class="body">
     <h2 class="reveal">네 회사는 <span class="mark">달러·금리</span>에 반응이 다르다</h2>
     <div class="cards reveal" style="grid-template-columns:repeat(4,1fr)">
-      <div class="card"><div class="k">A · 수출 제조업</div><h3>한빛수출</h3><p>반도체·자동차 부품 수출.<br>매출은 <b>달러로 받음</b>.<br>원료 일부 수입.</p></div>
-      <div class="card"><div class="k">B · 수입 유통업</div><h3>바다유통</h3><p>바나나·생활용품 수입.<br>물건값을 <b>달러로 지불</b>.</p></div>
-      <div class="card"><div class="k">C · 빚 많은 내수 기업</div><h3>튼튼건설</h3><p>아파트·공장 건설.<br><b>대출과 단기 외화 차입</b>이 많음.</p></div>
-      <div class="card"><div class="k">D · 금융기관</div><h3>믿음은행</h3><p>해외에서 <b>단기로 달러</b>를 빌려 국내 기업에 대출.</p></div>
+      <div class="card co"><img src="img/co_a.webp" alt="수출 공장과 부산항 컨테이너선"><div class="k">A · 수출 제조업</div><h3>한빛수출</h3><p>반도체·부품 수출. 매출은 <b>달러로 받음</b>. 원료 일부 수입.</p></div>
+      <div class="card co"><img src="img/co_b.webp" alt="바나나 상자가 쌓인 수입 창고"><div class="k">B · 수입 유통업</div><h3>바다유통</h3><p>바나나·생활용품 수입. 물건값을 <b>달러로 지불</b>.</p></div>
+      <div class="card co"><img src="img/co_c.webp" alt="대출이라는 쇠공에 짓눌린 건설 현장"><div class="k">C · 빚 많은 내수 기업</div><h3>튼튼건설</h3><p>아파트·공장 건설. <b>대출과 단기 외화 차입</b>이 많음.</p></div>
+      <div class="card co"><img src="img/co_d.webp" alt="모래시계 앞에서 달러를 빌리는 은행"><div class="k">D · 금융기관</div><h3>믿음은행</h3><p>해외에서 <b>단기로 달러</b>를 빌려 국내 기업에 대출.</p></div>
     </div>
-    <p class="reveal" style="margin-top:44px;font-size:32px;color:var(--ink-2)">시작가는 모두 1주 100만원 · 가상 회사·가상 주가 · 위기 상황과 통계는 실제 자료</p>
+    <p class="reveal" style="margin-top:34px;font-size:30px;color:var(--ink-2)">시작가는 모두 1주 100만원 · 가상 회사·가상 주가 · 위기 상황과 통계는 실제 자료</p>
   </div>
   <div class="foot"><span>질문: 환율이 오르면 누가 웃고 누가 울까?</span><span>05</span></div>
 </section>
@@ -292,10 +311,11 @@ body.editing [data-edit]{outline:2px dashed rgba(214,40,27,.6);outline-offset:4p
 <!-- ===== 9. 1997 섹션 ===== -->
 <section class="slide section">
   <div class="masthead"><b>GAME 1</b><span>09</span></div>
-  <div class="body" style="top:260px">
+  <figure class="sec-photo"><img src="img/hero.webp" alt="서울의 은행 로비 삽화" style="object-position:0% 50%"></figure>
+  <div class="body" style="top:260px;right:1000px">
     <p class="mono reveal" style="font-size:34px;color:#b9b2a2;letter-spacing:.2em">1996년 말 · 시작가 각 100만원</p>
     <h1 class="reveal">1997</h1>
-    <p class="sub reveal">다음에 무슨 일이 생길지 모르는 상태에서<br>첫 전략을 세우고 주문을 확정하세요.</p>
+    <p class="sub reveal" style="font-size:40px">다음에 무슨 일이 생길지 모르는 상태에서 첫 전략을 세우고 주문을 확정하세요.</p>
   </div>
   <div class="foot"><span>주문 → 재조정 1번 → 결과 · 결과를 보고 "맞았던 근거, 빗나간 근거"</span><span>25–42분</span></div>
 </section>
@@ -303,12 +323,26 @@ body.editing [data-edit]{outline:2px dashed rgba(214,40,27,.6);outline-offset:4p
 <!-- ===== 10. 2008 섹션 ===== -->
 <section class="slide section">
   <div class="masthead"><b>GAME 2</b><span>10</span></div>
-  <div class="body" style="top:260px">
+  <figure class="sec-photo"><img src="img/hero.webp" alt="월가 금융가 삽화" style="object-position:100% 50%"></figure>
+  <div class="body" style="top:260px;right:1000px">
     <p class="mono reveal" style="font-size:34px;color:#b9b2a2;letter-spacing:.2em">2007년 · 다시 1억 원</p>
     <h1 class="reveal">2008</h1>
-    <p class="sub reveal">1997년과 <span style="color:var(--led)">무엇이 같고 무엇이 다른가?</span><br>지난 게임의 판단을 이번엔 어떻게 바꿀까?</p>
+    <p class="sub reveal" style="font-size:40px">1997년과 <span style="color:var(--led)">무엇이 같고 무엇이 다른가?</span> 지난 게임의 판단을 이번엔 어떻게 바꿀까?</p>
   </div>
   <div class="foot"><span>게임이 끝나면 휴식 10분 · 화면을 닫지 마세요</span><span>42–59분</span></div>
+</section>
+
+<!-- ===== 10-2. 휴식 후: 실제 뉴스로 다시 보기 ===== -->
+<section class="slide">
+  <div class="masthead"><b>휴식 후 · 당시 뉴스</b><span>11</span></div>
+  <div class="body">
+    <h2 class="reveal" style="font-size:72px;margin-bottom:26px">게임 속 뉴스, 실제 방송으로 다시 본다</h2>
+    <div class="videos reveal">
+      <figure><div class="vlab">1997년 11월 21일</div><div class="vbox" data-yt="t6KZ6MLz0UM"><img src="https://i.ytimg.com/vi/t6KZ6MLz0UM/hqdefault.jpg" alt=""><span class="play">▶</span></div><figcaption>정부, IMF에 구제금융 요청 · MBC 뉴스투데이 「오늘 다시보기」</figcaption></figure>
+      <figure><div class="vlab">2008년 9월 15일</div><div class="vbox" data-yt="dGP6vnspW6A"><img src="https://i.ytimg.com/vi/dGP6vnspW6A/hqdefault.jpg" alt=""><span class="play">▶</span></div><figcaption>리먼 브라더스 파산과 금융위기 · KBS 「한눈에 그때 이슈」</figcaption></figure>
+    </div>
+  </div>
+  <div class="foot"><span>화면을 눌러 재생 · 인터넷 연결 필요</span><span>69분 보고서 시작 전</span></div>
 </section>
 
 <!-- ===== 11. STEP 3 지표 비교 ===== -->
@@ -467,7 +501,15 @@ class SlidePresentation{
     history.replaceState(null,'','#'+(this.i+1));
   }
 }
+/* 쓪 번호 자동 정리: 슬라이드를 끼워 넣어도 머리글 숫자가 맞도록 */
+document.querySelectorAll('.slide').forEach((s,i)=>{const n=String(i+1).padStart(2,'0');s.querySelectorAll('.masthead span:last-child, .foot span:last-child').forEach(el=>{if(/^\d{2}$/.test(el.textContent.trim()))el.textContent=n})});
+
+/* 유튜브: 눌렀을 때만 불러오고, 다른 슬라이드로 가면 멈춤 */
+const ytReset=()=>document.querySelectorAll('.vbox').forEach(b=>{if(b.querySelector('iframe')){b.innerHTML=b.dataset.thumb}});
+document.querySelectorAll('.vbox').forEach(b=>{b.dataset.thumb=b.innerHTML;b.addEventListener('click',()=>{if(b.querySelector('iframe'))return;b.innerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${b.dataset.yt}?autoplay=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen title="뉴스 영상"></iframe>`})});
+
 const deck=new SlidePresentation();
+const _go=deck.go.bind(deck);deck.go=n=>{ytReset();_go(n)};
 
 /* ===========================================
    INLINE EDITING · E 키 또는 왼쪽 위 모서리
