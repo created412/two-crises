@@ -122,15 +122,15 @@ async function load(){try{const t0=Date.now();D=await api(`/rooms/${T.code}/teac
 }catch(e){$('#app').innerHTML=`<div class="card"><p class="err">${esc(e.message)}</p><button id="re">다른 방 열기</button></div>`;$('#re').onclick=()=>{T={};saveT();setup()}}}
 
 function gameTab(){const st=D.state,g=st.game,p=st.prices[g],h=st.history[g];const ordN=D.orders.filter(o=>o.game===g&&o.round===st.round).length;
- const evIdx=st.phase==='over'?-1:st.round;const ev=D.effects[evIdx];const pubEv=st.events[g].at(-1);const rn=Math.min(st.round+1,6);
+ const evIdx=st.phase==='over'?-1:st.round;const ev=D.effects[evIdx];const pubEv=st.events[g].at(-1);const NR=st.rounds||4;const rn=Math.min(st.round+1,NR);
  const title=st.phase==='ready'?(ev?ev.title:''):(st.phase==='over'?(g==='97'?'1997 게임 끝 · 실제와 비교':'2008 게임 끝 · 실제와 비교'):pubEv?.title||'');
- let top=`<div class="stage ${st.phase}"><div class="sl"><div class="rd">${g==='97'?'1997':'2008'} · R${rn}<small>/6</small></div><div class="ph ${st.phase}">${{ready:'다음 라운드 대기',open:'주문 받는 중',closed:'라운드 결과',over:'게임 종료'}[st.phase]}</div></div>
+ let top=`<div class="stage ${st.phase}"><div class="sl"><div class="rd">${g==='97'?'1997':'2008'} · R${rn}<small>/${NR}</small></div><div class="ph ${st.phase}">${{ready:'다음 라운드 대기',open:'주문 받는 중',closed:'라운드 결과',over:'게임 종료'}[st.phase]}</div></div>
   <div class="sm"><div class="evd">${st.phase==='ready'?'다음 사건 (아직 비공개)':esc((pubEv?.date||'').replace('-','.'))}</div><div class="evt">${esc(title.split('·').slice(st.phase==='over'?0:1).join('·').trim()||title)}</div>${st.phase==='open'?`<ul class="tnews">${pubEv.news.map(n=>`<li>${n}</li>`).join('')}</ul>`:''}</div>
   <div class="sr">${st.phase==='open'?`<div id="tm" class="tm">--:--</div><i class="tbar"><u id="tmbar"></u></i><div class="sub">제출 <b id="cnt">${ordN}/${D.players.length}</b></div>`:`<div class="sub">입장 <b>${D.players.length}</b>명</div>`}</div></div>`;
  let ctl=`<div class="ctl">
   <button onclick="act('open')" ${st.phase==='ready'?'':'disabled'}>① 라운드 열기</button>
   <button onclick="act('close')" ${st.phase==='open'?'':'disabled'}>② 마감하고 주가 반영</button>
-  <button onclick="act('next')" ${st.phase==='closed'?'':'disabled'}>③ ${st.round>=5?'게임 끝내고 실제와 비교':'다음 라운드로'}</button>
+  <button onclick="act('next')" ${st.phase==='closed'?'':'disabled'}>③ ${st.round>=NR-1?'게임 끝내고 실제와 비교':'다음 라운드로'}</button>
   ${g==='97'&&st.phase==='over'?`<button onclick="act('start08')">2008 게임 시작</button>`:''}
   ${st.phase==='open'?`<button class="ghost" onclick="act('extend')">+1분</button><button class="ghost" onclick="act('undoOpen')">열기 취소</button>`:''}
   <label class="lim">주문 시간 <select onchange="LIMIT=+this.value;localStorage.setItem('tcLimit',LIMIT)">${[180,240,300].map(v=>`<option value="${v}" ${v===LIMIT?'selected':''}>${v/60}분</option>`).join('')}</select></label>
