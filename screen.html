@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Zoom 공유 화면 · 두 번의 위기</title>
+<meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* Zoom 화면 공유 전용: 공개 정보만 표시 (다음 사건·사건 영향은 서버가 주지 않음) */
+:root{--paper:#f4efe4;--sheet:#fffdf7;--ink:#16130f;--ink2:#4a4339;--rule:#cfc4ae;--red:#d6281b;--board:#0f1411;--led:#ffb020;--ok:#1f7a4d;--display:'Black Han Sans',sans-serif;--body:'IBM Plex Sans KR',sans-serif;--mono:'IBM Plex Mono',monospace}
+*{box-sizing:border-box}body{margin:0;font-family:var(--body);background:var(--paper);color:var(--ink)}
+.top{display:flex;justify-content:space-between;align-items:center;background:var(--ink);color:var(--paper);padding:10px 28px;font-size:18px}
+.top b{font-family:var(--mono);color:var(--led);font-size:30px;letter-spacing:.08em}
+main{max-width:1500px;margin:0 auto;padding:18px 24px}
+.stage{display:grid;grid-template-columns:260px 1fr 260px;gap:26px;align-items:center;background:var(--board);color:var(--paper);padding:24px 30px;border:2px solid var(--ink)}
+.rd{font-family:var(--display);font-size:46px;color:var(--led);white-space:nowrap}.rd small{font-size:22px;color:#b9b2a2}
+.ph{display:inline-block;margin-top:10px;padding:4px 14px;border:1px solid #556;font-weight:700;font-size:18px}.ph.open{background:var(--red);border-color:var(--red)}.ph.closed{background:var(--led);color:var(--ink)}
+.evd{font-family:var(--mono);color:#ff7a6e;font-size:26px;font-weight:700}.evt{font-family:var(--display);font-size:54px;line-height:1.1;margin-top:4px}
+.news{margin:14px 0 0;padding-left:22px;font-size:22px;line-height:1.55;color:#e8e1d2}
+.news li{animation:fadeUp .6s ease-out both}
+.sr{text-align:right}.tm{font-family:var(--mono);font-size:76px;font-weight:700;line-height:1}.tm.low{color:#ff5a4e;animation:blink 1s steps(2) infinite}
+.tbar{display:block;height:12px;background:#2a302b;margin:12px 0}.tbar u{display:block;height:100%;background:var(--led);transition:width .5s linear}
+.sub{font-size:24px}.sub b{font-family:var(--mono);color:var(--led);font-size:40px}
+.stamp{display:inline-block;font-family:var(--display);color:#fff;background:var(--red);padding:4px 14px;font-size:22px;transform:rotate(-3deg);margin-right:12px;animation:stampIn .5s cubic-bezier(.2,1.6,.4,1) both}
+.card{background:var(--sheet);border:2px solid var(--ink);box-shadow:6px 6px 0 var(--ink);padding:20px 24px;margin-top:18px}
+.media{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,420px));gap:16px;margin-top:14px}.media img{width:100%;height:170px;object-fit:cover;border:2px solid var(--ink)}.media figure{margin:0}.media figcaption{font-size:13px;color:var(--ink2)}
+.board{background:var(--board);display:grid;grid-template-columns:repeat(4,1fr);border:2px solid var(--ink)}
+.tile{padding:16px 18px;border-right:1px solid #2a302b}.tile:last-child{border-right:0}.tile img{width:100%;height:130px;object-fit:cover;display:block;margin-bottom:10px}
+.nm{color:#f4efe4;font-weight:700;font-size:19px}.price{font-family:var(--mono);font-weight:700;font-size:64px;line-height:1.05;color:var(--led)}
+.chg{font-family:var(--mono);font-size:26px;font-weight:700;color:#b9b2a2}.chg.up{color:#53d18f}.chg.down{color:#ff5a4e}
+.tile.fu{animation:flashU 1.6s ease-out .3s}.tile.fd{animation:flashD 1.6s ease-out .3s}
+.bh,.br{display:grid;grid-template-columns:190px 1fr 1fr 280px;gap:18px;align-items:center}.bh{font-size:16px;color:var(--ink2);padding-bottom:6px;border-bottom:2px solid var(--ink)}
+.br{padding:12px 0;border-bottom:1px solid var(--rule)}.br b{font-size:20px}
+.bw{position:relative;height:36px;background:linear-gradient(90deg,transparent calc(50% - 1px),#16130f calc(50% - 1px),#16130f calc(50% + 1px),transparent calc(50% + 1px)),#f1ebdf}
+.bw .b{position:absolute;top:6px;height:24px;width:0;animation:grow .9s ease-out .4s forwards}.bw .b.p{left:50%}.bw .b.n{right:50%}.bw em{position:absolute;top:7px;left:8px;font-style:normal;font-family:var(--mono);font-size:16px;font-weight:700}
+.br strong{font-family:var(--mono);font-size:30px}.br strong.up{color:var(--ok)}.br strong.down{color:var(--red)}.br strong small{display:block;font-size:14px;color:var(--ink2);font-weight:400}
+.chart{width:100%;height:auto;background:#fff;border:2px solid var(--ink)}
+.chart .ln[pathLength]{stroke-dasharray:1 1;stroke-dashoffset:1;animation:drawLn 2.2s ease-in-out forwards}.chart .ln.dash{animation:fadeIn 1.6s ease-out both}.chart .dt,.chart .lb{opacity:0;animation:fadeIn .5s ease-out forwards}
+.wait{text-align:center;padding:60px 20px;font-size:26px;color:var(--ink2)}.wait b{display:block;font-family:var(--display);font-size:110px;color:var(--ink);line-height:1}
+h3{font-family:var(--display);font-weight:400;font-size:26px;margin:16px 0 8px}
+@keyframes blink{50%{opacity:.35}}@keyframes fadeUp{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}@keyframes stampIn{from{transform:scale(2.4) rotate(-12deg);opacity:0}to{transform:rotate(-3deg);opacity:1}}
+@keyframes flashU{0%,100%{background:transparent}25%{background:rgba(83,209,143,.28)}}@keyframes flashD{0%,100%{background:transparent}25%{background:rgba(255,90,78,.3)}}
+@keyframes grow{to{width:var(--w)}}@keyframes drawLn{to{stroke-dashoffset:0}}@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}.bw .b{width:var(--w)}.chart .dt,.chart .lb{opacity:1}.chart .ln[pathLength]{stroke-dasharray:none}}
+</style>
+</head>
+<body>
+<div class="top"><span>두 번의 위기 · 접속 <b style="font-size:20px;letter-spacing:0">created412.github.io/two-crises</b></span><span>방 코드 <b id="code">----</b></span></div>
+<main id="app"><div class="wait">방 코드를 주소에 넣어 여세요. 예: screen.html?room=1234</div></main>
+<script>
+'use strict';
+const API='https://two-crises-api.histo5731.workers.dev/api';
+const CO=['A 한빛수출','B 바다유통','C 튼튼건설','D 믿음은행'];const COI=['img/co_a.webp','img/co_b.webp','img/co_c.webp','img/co_d.webp'];
+const room=new URLSearchParams(location.search).get('room');let D=null,lastKey='',off=0;
+const $=s=>document.querySelector(s);const esc=v=>String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt=n=>Number(n).toLocaleString('ko-KR',{maximumFractionDigits:1});const pct=x=>(x>0?'+':'')+fmt(x)+'%';const avg=a=>a.reduce((x,y)=>x+y,0)/a.length;
+function chart(g){const st=D.state;const R=st.real?.[g];const h=st.history[g];if(!R||!h.length)return '';
+ const months=R.kospi.map(r=>r[0]);const mi=d=>months.indexOf(d);const norm=s=>{const base=(s.find(r=>r[0]===h[0].date)||s[0])[1];return s.map(([d,v])=>[mi(d),v/base*100])};
+ const se=[{n:'실제 코스피',c:'#16130f',w:4,pts:norm(R.kospi)}];if(R.sp500)se.push({n:'실제 S&P 500',c:'#1d4ed8',w:3,pts:norm(R.sp500)});se.push({n:'우리 반',c:'#d6281b',w:5,d:1,pts:h.map(x=>[mi(x.date),avg(x.after)]),dots:1});
+ const all=se.flatMap(s=>s.pts.map(p=>p[1])).concat(100);const lo=Math.floor(Math.min(...all)/10)*10-5,hi=Math.ceil(Math.max(...all)/10)*10+5;
+ const W=1100,H=470,L=60,Rr=170,T=24,B=60;const X=i=>L+(W-L-Rr)*i/(months.length-1),Y=v=>T+(H-T-B)*(1-(v-lo)/(hi-lo));
+ let s=`<svg class="chart" viewBox="0 0 ${W} ${H}">`;for(let v=Math.ceil(lo/20)*20;v<=hi;v+=20)s+=`<line x1="${L}" x2="${W-Rr}" y1="${Y(v)}" y2="${Y(v)}" stroke="#e4dbc8"/><text x="${L-8}" y="${Y(v)+5}" font-size="15" text-anchor="end">${v}</text>`;
+ s+=`<line x1="${L}" x2="${W-Rr}" y1="${Y(100)}" y2="${Y(100)}" stroke="#16130f" stroke-dasharray="3 4"/>`;months.forEach((m,i)=>{if(i%3===0)s+=`<text x="${X(i)}" y="${H-B+22}" font-size="14" text-anchor="middle">${m.replace('-','.')}</text>`});
+ h.forEach((x,k)=>{const i=mi(x.date);s+=`<line x1="${X(i)}" x2="${X(i)}" y1="${T}" y2="${H-B}" stroke="#d6281b" stroke-opacity=".18"/><text x="${X(i)}" y="${H-B+44}" font-size="15" font-weight="700" text-anchor="middle" fill="#d6281b">R${k+1}</text>`});
+ se.forEach((q,k)=>{const pts=q.pts.map(p=>X(p[0]).toFixed(1)+','+Y(p[1]).toFixed(1)).join(' ');const last=q.pts.at(-1);s+=`<polyline class="ln ${q.d?'dash':''}" style="animation-delay:${k*.6}s" ${q.d?'stroke-dasharray="12 7"':'pathLength="1"'} fill="none" stroke="${q.c}" stroke-width="${q.w}" stroke-linejoin="round" points="${pts}"/>`;
+  if(q.dots)q.pts.forEach(p=>s+=`<circle class="dt" style="animation-delay:${k*.6+.9}s" cx="${X(p[0])}" cy="${Y(p[1])}" r="6" fill="${q.c}"/>`);s+=`<text class="lb" style="animation-delay:${k*.6+1}s" x="${X(last[0])+10}" y="${Y(last[1])+6}" font-size="18" font-weight="700" fill="${q.c}">${q.n.replace('실제 ','')} ${Math.round(last[1])}</text>`});
+ return s+'</svg><p style="color:#4a4339">세 선 모두 R1 시점=100 · 코스피 ^KS11 · S&P 500 ^GSPC 월말 종가</p>'}
+function bars(x){const bar=(v,c)=>{const w=Math.min(Math.abs(v),30)/30*50;return `<div class="bw"><span class="b ${v>=0?'p':'n'}" style="--w:${w}%;background:${c}"></span><em>${pct(v)}</em></div>`};
+ return `<div class="bh"><span></span><span>사건 영향</span><span>우리 반 매수·매도</span><span>최종 변화</span></div>${CO.map((c,i)=>{const t=(x.after[i]/x.before[i]-1)*100;return `<div class="br"><b>${c}</b>${bar(x.e[i],x.e[i]>=0?'#2fa86b':'#d6281b')}${bar(x.d[i],x.d[i]>=0?'#53d18f':'#ff7a6e')}<strong class="${t>=0?'up':'down'}">${t>=0?'▲':'▼'} ${pct(t)}<small>${fmt(x.before[i])} → ${fmt(x.after[i])} · 산 ${x.buyers[i]} / 판 ${x.sellers[i]}</small></strong></div>`}).join('')}`}
+function board(p,prev){return `<div class="board">${CO.map((c,i)=>{const ch=prev?(p[i]/prev[i]-1)*100:0;return `<div class="tile ${prev?(ch>=0?'fu':'fd'):''}"><img src="${COI[i]}" alt=""><div class="nm">${c}</div><div class="price" data-from="${prev?prev[i]:p[i]}" data-to="${p[i]}">${fmt(prev?prev[i]:p[i])}</div>${prev?`<div class="chg ${ch>=0?'up':'down'}">${ch>=0?'▲ +':'▼ '}${fmt(ch)}%</div>`:'<div class="chg">만원</div>'}</div>`}).join('')}</div>`}
+function count(){document.querySelectorAll('.price[data-from]').forEach(el=>{const a=+el.dataset.from,b=+el.dataset.to;if(a===b)return;const t0=performance.now();const st=t=>{const k=Math.min(1,(t-t0)/1500),e=1-Math.pow(1-k,3);el.textContent=fmt(a+(b-a)*e);if(k<1)requestAnimationFrame(st)};setTimeout(()=>requestAnimationFrame(st),350)})}
+function tick(){const st=D?.state;const el=$('#tm');if(!el||!st||st.phase!=='open')return;const left=Math.max(0,st.limit*1000-((Date.now()+off)-st.openedAt));const s=Math.ceil(left/1000);el.textContent=`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;el.classList.toggle('low',s<=30);const b=$('#tmbar');if(b)b.style.width=(left/(st.limit*1000)*100)+'%'}
+setInterval(tick,500);
+function draw(){const st=D.state,g=st.game,p=st.prices[g],h=st.history[g],ev=st.events[g].at(-1),rn=Math.min(st.round+1,6);
+ let html=`<div class="stage"><div><div class="rd">${g==='97'?'1997':'2008'} · R${rn}<small>/6</small></div><div class="ph ${st.phase}">${{ready:'다음 라운드 준비 중',open:'주문 받는 중',closed:'라운드 결과',over:'게임 종료'}[st.phase]}</div></div>`;
+ if(st.phase==='ready')html+=`<div><div class="evt" style="color:#8d877a">R${rn} 사건 곧 공개</div><div style="font-size:22px;color:#cfc8b8;margin-top:10px">${h.length?'지난 라운드 결과를 돌아보세요.':'화면을 반으로 나눠 게임 창을 열어 두세요.'}</div></div>`;
+ else if(st.phase==='over')html+=`<div><div class="evt">${g==='97'?'1997':'2008'} 게임 끝 · 실제와 비교</div></div>`;
+ else html+=`<div><div class="evd">${st.phase==='open'?'<span class="stamp">속보</span>':''}${esc(ev.date.replace('-','.'))}</div><div class="evt">${esc(ev.title.split('·').slice(1).join('·').trim())}</div>${st.phase==='open'?`<ul class="news">${ev.news.map((n,i)=>`<li style="animation-delay:${.3+i*.35}s">${n}</li>`).join('')}</ul>`:''}</div>`;
+ html+=`<div class="sr">${st.phase==='open'?`<div id="tm" class="tm">--:--</div><i class="tbar"><u id="tmbar"></u></i><div class="sub">제출 <b id="cnt">${D.ordered}/${D.players}</b></div>`:`<div class="sub">입장 <b>${D.players}</b>명</div>`}</div></div>`;
+ if(st.phase==='open'&&ev.media?.length)html+=`<div class="media">${ev.media.filter(m=>m.img).map(m=>`<figure><img src="${m.img}" alt="" style="object-position:${m.pos||'50% 50%'}"><figcaption>${m.cap}</figcaption></figure>`).join('')}${ev.media.filter(m=>m.yt).map(m=>`<figure><img src="https://i.ytimg.com/vi/${m.yt}/hqdefault.jpg" alt=""><figcaption>▶ 영상: ${m.cap} (학생 화면에서 재생)</figcaption></figure>`).join('')}</div>`;
+ if(st.phase==='over')html+=`<div class="card">${chart(g)}</div>`;
+ else html+=`<div class="card">${board(p,st.phase==='closed'?h.at(-1)?.before:null)}${st.phase==='closed'?`<h3>왜 바뀌었나</h3>${bars(h.at(-1))}`:''}</div>`;
+ if(st.locked)html=`<div class="stage" style="grid-template-columns:1fr"><div class="evt" style="text-align:center">보고서 제출이 마감되었습니다</div></div>`+html;
+ $('#app').innerHTML=html;count();tick()}
+async function load(){if(!room)return;try{const t0=Date.now();const r=await fetch(`${API}/rooms/${room}`,{cache:'no-store'});D=await r.json();if(D.error){$('#app').innerHTML=`<div class="wait">${esc(D.error)}</div>`;return}off=D.state.now-Math.round((t0+Date.now())/2);
+ const st=D.state;const key=[st.game,st.round,st.phase,st.history[st.game].length,st.locked,st.limit].join('|');if(key!==lastKey){lastKey=key;draw()}else{const c=$('#cnt');if(c)c.textContent=`${D.ordered}/${D.players}`}}catch(e){}}
+$('#code').textContent=room||'----';load();setInterval(load,2000);
+</script>
+</body>
+</html>

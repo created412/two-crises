@@ -59,6 +59,15 @@ a{color:#1d4ed8}
 @keyframes drawLn{to{stroke-dashoffset:0}}.chart.draw .dt,.chart.draw .lb{opacity:0;animation:fadeIn .5s ease-out forwards}@keyframes fadeIn{from{opacity:0}to{opacity:1}}
 details.card summary{cursor:pointer;font-weight:700}
 @media(prefers-reduced-motion:reduce){*{animation:none!important}.bw .b{width:var(--w)}.chart.draw .dt,.chart.draw .lb{opacity:1}}
+
+.onl{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:14px;font-size:15px}.onl b{font-family:var(--mono);font-size:20px}
+.warnb{background:var(--red)!important;border-color:var(--red)!important;box-shadow:4px 4px 0 var(--ink)!important}
+.nos{font-size:13px;color:var(--red);font-weight:700;width:100%}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#bbb;margin-right:6px}.dot.on{background:#2fa86b}
+.gd summary{display:flex;gap:14px;align-items:center}.gn{font-weight:700;font-size:17px}.tot{font-family:var(--mono);font-weight:700;color:var(--red);margin-left:auto}
+.gwrap{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:12px}.gwrap h4{margin:10px 0 4px}.gwrap select,.gwrap textarea{width:100%;font:inherit;border:1.5px solid var(--ink);padding:8px;font-size:14px}.gwrap textarea{min-height:70px}
+.gwrap label{display:block;font-weight:700;margin:10px 0 4px}.oq li{margin:6px 0;font-size:16px}.mini p{font-size:13px;margin:4px 0}
+.oclock{position:fixed;right:24px;bottom:24px;z-index:60;font-family:var(--mono);font-size:40px;font-weight:700;background:#16130f;color:#ffb020;padding:8px 20px;border:2px solid #16130f}.oclock:empty{display:none}.oclock.low{color:#ff5a4e}
 </style>
 </head>
 <body>
@@ -106,10 +115,10 @@ function board(p,prev){return `<div class="board">${CO.map((c,i)=>{const ch=prev
 function countUp(){document.querySelectorAll('.price[data-from]').forEach(el=>{const a=+el.dataset.from,b=+el.dataset.to;if(a===b){el.textContent=fmt(b);return}const t0=performance.now(),Dd=1500;const step=t=>{const k=Math.min(1,(t-t0)/Dd),e=1-Math.pow(1-k,3);el.textContent=fmt(a+(b-a)*e);if(k<1)requestAnimationFrame(step)};setTimeout(()=>requestAnimationFrame(step),350)})}
 function tick(){const st=D?.state;const el=document.getElementById('tm');if(!el||!st||st.phase!=='open'||!st.openedAt)return;const left=Math.max(0,st.limit*1000-((Date.now()+clockOff)-st.openedAt));const s=Math.ceil(left/1000);el.textContent=`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;el.classList.toggle('low',s<=30);const b=document.getElementById('tmbar');if(b)b.style.width=(left/(st.limit*1000)*100)+'%'}
 setInterval(tick,500);
-async function act(a){if(a==='close'&&!confirm('이번 라운드를 마감하고 주가를 반영할까요?'))return;try{await api(`/rooms/${T.code}/teacher`,{pin:T.pin,action:a,limit:LIMIT});lastKey='';await load()}catch(e){alert(e.message)}}
+async function act(a){if(a==='close'&&!confirm('이번 라운드를 마감하고 주가를 반영할까요?'))return;if(a==='lock'&&!confirm('보고서 제출을 마감할까요? 이후 학생은 제출·수정할 수 없고, 지금까지 저장된 초안과 최종본이 남습니다.'))return;try{await api(`/rooms/${T.code}/teacher`,{pin:T.pin,action:a,limit:LIMIT});lastKey='';await load()}catch(e){alert(e.message)}}
 async function load(){try{const t0=Date.now();D=await api(`/rooms/${T.code}/teacher?pin=${encodeURIComponent(T.pin)}`);clockOff=D.state.now-Math.round((t0+Date.now())/2);
- const st=D.state;const ordN=D.orders.filter(o=>o.game===st.game&&o.round===st.round).length;const key=[tab,st.game,st.round,st.phase,st.history[st.game].length,st.limit,D.submissions.length,D.players.length].join('|');
- if(key!==lastKey){lastKey=key;draw()}else{const c=document.getElementById('cnt');if(c)c.textContent=`${ordN}/${D.players.length}`;document.querySelectorAll('[data-pl]').forEach(td=>{const on=D.orders.some(o=>o.player===td.dataset.pl&&o.game===st.game&&o.round===st.round);td.className=on?'y':'no';td.textContent=on?'제출':'-'})}
+ const st=D.state;const ordN=D.orders.filter(o=>o.game===st.game&&o.round===st.round).length;const key=tab==='grade'?[tab,D.players.length,Object.keys(D.grades||{}).length].join('|'):[tab,st.game,st.round,st.phase,st.history[st.game].length,st.limit,st.locked,D.submissions.length,D.submissions.filter(s=>s.status==='final').length,D.players.length].join('|');
+ if(key!==lastKey){lastKey=key;draw()}else{const c=document.getElementById('cnt');if(c)c.textContent=`${ordN}/${D.players.length}`;document.querySelectorAll('[data-pl]').forEach(td=>{const on=D.orders.some(o=>o.player===td.dataset.pl&&o.game===st.game&&o.round===st.round);td.className=on?'y':'no';td.textContent=on?'제출':'-'});document.querySelectorAll('[data-pr]').forEach(td=>{const pl=D.players.find(p=>p.id===td.dataset.pr);if(pl)td.innerHTML=presence(pl)})}
 }catch(e){$('#app').innerHTML=`<div class="card"><p class="err">${esc(e.message)}</p><button id="re">다른 방 열기</button></div>`;$('#re').onclick=()=>{T={};saveT();setup()}}}
 
 function gameTab(){const st=D.state,g=st.game,p=st.prices[g],h=st.history[g];const ordN=D.orders.filter(o=>o.game===g&&o.round===st.round).length;
@@ -129,17 +138,62 @@ function gameTab(){const st=D.state,g=st.game,p=st.prices[g],h=st.history[g];con
  let body='';
  if(st.phase==='over')body+=`<div class="card">${chart(g)}</div>`;
  else body+=`<div class="card">${board(p,st.phase==='closed'?h.at(-1)?.before:null)}${st.phase==='closed'&&h.length?`<h3>왜 바뀌었나</h3>${bars(h.at(-1))}`:''}</div>`;
- body+=`<details class="card"><summary>학생 ${D.players.length}명 · 주문 현황</summary><table><tr><th>학번 이름</th><th>이번 라운드</th><th>1997 평가액</th><th>2008 평가액</th><th>보고서</th></tr>
- ${D.players.map(pl=>{const w=gg=>{const G=pl.games[gg];return G.cash+G.q.reduce((s,q,i)=>s+q*D.state.prices[gg][i],0)};const on=D.orders.some(o=>o.player===pl.id&&o.game===g&&o.round===st.round);const sub=D.submissions.find(s=>s.player===pl.id);return `<tr><td>${esc(pl.name)}</td><td data-pl="${pl.id}" class="${on?'y':'no'}">${on?'제출':'-'}</td><td class="n">${fmt(w('97'))}</td><td class="n">${fmt(w('08'))}</td><td>${sub?'<span class="y">'+new Date(sub.ts).toLocaleTimeString('ko-KR')+'</span>':'-'}</td></tr>`}).join('')}</table>
+ body+=`<details class="card" open><summary>학생 ${D.players.length}명 · 접속·주문 현황</summary><table><tr><th>학번 이름</th><th>접속 · 단계</th><th>이번 라운드</th><th>1997 평가액</th><th>2008 평가액</th><th>보고서</th></tr>
+ ${D.players.map(pl=>{const w=gg=>{const G=pl.games[gg];return G.cash+G.q.reduce((s,q,i)=>s+q*D.state.prices[gg][i],0)};const on=D.orders.some(o=>o.player===pl.id&&o.game===g&&o.round===st.round);const sub=D.submissions.find(s=>s.player===pl.id);return `<tr><td>${esc(pl.name)}</td><td data-pr="${pl.id}">${presence(pl)}</td><td data-pl="${pl.id}" class="${on?'y':'no'}">${on?'제출':'-'}</td><td class="n">${fmt(w('97'))}</td><td class="n">${fmt(w('08'))}</td><td>${sub?'<span class="'+(sub.status==='final'?'y':'')+'">'+(sub.status==='final'?'최종 ':'초안 ')+new Date(sub.ts).toLocaleTimeString('ko-KR')+'</span>':'-'}</td></tr>`}).join('')}</table>
  <p class="muted">학생 접속 주소: <a href="${SITE}?room=${T.code}" target="_blank">${SITE}?room=${T.code}</a></p></details>
  ${h.length?`<details class="card"><summary>라운드 기록</summary><table><tr><th>R</th><th>사건</th>${CO.map(c=>`<th>${c}<br>사건 / 반 → 가격</th>`).join('')}<th>주문</th></tr>${h.map((x,k)=>`<tr><td>R${k+1}</td><td>${esc(x.title)}</td>${x.after.map((a,i)=>`<td class="n">${x.e[i]}% / ${x.d[i]}% → ${fmt(a)}</td>`).join('')}<td class="n">${x.ordered}/${x.players}</td></tr>`).join('')}</table></details>`:''}
  ${st.done['97']&&g==='08'?`<details class="card"><summary>1997 게임: 실제와 비교 다시 보기</summary>${chart('97')}</details>`:''}`;
  return top+ctl+body}
 
+/* ===== 온라인(Zoom) 운영: 링크·공유 화면·접속 상태·마감 ===== */
+const STG=['시작','① 내 자료','② 1997','③ 2008','④ 지표','⑤ 득실','⑥ AI','⑦ 제출'];
+function copyLink(){const u=`${SITE}?room=${T.code}`;navigator.clipboard?.writeText(u).then(()=>alert('학생 링크를 복사했습니다. Zoom 채팅에 붙여 넣으세요.\n'+u),()=>prompt('복사하세요',u))}
+function openScreen(){window.open(`screen.html?room=${T.code}`,'twoCrisisScreen','width=1500,height=950')}
+function onlineBar(){const st=D.state;const live=D.players.filter(p=>D.now-p.seen<30000).length;const fin=D.submissions.filter(s=>s.status==='final').length,dr=D.submissions.filter(s=>s.status==='draft').length;
+ return `<div class="onl"><button class="ghost" onclick="copyLink()">학생 링크 복사 (Zoom 채팅용)</button><button onclick="openScreen()">Zoom 공유 화면 열기</button>
+ <span>접속 중 <b>${live}</b>/${D.players.length}</span><span>보고서 최종 <b>${fin}</b> · 초안 ${dr}</span>
+ <button class="${st.locked?'':'warnb'}" onclick="act('${st.locked?'unlock':'lock'}')">${st.locked?'제출 마감 풀기':'보고서 제출 마감 (124분)'}</button>
+ <span class="nos">⚠ 이 선생님 화면은 Zoom으로 공유하지 마세요. 공유는 「Zoom 공유 화면」 창으로.</span></div>`}
+function presence(pl){const ago=Math.round((D.now-pl.seen)/1000);const on=pl.seen&&ago<30;return `<span class="dot ${on?'on':''}"></span>${on?'접속':pl.seen?Math.floor(ago/60)+'분 전':'-'} · ${pl.stage!=null?STG[pl.stage]||'':''}`}
+
+/* ===== 채점·구술 ===== */
+const RUB=[
+ {k:'a',n:'지표 비교',max:8,lv:[[8,'1997·2008 대응을 공통 지표로 비교하고 타국 1개 이상과 대조하며, 근거를 지표의 어느 부분에서 읽었는지까지 명시'],[7,'두 위기를 지표로 비교하고 타국과 대조하며 근거를 밝힘'],[6,'두 위기를 지표로 비교하고 근거를 제시'],[5,'지표를 제시하고 비교하나 해석이 간략'],[4,'지표를 해석 없이 나열'],[3,'수치 자료 활용이 거의 없음']]},
+ {k:'b',n:'구조·득실',max:6,lv:[[6,'쟁점의 원인을 무역·금융 구조로 연결해 규명하고, 이해관계자별 득실표로 대안을 저울질'],[5,'원인을 구조와 연결하고 득실을 비교해 정리'],[4,'구조와 연결하나 이해관계자별 득실 구분이 뭉뚱그려짐'],[3,'원인을 서술하나 무역·금융 구조와의 연결이 드러나지 않음'],[2,'구조적 원인 규명과 득실 분석이 없음']]},
+ {k:'c',n:'비교·수정',max:6,lv:[[6,'실제 지수와 비교해 해석을 실제로 수정하고 추적 로그 2회차에 과정을 기록'],[5,'비교를 반영해 해석을 수정하고 추적 로그 작성'],[4,'수정이 부분적이거나 기록이 소략'],[3,'수정·추적 로그가 없음 (2회차 미제출 시 최저점)']]},
+ {k:'d',n:'AI 검증',max:5,lv:[[5,'AI 정보의 오류·출처 없는 서술·편향을 2건 이상 원자료로 교정하고 구술에서 자기 논리로 설명'],[4,'오류 1건을 원자료로 교정하고 구술 수행'],[3,'AI 활용 기록은 냈으나 검증이 형식적'],[2,'AI 활용 기록 미제출 또는 구술 미수행']]}];
+const QB=['네 주장을 지탱하는 숫자 하나를 골라, 어느 자료의 몇 년 값인지와 뜻을 설명해 보세요.','1997년과 2008년 정부 대응은 무엇이 달랐고, 공통 지표 어디에서 그 차이가 보이나요?','한국과 태국을 비교했을 때 같은 점 또는 다른 점 하나를 근거와 함께 말해 보세요.','네가 지지한 대안에서 이익을 보는 집단과 부담을 지는 집단은 누구인가요?','AI 문장 중 틀렸다고 판단한 것 하나를 골라, 원자료로 어떻게 확인했는지 설명해 보세요.','AI 대화 기록에서 채택하지 않은 답은 무엇이고, 왜 버렸나요?','게임에서 실제 코스피와 우리 반 주가가 가장 크게 달랐던 시점과 이유는 무엇인가요?','2008년에 코스피와 S&P 500이 다르게 움직인 구간을 하나 골라 이유를 설명해 보세요.','발표 슬라이드에서 무엇을 고쳤고, 왜 그것이 더 정확한가요?','게임 중 판단을 바꾼 라운드 하나와, 그때 본 근거를 말해 보세요.'];
+let G={},oralT=null,oralEnd=0;
+function gradeOf(id){return G[id]||D.grades?.[id]||{}}
+function total(g){if(g.sp==='9'||g.sp==='8')return +g.sp;const v=RUB.map(r=>+g[r.k]||0);return v.every(x=>x>0)?v.reduce((a,b)=>a+b,0):''}
+function gradeTab(){const subs=Object.fromEntries(D.submissions.map(s=>[s.player,s]));
+ return `<div class="card"><h2>채점·구술 (${D.players.length}명)</h2><p class="muted">구술 순서대로 학생을 펼쳐 질문 2개를 뽑고 2분 타이머를 켭니다. 점수는 「저장」을 누르면 서버에 남습니다. 공식 평가계획의 표현이 우선합니다. 「비교·수정」은 원 평가계획의 「발표·동료 피드백 수정」을 이번 수업 방식에 맞춘 표현입니다.</p>
+ <div class="row"><button class="ghost" onclick="gradeCsv()">점수표 CSV 받기</button><span id="oralClock" class="oclock"></span></div></div>
+ ${D.players.map((pl,ix)=>{const g=gradeOf(pl.id);const s=subs[pl.id];const r=s?.report;const tt=total(g);
+  return `<details class="card gd" ${G.__open===pl.id?'open':''} ontoggle="if(this.open)G.__open='${pl.id}'"><summary><span class="gn">${ix+1}. ${esc(pl.name)}</span> <span class="muted">${s?(s.status==='final'?'최종 제출':'초안만')+' '+new Date(s.ts).toLocaleTimeString('ko-KR'):'제출 없음'}</span> <span class="tot">${tt!==''?tt+'점':'미채점'}</span> ${g.ts?'<span class="y">저장됨</span>':''}</summary>
+  <div class="gwrap"><div>
+   <h4>구술 질문</h4><ol class="oq">${(g.q||[]).map(i=>`<li>${QB[i]}</li>`).join('')||'<li class="muted">아직 뽑지 않음</li>'}</ol>
+   <div class="row"><button class="ghost" onclick="pickQ('${pl.id}')">질문 2개 뽑기</button><button onclick="startOral()">2분 타이머</button></div>
+   <label>구술 메모</label><textarea id="om_${pl.id}" oninput="setG('${pl.id}','oral',this.value)">${esc(g.oral||'')}</textarea>
+   <h4>보고서 빠르게 보기</h4>${r?`<div class="mini"><p><b>근거 위치</b> ${esc(r.compare?.where)}</p><p><b>결론</b> ${esc(r.issue?.choice)}</p><p><b>추적 로그 2회차</b> ${esc(r.issue?.log2)}</p><p><b>AI 대화</b> ${(r.ai?.links||[]).map(l=>`<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.tool||'링크')}</a>`).join(' · ')||'없음'}</p></div><p class="muted">전체 보고서는 「제출물·AI 대화 기록」 탭</p>`:'<p class="muted">제출물 없음</p>'}
+  </div><div>
+   ${RUB.map(rb=>`<label>${rb.n} (${rb.max}점)</label><select onchange="setG('${pl.id}','${rb.k}',this.value)"><option value="">선택</option>${rb.lv.map(([v,t])=>`<option value="${v}" ${+g[rb.k]===v?'selected':''}>${v}점 · ${t}</option>`).join('')}</select>`).join('')}
+   <label>특수 처리</label><select onchange="setG('${pl.id}','sp',this.value)"><option value="">해당 없음</option><option value="9" ${g.sp==='9'?'selected':''}>본인 의사에 의한 미제출·백지·미응시 (9점)</option><option value="8" ${g.sp==='8'?'selected':''}>장기 미인정 결석 (8점)</option></select>
+   <label>채점 메모</label><textarea oninput="setG('${pl.id}','memo',this.value)">${esc(g.memo||'')}</textarea>
+   <div class="row"><b class="tot" id="tot_${pl.id}">${tt!==''?'합계 '+tt+'점':''}</b><button onclick="saveG('${pl.id}')">저장</button></div>
+  </div></div></details>`}).join('')}`}
+function setG(id,k,v){G[id]={...gradeOf(id),...(G[id]||{}),[k]:v};const t=total(G[id]);const el=document.getElementById('tot_'+id);if(el)el.textContent=t!==''?'합계 '+t+'점':''}
+function pickQ(id){const a=[...QB.keys()].sort(()=>Math.random()-.5).slice(0,2);G[id]={...gradeOf(id),...(G[id]||{}),q:a};G.__open=id;lastKey='';draw()}
+async function saveG(id){const d={...gradeOf(id),...(G[id]||{})};delete d.ts;try{await api(`/rooms/${T.code}/teacher`,{pin:T.pin,action:'grade',player:id,data:d});delete G[id];G.__open=id;lastKey='';await load()}catch(e){alert(e.message)}}
+function startOral(){oralEnd=Date.now()+120000;clearInterval(oralT);oralT=setInterval(()=>{const el=document.getElementById('oralClock');const s=Math.max(0,Math.ceil((oralEnd-Date.now())/1000));if(el)el.textContent=`구술 ${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;if(el)el.classList.toggle('low',s<=20);if(!s)clearInterval(oralT)},300)}
+function gradeCsv(){const rows=[['학번 이름','지표 비교(8)','구조·득실(6)','비교·수정(6)','AI 검증(5)','특수','합계','구술 질문','구술 메모','채점 메모','AI 대화 링크']];
+ D.players.forEach(pl=>{const g=gradeOf(pl.id);const s=D.submissions.find(x=>x.player===pl.id);rows.push([pl.name,g.a||'',g.b||'',g.c||'',g.d||'',g.sp||'',total(g),(g.q||[]).map(i=>QB[i]).join(' / '),g.oral||'',g.memo||'',(s?.report?.ai?.links||[]).map(l=>l.url).join(' ')])});
+ const t='\ufeff'+rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/csv'}));a.download=`채점표_방${T.code}.csv`;a.click()}
+
 function L(l,v){return `<p><b>${l}</b><br>${esc(v).replace(/\n/g,'<br>')}</p>`}
 function repTab(){const subs=[...D.submissions].sort((a,b)=>a.name.localeCompare(b.name));
  return `<div class="card"><h2>제출물 (${subs.length}/${D.players.length})</h2><div class="row"><button class="ghost" onclick="csv()">AI 대화 링크 목록 CSV 받기</button></div>
- <table style="margin-top:12px"><tr><th>학번 이름</th><th>제출 시각</th><th>AI 대화 기록 링크</th></tr>${subs.map(s=>`<tr><td>${esc(s.name)}</td><td>${new Date(s.ts).toLocaleString('ko-KR')}</td><td>${(s.report.ai?.links||[]).map(l=>`<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.tool||'링크')}</a>`).join(' · ')||'<span class="no">없음</span>'}</td></tr>`).join('')}</table>
+ <table style="margin-top:12px"><tr><th>학번 이름</th><th>상태 · 시각</th><th>AI 대화 기록 링크</th></tr>${subs.map(s=>`<tr><td>${esc(s.name)}</td><td>${s.status==='final'?'<b class="y">최종</b>':'초안(자동 저장)'} · ${new Date(s.ts).toLocaleString('ko-KR')}</td><td>${(s.report.ai?.links||[]).map(l=>`<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.tool||'링크')}</a>`).join(' · ')||'<span class="no">없음</span>'}</td></tr>`).join('')}</table>
  ${subs.map(s=>{const r=s.report;return `<details><summary>${esc(s.name)} · 보고서 펼치기</summary><div class="rep">
   <h4>내 자료</h4>${L('주제',r.topic)}${L('슬라이드에서 고친 것',r.fix?.after)}${L('위기 신호',r.fix?.evidence)}
   <h4>게임 판단 기록</h4><table><tr><th>R</th><th>보유</th><th>근거</th><th>새 정보 → 기업 영향 → 선택</th></tr>${(r.logs||[]).map(l=>`<tr><td>${l.game} R${l.round+1}</td><td>${(l.q||[]).join(' / ')}</td><td>${esc(l.ind)}</td><td>${esc(l.info)} → ${esc(l.impact)} → ${esc(l.why)}</td></tr>`).join('')}</table>
@@ -152,7 +206,7 @@ function csv(){const rows=[['학번 이름','제출 시각','AI 도구','링크'
  const t='\ufeff'+rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/csv'}));a.download=`AI대화기록_방${T.code}.csv`;a.click()}
 
 function draw(){$('#code').textContent=T.code;const open=[...document.querySelectorAll('details[open]')].map(d=>d.querySelector('summary').textContent);
- $('#app').innerHTML=`<div class="tabs"><button class="${tab==='game'?'on':''}" onclick="tab='game';lastKey='';draw()">게임 진행</button><button class="${tab==='rep'?'on':''}" onclick="tab='rep';lastKey='';draw()">제출물·AI 대화 기록</button></div>`+(tab==='game'?gameTab():repTab());
+ $('#app').innerHTML=onlineBar()+`<div class="tabs"><button class="${tab==='game'?'on':''}" onclick="tab='game';lastKey='';draw()">게임 진행</button><button class="${tab==='rep'?'on':''}" onclick="tab='rep';lastKey='';draw()">제출물·AI 대화 기록</button><button class="${tab==='grade'?'on':''}" onclick="tab='grade';lastKey='';draw()">채점·구술</button></div>`+(tab==='game'?gameTab():tab==='rep'?repTab():gradeTab());
  document.querySelectorAll('details').forEach(d=>{if(open.includes(d.querySelector('summary').textContent))d.open=true});countUp();tick()}
 function start(){load();setInterval(load,2500)}
 T.code&&T.pin?start():setup();

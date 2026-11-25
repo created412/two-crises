@@ -197,6 +197,12 @@ details.card summary{cursor:pointer;font-weight:700;font-size:16px}
 .evbody .media figure>img,.evbody .media .vbox{height:210px!important;max-width:none!important;width:100%;aspect-ratio:auto}
 .evbody .media figcaption{font-size:12px}
 @media(max-width:800px){.evbody.has{grid-template-columns:1fr}}
+
+.lockbar{position:sticky;top:0;z-index:50;background:var(--red);color:#fff;font-weight:700;text-align:center;padding:12px}
+.pol{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:8px 0}
+.pc{border:1.5px solid var(--ink);background:#fff;padding:12px 14px}.pc .pk{display:inline-block;font-family:var(--mono);font-size:12px;background:var(--ink);color:var(--paper);padding:2px 8px;margin-bottom:6px}
+.pc b{display:block;font-size:16px}.pc p{font-size:14px;margin:6px 0}.pc a{font-size:12px;color:#1d4ed8}
+@media(max-width:800px){.pol{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -290,6 +296,7 @@ V[0]=()=>`<div class="card"><h2>오늘 할 일</h2>
 <li><b>2008 게임</b> 6라운드 + 코스피·S&P 500과 비교 · 35분</li>
 <li><b>보고서</b> 지표 비교·득실표·AI 검증과 대화 링크 · 29분</li>
 <li><b>124분 전원 제출 → 2분 구술</b> · 26분</li></ol>
+<div class="tip"><b>Zoom 수업</b> · Zoom은 켜 둔 채로 이 사이트를 <b>다른 창</b>에서 엽니다. 화면을 반으로 나눠 왼쪽엔 Zoom(선생님 공유 화면), 오른쪽엔 이 게임을 띄우세요. 마이크는 끄고, 질문은 Zoom 채팅으로 합니다. 구술 때 선생님이 이름을 부릅니다.</div>
 <label for="code">학번과 이름</label><div class="muted">제출본에 그대로 들어갑니다.</div><input id="code" placeholder="예: 20315 김민준" autocomplete="off">
 <label for="room">방 코드 (선생님 화면의 4자리)</label><input id="room" inputmode="numeric" maxlength="4" placeholder="예: 4821">
 <div id="msg"></div></div>
@@ -400,17 +407,29 @@ function gameAfter(){const g=g_;wire();countUp();tickTimer();const st=LIVE?.stat
   if(!note.ind||note.info.length<5||note.why.length<5)return $('#msg').innerHTML='<div class="err">근거 지표와 두 칸을 적어야 주문이 됩니다.</div>';
   try{await api(`/rooms/${S.room}/order`,{pid:S.pid,game:g,round:r,qty:q,note});S.logs=S.logs.filter(l=>!(l.game===g&&l.round===r));S.logs.push({game:g,round:r,q,...note});delete S.drafts[dk];save();lastKey='';await poll()}catch(e){$('#msg').innerHTML=`<div class="err">${esc(e.message)}</div>`}}}
 V[2]=()=>gameView('97');V[3]=()=>gameView('08');V[2].after=gameAfter;V[3].after=gameAfter;
-async function poll(){if(!S.room||!S.pid)return;try{const t0=Date.now();LIVE=await api(`/rooms/${S.room}?pid=${S.pid}`);clockOff=LIVE.state.now-Math.round((t0+Date.now())/2);}catch(e){return}
+async function poll(){if(!S.room||!S.pid)return;try{const t0=Date.now();LIVE=await api(`/rooms/${S.room}?pid=${S.pid}&stage=${S.stage}`);lockBanner();clockOff=LIVE.state.now-Math.round((t0+Date.now())/2);}catch(e){return}
  if(S.stage!==2&&S.stage!==3)return;const st=LIVE.state,g=S.stage===2?'97':'08';
  const key=[st.game,st.round,st.phase,st.history[g].length,st.done[g],!!LIVE.me?.order,st.limit].join('|');
  if(key!==lastKey){const opened=st.phase==='open'&&!lastKey.includes('|open|');lastKey=key;const y=scrollY;render();if(opened||st.phase==='closed')scrollTo(0,0);else scrollTo(0,y)}
  else{const c=$('#cnt');if(c)c.textContent=`${LIVE.ordered}/${LIVE.players}`}}
 setInterval(poll,2500);
 
+/* ---------- 온라인: 마감 배너·초안 자동 저장 ---------- */
+function lockBanner(){let b=document.getElementById('lockbar');const on=!!LIVE?.state?.locked;if(on&&!b){b=document.createElement('div');b.id='lockbar';b.className='lockbar';b.textContent='제출이 마감되었습니다. 지금부터는 고칠 수 없습니다. Zoom에서 선생님 안내를 기다리세요.';document.body.prepend(b)}if(!on&&b)b.remove();const sb=document.getElementById('send');if(sb)sb.disabled=on}
+let lastDraft='';async function autoDraft(){if(!S.pid||S.stage<4||LIVE?.state?.locked)return;const r=JSON.stringify(reportObj());if(r===lastDraft)return;try{await api(`/rooms/${S.room}/submit`,{pid:S.pid,report:reportObj(),draft:true});lastDraft=r;const el=document.getElementById('autosave');if(el)el.textContent='자동 저장됨 '+new Date().toLocaleTimeString('ko-KR')}catch(e){}}
+setInterval(autoDraft,40000);
+const POLICY=[
+ {c:'한국 · 1997',t:'IMF 프로그램: 고금리와 금융 구조조정',b:'1997년 12월 IMF 지원 프로그램은 초기 고금리(콜금리 연 30% 안팎)와 부실 금융회사 정리를 담았다. 외환시장이 안정된 1998년부터 콜금리를 점차 낮췄다.',s:'IMF Letter of Intent (1997.12.24 / 1998.2.7 / 1998.5.2)',u:'https://www.imf.org/external/np/loi/122497.htm'},
+ {c:'한국 · 2008',t:'기준금리 인하와 한미 통화스와프',b:'한국은행은 2008년 10월 27일 기준금리를 5.00%에서 4.25%로 내리는 등 2009년 2월까지 2.00%로 낮췄다. 10월 30일 미국 연준과 최대 300억 달러 통화스와프를 맺었다.',s:'한국은행 통화정책방향(2008.10.27) · 미 연준 보도자료(2008.10.29)',u:'https://www.federalreserve.gov/newsevents/pressreleases/monetary20081029b.htm'},
+ {c:'태국 · 1997',t:'변동환율 전환과 IMF 지원',b:'태국은 1997년 7월 2일 바트화 고정환율을 포기하고 변동환율제로 바꿨다. 8월 IMF 지원을 받으며 부실 금융회사 영업을 정지하는 등 금융 구조조정을 했다.',s:'IMF Letter of Intent (1997.8.14) · IMF 보도자료 97/37',u:'https://www.imf.org/external/np/loi/081497.HTM'},
+ {c:'태국 · 2008',t:'정책금리 인하',b:'태국은행은 2008년 12월 3일 정책금리를 3.75%에서 2.75%로 내렸고, 2009년 4월까지 1.25%로 더 낮췄다.',s:'Bank of Thailand, Economic and Monetary Conditions 2008·2009',u:'https://www.bot.or.th/'}];
+function policyCards(){return `<h3>정책 대응 사실 카드</h3><div class="pol">${POLICY.map(p=>`<div class="pc"><span class="pk">${p.c}</span><b>${p.t}</b><p>${p.b}</p><a href="${p.u}" target="_blank" rel="noopener">출처: ${p.s}</a></div>`).join('')}</div><div class="muted">공통지표②는 은행 대출금리이고, 위 카드의 콜금리·기준금리·정책금리와 같지 않습니다.</div>`}
+
 /* ---------- 4. 지표 비교 ---------- */
 V[4]=()=>`<div class="card"><h2>④ 지표로 두 위기의 대응 비교하기 <span class="badge">8점</span></h2>
 <div class="tip">세 공통 지표를 모두 쓰고, 한국과 태국을 비교하고, <b>어느 표의 몇 년 값을 보았는지</b> 적으세요. 예: "공통지표② 1997→1998 한국 11.88→15.28"</div>
 ${indTable(2010,1996)}
+${policyCards()}
 ${ta('compare.crisis','1997년과 2008년, 한국 정부의 대응은 어떻게 달랐고 지표는 어떻게 움직였나?','IMF 고금리 vs 기준금리 인하·통화스와프',true)}
 ${ta('compare.country','한국과 태국을 비교하면 무엇이 같고 무엇이 다른가?','',true)}
 ${ta('compare.where','내가 읽은 근거 위치 목록','지표 번호 · 연도 · 국가 · 값')}
@@ -470,7 +489,7 @@ function report(){const t=TOPICS[S.topic]||{};const L=(l,v)=>`<p><b>${l}</b><br>
  <h3>AI 대화 기록</h3>${S.ai.links.filter(l=>l.url.trim()).map(l=>`<p><b>${esc(l.tool||'AI')}</b> <a href="${esc(l.url)}">${esc(l.url)}</a><br>${esc(l.what)}</p>`).join('')}`}
 V[7]=()=>`<div class="card noprint"><h2>⑦ 제출</h2><p>확인한 뒤 <b>선생님에게 제출</b>을 누르세요. 124분 이후에는 수정하지 않습니다. 제출 직후 선생님과 2분 구술(질문 2개)이 있습니다.</p>
 ${S.submittedAt?`<div class="tip"><span class="done-badge">제출됨</span> ${new Date(S.submittedAt).toLocaleString('ko-KR')}. 다시 누르면 최신 내용으로 덮어씁니다.</div>`:''}
-<div class="row"><button id="send">선생님에게 제출</button><button class="ghost" id="pdf">PDF로도 저장</button><button class="ghost" id="back">이전</button></div><div id="msg"></div></div><div class="card">${report()}</div>`;
+<div class="muted" id="autosave">보고서는 40초마다 선생님에게 자동 저장됩니다(초안). 끝나면 꼭 「선생님에게 제출」을 누르세요.</div><div class="row"><button id="send" ${LIVE?.state?.locked?'disabled':''}>선생님에게 제출</button><button class="ghost" id="pdf">PDF로도 저장</button><button class="ghost" id="back">이전</button></div><div id="msg"></div></div><div class="card">${report()}</div>`;
 V[7].after=()=>{$('#back').onclick=()=>go(6);$('#pdf').onclick=()=>{$('#print').innerHTML=report();print()};
  $('#send').onclick=async()=>{try{const j=await api(`/rooms/${S.room}/submit`,{pid:S.pid,report:reportObj()});S.submittedAt=j.ts;save();render()}catch(e){$('#msg').innerHTML=`<div class="err">${esc(e.message)}</div>`}}};
 
