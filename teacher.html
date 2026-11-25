@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>선생님 화면 · 두 번의 위기</title>
+<meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#f4efe4;--sheet:#fffdf7;--ink:#16130f;--ink2:#4a4339;--rule:#cfc4ae;--red:#d6281b;--board:#0f1411;--led:#ffb020;--ok:#1f7a4d;--display:'Black Han Sans',sans-serif;--body:'IBM Plex Sans KR',sans-serif;--mono:'IBM Plex Mono',monospace}
+*{box-sizing:border-box}body{margin:0;font-family:var(--body);background:var(--paper);color:var(--ink);line-height:1.55}
+header{background:var(--board);color:var(--paper);padding:14px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+header h1{margin:0;font-family:var(--display);font-weight:400;font-size:24px}
+.code{font-family:var(--mono);font-size:44px;color:var(--led);letter-spacing:.12em}
+main{max-width:1200px;margin:0 auto;padding:20px}
+.card{background:var(--sheet);border:2px solid var(--ink);box-shadow:6px 6px 0 var(--ink);padding:18px 22px;margin-bottom:20px}
+h2{font-family:var(--display);font-weight:400;font-size:28px;margin:0 0 10px}h3{font-family:var(--display);font-weight:400;font-size:20px;margin:16px 0 8px}
+button{font:inherit;font-weight:700;border:2px solid var(--ink);background:var(--ink);color:var(--paper);padding:12px 20px;cursor:pointer;box-shadow:4px 4px 0 var(--red);font-size:17px}
+button.ghost{background:var(--sheet);color:var(--ink);box-shadow:4px 4px 0 var(--ink)}button:disabled{opacity:.35;cursor:not-allowed;box-shadow:none}
+input{font:inherit;border:1.5px solid var(--ink);padding:9px 10px;width:220px}
+.row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.muted{color:var(--ink2);font-size:14px}.err{color:var(--red);font-weight:700}
+table{width:100%;border-collapse:collapse;font-size:14px;background:#fff}th,td{border:1px solid var(--ink);padding:6px 8px;text-align:left;vertical-align:top}th{background:var(--ink);color:var(--paper);font-weight:500}
+td.n{text-align:right;font-family:var(--mono)}.y{color:var(--ok);font-weight:700}.no{color:var(--red)}
+.status{display:flex;gap:24px;flex-wrap:wrap;font-size:18px;margin-bottom:12px}.status b{font-family:var(--mono)}
+.ph{padding:3px 12px;border:2px solid var(--ink);font-weight:700}.ph.open{background:var(--red);color:#fff;border-color:var(--red)}.ph.closed{background:var(--led)}
+.tabs{display:flex;gap:0;margin-bottom:16px}.tabs button{box-shadow:none;background:var(--sheet);color:var(--ink)}.tabs button.on{background:var(--ink);color:var(--paper)}
+details{border-top:1px solid var(--rule);padding:8px 0}summary{cursor:pointer;font-weight:700}
+.rep p{margin:4px 0 10px}.rep h4{margin:12px 0 4px}
+a{color:#1d4ed8}
+.chart{width:100%;height:auto;background:#fff;border:2px solid var(--ink)}
+</style>
+</head>
+<body>
+<header><h1>선생님 화면 · 두 번의 위기</h1><div class="row"><span>방 코드</span><span class="code" id="code">----</span></div></header>
+<main id="app"></main>
+<script>
+'use strict';
+const API='https://two-crises-api.histo5731.workers.dev/api';
+const SITE='https://created412.github.io/two-crises/game.html';
+const CO=['A 한빛수출','B 바다유통','C 튼튼건설','D 믿음은행'];
+let T=JSON.parse(localStorage.getItem('twoCrisisTeacher')||'{}');let D=null;let tab='game';
+const $=s=>document.querySelector(s);const esc=v=>String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt=n=>Number(n).toLocaleString('ko-KR',{maximumFractionDigits:1});
+async function api(p,b){const r=await fetch(API+p,b?{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(b)}:{cache:'no-store'});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||r.status);return j}
+function saveT(){localStorage.setItem('twoCrisisTeacher',JSON.stringify(T))}
+
+function setup(){$('#app').innerHTML=`<div class="card"><h2>새 방 만들기</h2><p>수업 시작 전에 한 번 만듭니다. 비밀번호는 이 화면을 다시 열 때 필요합니다.</p>
+<div class="row"><input id="pin" type="password" placeholder="선생님 비밀번호 (4자 이상)"><button id="mk">방 만들기</button></div>
+<h3>이미 만든 방 다시 열기</h3><div class="row"><input id="oc" placeholder="방 코드"><input id="op" type="password" placeholder="비밀번호"><button class="ghost" id="op2">열기</button></div><div id="msg"></div></div>`;
+ $('#mk').onclick=async()=>{try{const pin=$('#pin').value.trim();const j=await api('/rooms',{pin});T={code:j.code,pin};saveT();start()}catch(e){$('#msg').innerHTML=`<p class="err">${esc(e.message)}</p>`}};
+ $('#op2').onclick=async()=>{T={code:$('#oc').value.trim(),pin:$('#op').value.trim()};try{await api(`/rooms/${T.code}/teacher?pin=${encodeURIComponent(T.pin)}`);saveT();start()}catch(e){$('#msg').innerHTML=`<p class="err">${esc(e.message)}</p>`}}}
+
+async function act(a){if(a==='close'&&!confirm('이번 라운드를 마감하고 주가를 반영할까요?'))return;try{await api(`/rooms/${T.code}/teacher`,{pin:T.pin,action:a});await load()}catch(e){alert(e.message)}}
+async function load(){try{D=await api(`/rooms/${T.code}/teacher?pin=${encodeURIComponent(T.pin)}`);draw()}catch(e){$('#app').innerHTML=`<div class="card"><p class="err">${esc(e.message)}</p><button id="re">다른 방 열기</button></div>`;$('#re').onclick=()=>{T={};saveT();setup()}}}
+
+function chart(g){const st=D.state;const real=st.real?.[g]?.kospi||[];const h=st.history[g];if(!real.length||!h.length)return '';
+ const months=real.map(r=>r[0]);const mi=d=>months.indexOf(d);const base=real[mi(h[0].date)]?.[1]||real[0][1];
+ const rs=real.map(([d,v],i)=>[i,v/base*100]);const cs=h.map(x=>[mi(x.date),x.after.reduce((a,b)=>a+b,0)/4]);
+ const all=[...rs.map(p=>p[1]),...cs.map(p=>p[1]),100];const lo=Math.floor(Math.min(...all)/10)*10-5,hi=Math.ceil(Math.max(...all)/10)*10+5;
+ const W=900,H=360,L=56,R=20,TT=20,B=50;const X=i=>L+(W-L-R)*i/(months.length-1),Y=v=>TT+(H-TT-B)*(1-(v-lo)/(hi-lo));
+ let s=`<svg class="chart" viewBox="0 0 ${W} ${H}">`;for(let v=Math.ceil(lo/20)*20;v<=hi;v+=20)s+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="#ddd"/><text x="${L-8}" y="${Y(v)+4}" font-size="12" text-anchor="end">${v}</text>`;
+ months.forEach((m,i)=>{if(i%3===0)s+=`<text x="${X(i)}" y="${H-B+18}" font-size="11" text-anchor="middle">${m}</text>`});
+ s+=`<polyline fill="none" stroke="#16130f" stroke-width="3" points="${rs.map(p=>X(p[0])+','+Y(p[1])).join(' ')}"/><polyline fill="none" stroke="#d6281b" stroke-width="3" stroke-dasharray="8 5" points="${cs.map(p=>X(p[0])+','+Y(p[1])).join(' ')}"/>`;
+ cs.forEach(p=>s+=`<circle cx="${X(p[0])}" cy="${Y(p[1])}" r="5" fill="#d6281b"/>`);return s+'</svg><p class="muted">검정 실선: 실제 코스피(R1 시점=100) · 빨강 점선: 우리 반 주가지수</p>'}
+
+function gameTab(){const st=D.state,g=st.game,p=st.prices[g],h=st.history[g];const ord=D.orders.filter(o=>o.game===g&&o.round===st.round);const ordSet=new Set(ord.map(o=>o.player));
+ const nextEv=D.effects[st.round];const ph={ready:'다음 라운드 대기',open:'주문 받는 중',closed:'라운드 결과 공개 중',over:'게임 종료'}[st.phase];
+ return `<div class="card"><div class="status"><span>${g==='97'?'1997 외환위기':'2008 세계 금융위기'}</span><span>라운드 <b>${Math.min(st.round+1,6)}</b>/6</span><span class="ph ${st.phase}">${ph}</span><span>입장 <b>${D.players.length}</b>명</span><span>이번 라운드 주문 <b>${ord.length}</b>명</span></div>
+ <p class="muted">${st.phase==='over'?'':`이번 라운드 사건: <b>${esc(nextEv?.title)}</b> · 사건 영향(선생님만 보임) ${nextEv?.e.map((x,i)=>CO[i].slice(0,1)+' '+(x>0?'+':'')+x+'%').join(' · ')}`}</p>
+ <div class="row">
+  <button onclick="act('open')" ${st.phase==='ready'?'':'disabled'}>① 라운드 열기 (사건 공개)</button>
+  <button onclick="act('close')" ${st.phase==='open'?'':'disabled'}>② 마감하고 주가 반영</button>
+  <button onclick="act('next')" ${st.phase==='closed'?'':'disabled'}>③ ${st.round>=5?'게임 끝내고 실제와 비교':'다음 라운드로'}</button>
+  ${g==='97'&&st.phase==='over'?`<button onclick="act('start08')">2008 게임 시작</button>`:''}
+  ${st.phase==='open'?`<button class="ghost" onclick="act('undoOpen')">열기 취소</button>`:''}</div>
+ <p class="muted">진행: 라운드 열기 → 학생들 사건 읽고 주문(4~5분) → 마감 → 결과 설명(1분) → 다음 라운드. 주문하지 않은 학생은 보유를 그대로 유지합니다.</p></div>
+ <div class="card"><h3>현재 주가</h3><table><tr>${CO.map(c=>`<th>${c}</th>`).join('')}</tr><tr>${p.map(x=>`<td class="n">${fmt(x)}</td>`).join('')}</tr></table>
+ ${h.length?`<h3>라운드 기록</h3><table><tr><th>R</th><th>사건</th>${CO.map(c=>`<th>${c}<br>사건 / 반 영향 → 가격</th>`).join('')}<th>주문</th></tr>${h.map((x,k)=>`<tr><td>R${k+1}</td><td>${esc(x.title)}</td>${x.after.map((a,i)=>`<td class="n">${x.e[i]}% / ${x.d[i]}% → ${fmt(a)}</td>`).join('')}<td class="n">${x.ordered}/${x.players}</td></tr>`).join('')}</table>`:''}
+ ${st.done['97']?'<h3>1997 게임: 실제 코스피와 비교</h3>'+chart('97'):''}${st.done['08']?'<h3>2008 게임: 실제 코스피와 비교</h3>'+chart('08'):''}</div>
+ <div class="card"><h3>학생 (${D.players.length}명)</h3><table><tr><th>학번 이름</th><th>이번 라운드 주문</th><th>1997 평가액</th><th>2008 평가액</th><th>보고서 제출</th></tr>
+ ${D.players.map(pl=>{const w=gg=>{const G=pl.games[gg];return G.cash+G.q.reduce((s,q,i)=>s+q*D.state.prices[gg][i],0)};const sub=D.submissions.find(s=>s.player===pl.id);return `<tr><td>${esc(pl.name)}</td><td class="${ordSet.has(pl.id)?'y':'no'}">${ordSet.has(pl.id)?'제출':'-'}</td><td class="n">${fmt(w('97'))}</td><td class="n">${fmt(w('08'))}</td><td>${sub?'<span class="y">'+new Date(sub.ts).toLocaleTimeString('ko-KR')+'</span>':'-'}</td></tr>`}).join('')}</table>
+ <p class="muted">학생 접속 주소: <a href="${SITE}?room=${T.code}" target="_blank">${SITE}?room=${T.code}</a></p></div>`}
+
+function L(l,v){return `<p><b>${l}</b><br>${esc(v).replace(/\n/g,'<br>')}</p>`}
+function repTab(){const subs=[...D.submissions].sort((a,b)=>a.name.localeCompare(b.name));
+ return `<div class="card"><h2>제출물 (${subs.length}/${D.players.length})</h2><div class="row"><button class="ghost" onclick="csv()">AI 대화 링크 목록 CSV 받기</button></div>
+ <table style="margin-top:12px"><tr><th>학번 이름</th><th>제출 시각</th><th>AI 대화 기록 링크</th></tr>${subs.map(s=>`<tr><td>${esc(s.name)}</td><td>${new Date(s.ts).toLocaleString('ko-KR')}</td><td>${(s.report.ai?.links||[]).map(l=>`<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.tool||'링크')}</a>`).join(' · ')||'<span class="no">없음</span>'}</td></tr>`).join('')}</table>
+ ${subs.map(s=>{const r=s.report;return `<details><summary>${esc(s.name)} · 보고서 펼치기</summary><div class="rep">
+  <h4>내 자료</h4>${L('주제',r.topic)}${L('슬라이드에서 고친 것',r.fix?.after)}${L('위기 신호',r.fix?.evidence)}
+  <h4>게임 판단 기록</h4><table><tr><th>R</th><th>보유</th><th>근거</th><th>새 정보 → 기업 영향 → 선택</th></tr>${(r.logs||[]).map(l=>`<tr><td>${l.game} R${l.round+1}</td><td>${(l.q||[]).join(' / ')}</td><td>${esc(l.ind)}</td><td>${esc(l.info)} → ${esc(l.impact)} → ${esc(l.why)}</td></tr>`).join('')}</table>
+  ${['97','08'].map(g=>`<h4>${g} 게임 후 해석 수정</h4>${L('수정 전',r.reflect?.[g]?.before)}${L('실제와 비교',r.reflect?.[g]?.real)}${L('수정 후',r.reflect?.[g]?.after)}`).join('')}
+  <h4>지표 비교 (8)</h4>${L('두 위기',r.compare?.crisis)}${L('한국·태국',r.compare?.country)}${L('근거 위치',r.compare?.where)}
+  <h4>구조와 득실 (6)</h4>${L('쟁점',r.issue?.issue)}${L('원인',r.issue?.cause)}${L('대안 A',r.issue?.altA)}${L('대안 B',r.issue?.altB)}${L('결론',r.issue?.choice)}${L('추적 로그 2회차',r.issue?.log2)}
+  <h4>AI 검증 (5)</h4>${L('검증 질문',r.ai?.question)}${Object.entries(r.ai?.picks||{}).map(([k,v])=>L(k+' '+(v.v||''),v.fix)).join('')}
+  ${(r.ai?.links||[]).map(l=>`<p><b>${esc(l.tool)}</b> <a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.url)}</a><br>${esc(l.what)}</p>`).join('')}</div></details>`}).join('')}</div>`}
+function csv(){const rows=[['학번 이름','제출 시각','AI 도구','링크','검증 내용']];D.submissions.forEach(s=>(s.report.ai?.links||[{}]).forEach(l=>rows.push([s.name,new Date(s.ts).toLocaleString('ko-KR'),l.tool||'',l.url||'',l.what||''])));
+ const t='\ufeff'+rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/csv'}));a.download=`AI대화기록_방${T.code}.csv`;a.click()}
+
+function draw(){$('#code').textContent=T.code;const open=[...document.querySelectorAll('details[open]')].map(d=>d.querySelector('summary').textContent);
+ $('#app').innerHTML=`<div class="tabs"><button class="${tab==='game'?'on':''}" onclick="tab='game';draw()">게임 진행</button><button class="${tab==='rep'?'on':''}" onclick="tab='rep';draw()">제출물·AI 대화 기록</button></div>`+(tab==='game'?gameTab():repTab());
+ document.querySelectorAll('details').forEach(d=>{if(open.includes(d.querySelector('summary').textContent))d.open=true})}
+function start(){load();setInterval(()=>{if(tab==='game'||!document.querySelector('details[open]'))load()},3000)}
+T.code&&T.pin?start():setup();
+</script>
+</body>
+</html>
