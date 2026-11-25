@@ -29,6 +29,36 @@ details{border-top:1px solid var(--rule);padding:8px 0}summary{cursor:pointer;fo
 .rep p{margin:4px 0 10px}.rep h4{margin:12px 0 4px}
 a{color:#1d4ed8}
 .chart{width:100%;height:auto;background:#fff;border:2px solid var(--ink)}
+
+.stage{display:grid;grid-template-columns:240px 1fr 230px;gap:24px;align-items:center;background:var(--board);color:var(--paper);padding:22px 26px;border:2px solid var(--ink);margin-bottom:14px}
+.stage .rd{white-space:nowrap;font-family:var(--display);font-size:40px;color:var(--led);line-height:1}.stage .rd small{font-size:20px;color:#b9b2a2}
+.stage .ph{display:inline-block;margin-top:10px;padding:3px 12px;border:1px solid #556;font-weight:700}.stage .ph.open{background:var(--red);border-color:var(--red)}.stage .ph.closed{background:var(--led);color:var(--ink)}
+.stage .evd{font-family:var(--mono);color:#ff7a6e;font-size:22px;font-weight:700}.stage .evt{font-family:var(--display);font-size:46px;line-height:1.1;margin-top:4px}
+.stage.ready .evt{color:#8d877a}
+.tnews{margin:12px 0 0;padding-left:20px;font-size:19px;line-height:1.55;color:#e8e1d2}
+.stage .sr{text-align:right}.tm{font-family:var(--mono);font-size:64px;font-weight:700;line-height:1}.tm.low{color:#ff5a4e;animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:.35}}
+.tbar{display:block;height:10px;background:#2a302b;margin:10px 0}.tbar u{display:block;height:100%;background:var(--led);transition:width .5s linear}
+.stage .sub{font-size:22px}.stage .sub b{font-family:var(--mono);color:var(--led);font-size:34px}
+.ctl{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:20px}.ctl .lim{font-weight:700}.ctl select{font:inherit;padding:8px;border:1.5px solid var(--ink)}
+.peek{font-size:14px;background:#fff4d6;border:1px dashed #b7791f;padding:6px 10px}
+.board{background:var(--board);color:var(--led);display:grid;grid-template-columns:repeat(4,1fr);border:2px solid var(--ink)}
+.tile{padding:16px 18px;border-right:1px solid #2a302b;text-align:left}.tile:last-child{border-right:0}
+.tile img{width:100%;height:110px;object-fit:cover;display:block;margin-bottom:10px;opacity:.9}
+.tile .nm{color:#f4efe4;font-weight:700}.price{font-family:var(--mono);font-weight:700;font-size:56px;line-height:1.05;color:var(--led)}
+.chg{font-family:var(--mono);font-size:22px;font-weight:700;color:#b9b2a2}.chg.up{color:#53d18f}.chg.down{color:#ff5a4e}
+.tile.fu{animation:flashU 1.6s ease-out .3s}.tile.fd{animation:flashD 1.6s ease-out .3s}
+@keyframes flashU{0%,100%{background:transparent}25%{background:rgba(83,209,143,.28)}}@keyframes flashD{0%,100%{background:transparent}25%{background:rgba(255,90,78,.3)}}
+.bars{margin:8px 0}.bh,.br{display:grid;grid-template-columns:170px 1fr 1fr 260px;gap:16px;align-items:center}
+.bh{font-size:14px;color:var(--ink2);padding-bottom:4px;border-bottom:2px solid var(--ink)}.br{padding:12px 0;border-bottom:1px solid var(--rule)}.br b{font-size:17px}
+.bw{position:relative;height:32px;background:linear-gradient(90deg,transparent calc(50% - 1px),#16130f calc(50% - 1px),#16130f calc(50% + 1px),transparent calc(50% + 1px)),#f1ebdf}
+.bw .b{position:absolute;top:5px;height:22px;width:0;animation:grow .9s ease-out .4s forwards}.bw .b.p{left:50%}.bw .b.n{right:50%}
+@keyframes grow{to{width:var(--w)}}.bw em{position:absolute;top:6px;left:6px;font-style:normal;font-family:var(--mono);font-size:14px;font-weight:700}
+.br strong{font-family:var(--mono);font-size:26px}.br strong.up{color:var(--ok)}.br strong.down{color:var(--red)}.br strong small{display:block;font-size:13px;color:var(--ink2);font-weight:400}
+.chart.draw .ln[pathLength]{stroke-dasharray:1 1;stroke-dashoffset:1;animation:drawLn 2.2s ease-in-out forwards}.chart.draw .ln[stroke-dasharray="10 6"]{animation:fadeIn 1.6s ease-out both}
+@keyframes drawLn{to{stroke-dashoffset:0}}.chart.draw .dt,.chart.draw .lb{opacity:0;animation:fadeIn .5s ease-out forwards}@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+details.card summary{cursor:pointer;font-weight:700}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}.bw .b{width:var(--w)}.chart.draw .dt,.chart.draw .lb{opacity:1}}
 </style>
 </head>
 <body>
@@ -51,36 +81,60 @@ function setup(){$('#app').innerHTML=`<div class="card"><h2>새 방 만들기</h
  $('#mk').onclick=async()=>{try{const pin=$('#pin').value.trim();const j=await api('/rooms',{pin});T={code:j.code,pin};saveT();start()}catch(e){$('#msg').innerHTML=`<p class="err">${esc(e.message)}</p>`}};
  $('#op2').onclick=async()=>{T={code:$('#oc').value.trim(),pin:$('#op').value.trim()};try{await api(`/rooms/${T.code}/teacher?pin=${encodeURIComponent(T.pin)}`);saveT();start()}catch(e){$('#msg').innerHTML=`<p class="err">${esc(e.message)}</p>`}}}
 
-async function act(a){if(a==='close'&&!confirm('이번 라운드를 마감하고 주가를 반영할까요?'))return;try{await api(`/rooms/${T.code}/teacher`,{pin:T.pin,action:a});await load()}catch(e){alert(e.message)}}
-async function load(){try{D=await api(`/rooms/${T.code}/teacher?pin=${encodeURIComponent(T.pin)}`);draw()}catch(e){$('#app').innerHTML=`<div class="card"><p class="err">${esc(e.message)}</p><button id="re">다른 방 열기</button></div>`;$('#re').onclick=()=>{T={};saveT();setup()}}}
+const avg=a=>a.reduce((x,y)=>x+y,0)/a.length;const pct=x=>(x>0?'+':'')+fmt(x)+'%';
+const COI=['img/co_a.webp','img/co_b.webp','img/co_c.webp','img/co_d.webp'];
+let clockOff=0,lastKey='',LIMIT=+(localStorage.getItem('tcLimit')||240);
+function chart(g){const st=D.state;const R=st.real?.[g];const h=st.history[g];if(!R||!h.length)return '';
+ const months=R.kospi.map(r=>r[0]);const mi=d=>months.indexOf(d);
+ const norm=s=>{const base=(s.find(r=>r[0]===h[0].date)||s[0])[1];return s.map(([d,v])=>[mi(d),v/base*100])};
+ const series=[{n:'실제 코스피',c:'#16130f',w:4,pts:norm(R.kospi)}];if(R.sp500)series.push({n:'실제 S&P 500',c:'#1d4ed8',w:3,pts:norm(R.sp500)});
+ series.push({n:'우리 반',c:'#d6281b',w:4,d:'10 6',pts:h.map(x=>[mi(x.date),avg(x.after)]),dots:true});
+ const all=series.flatMap(s=>s.pts.map(p=>p[1])).concat(100);const lo=Math.floor(Math.min(...all)/10)*10-5,hi=Math.ceil(Math.max(...all)/10)*10+5;
+ const W=1000,H=430,L=56,Rr=160,T=24,B=58;const X=i=>L+(W-L-Rr)*i/(months.length-1),Y=v=>T+(H-T-B)*(1-(v-lo)/(hi-lo));
+ let s=`<svg class="chart draw" viewBox="0 0 ${W} ${H}">`;for(let v=Math.ceil(lo/20)*20;v<=hi;v+=20)s+=`<line x1="${L}" x2="${W-Rr}" y1="${Y(v)}" y2="${Y(v)}" stroke="#e4dbc8"/><text x="${L-8}" y="${Y(v)+4}" font-size="13" text-anchor="end">${v}</text>`;
+ s+=`<line x1="${L}" x2="${W-Rr}" y1="${Y(100)}" y2="${Y(100)}" stroke="#16130f" stroke-dasharray="3 4"/>`;
+ months.forEach((m,i)=>{if(i%3===0)s+=`<text x="${X(i)}" y="${H-B+20}" font-size="12" text-anchor="middle">${m.replace('-','.')}</text>`});
+ h.forEach((x,k)=>{const i=mi(x.date);s+=`<line x1="${X(i)}" x2="${X(i)}" y1="${T}" y2="${H-B}" stroke="#d6281b" stroke-opacity=".18"/><text x="${X(i)}" y="${H-B+40}" font-size="13" font-weight="700" text-anchor="middle" fill="#d6281b">R${k+1}</text>`});
+ series.forEach((se,k)=>{const pts=se.pts.map(p=>X(p[0]).toFixed(1)+','+Y(p[1]).toFixed(1)).join(' ');const last=se.pts.at(-1);
+  s+=`<polyline class="ln" style="animation-delay:${k*.6}s" ${se.d?`stroke-dasharray="${se.d}"`:'pathLength="1"'} fill="none" stroke="${se.c}" stroke-width="${se.w}" stroke-linejoin="round" points="${pts}"/>`;
+  if(se.dots)se.pts.forEach(p=>s+=`<circle class="dt" style="animation-delay:${k*.6+.9}s" cx="${X(p[0])}" cy="${Y(p[1])}" r="5" fill="${se.c}"/>`);
+  s+=`<text class="lb" style="animation-delay:${k*.6+1}s" x="${X(last[0])+8}" y="${Y(last[1])+5}" font-size="15" font-weight="700" fill="${se.c}">${se.n.replace('실제 ','')} ${Math.round(last[1])}</text>`});
+ return s+'</svg><p class="muted">세 선 모두 R1 시점=100. 코스피 ^KS11 · S&P 500 ^GSPC 월말 종가(Yahoo Finance)</p>'}
+function bars(x){const mx=30;const bar=(v,c)=>{const w=Math.min(Math.abs(v),mx)/mx*50;return `<div class="bw"><span class="b ${v>=0?'p':'n'}" style="--w:${w}%;background:${c}"></span><em>${pct(v)}</em></div>`};
+ return `<div class="bars"><div class="bh"><span></span><span>사건 영향</span><span>우리 반 매수·매도</span><span>최종 변화</span></div>${CO.map((c,i)=>{const tot=(x.after[i]/x.before[i]-1)*100;return `<div class="br"><b>${c}</b>${bar(x.e[i],x.e[i]>=0?'#2fa86b':'#d6281b')}${bar(x.d[i],x.d[i]>=0?'#53d18f':'#ff7a6e')}<strong class="${tot>=0?'up':'down'}">${tot>=0?'▲':'▼'} ${pct(tot)}<small>${fmt(x.before[i])} → ${fmt(x.after[i])} · 산 ${x.buyers[i]} / 판 ${x.sellers[i]}</small></strong></div>`}).join('')}</div>`}
+function board(p,prev){return `<div class="board">${CO.map((c,i)=>{const ch=prev?(p[i]/prev[i]-1)*100:0;return `<div class="tile ${prev?(ch>=0?'fu':'fd'):''}"><img src="${COI[i]}" alt=""><div class="nm">${c}</div><div class="price" data-from="${prev?prev[i]:p[i]}" data-to="${p[i]}">${fmt(prev?prev[i]:p[i])}</div>${prev?`<div class="chg ${ch>=0?'up':'down'}">${ch>=0?'▲ +':'▼ '}${fmt(ch)}%</div>`:'<div class="chg">만원</div>'}</div>`}).join('')}</div>`}
+function countUp(){document.querySelectorAll('.price[data-from]').forEach(el=>{const a=+el.dataset.from,b=+el.dataset.to;if(a===b){el.textContent=fmt(b);return}const t0=performance.now(),Dd=1500;const step=t=>{const k=Math.min(1,(t-t0)/Dd),e=1-Math.pow(1-k,3);el.textContent=fmt(a+(b-a)*e);if(k<1)requestAnimationFrame(step)};setTimeout(()=>requestAnimationFrame(step),350)})}
+function tick(){const st=D?.state;const el=document.getElementById('tm');if(!el||!st||st.phase!=='open'||!st.openedAt)return;const left=Math.max(0,st.limit*1000-((Date.now()+clockOff)-st.openedAt));const s=Math.ceil(left/1000);el.textContent=`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;el.classList.toggle('low',s<=30);const b=document.getElementById('tmbar');if(b)b.style.width=(left/(st.limit*1000)*100)+'%'}
+setInterval(tick,500);
+async function act(a){if(a==='close'&&!confirm('이번 라운드를 마감하고 주가를 반영할까요?'))return;try{await api(`/rooms/${T.code}/teacher`,{pin:T.pin,action:a,limit:LIMIT});lastKey='';await load()}catch(e){alert(e.message)}}
+async function load(){try{const t0=Date.now();D=await api(`/rooms/${T.code}/teacher?pin=${encodeURIComponent(T.pin)}`);clockOff=D.state.now-Math.round((t0+Date.now())/2);
+ const st=D.state;const ordN=D.orders.filter(o=>o.game===st.game&&o.round===st.round).length;const key=[tab,st.game,st.round,st.phase,st.history[st.game].length,st.limit,D.submissions.length,D.players.length].join('|');
+ if(key!==lastKey){lastKey=key;draw()}else{const c=document.getElementById('cnt');if(c)c.textContent=`${ordN}/${D.players.length}`;document.querySelectorAll('[data-pl]').forEach(td=>{const on=D.orders.some(o=>o.player===td.dataset.pl&&o.game===st.game&&o.round===st.round);td.className=on?'y':'no';td.textContent=on?'제출':'-'})}
+}catch(e){$('#app').innerHTML=`<div class="card"><p class="err">${esc(e.message)}</p><button id="re">다른 방 열기</button></div>`;$('#re').onclick=()=>{T={};saveT();setup()}}}
 
-function chart(g){const st=D.state;const real=st.real?.[g]?.kospi||[];const h=st.history[g];if(!real.length||!h.length)return '';
- const months=real.map(r=>r[0]);const mi=d=>months.indexOf(d);const base=real[mi(h[0].date)]?.[1]||real[0][1];
- const rs=real.map(([d,v],i)=>[i,v/base*100]);const cs=h.map(x=>[mi(x.date),x.after.reduce((a,b)=>a+b,0)/4]);
- const all=[...rs.map(p=>p[1]),...cs.map(p=>p[1]),100];const lo=Math.floor(Math.min(...all)/10)*10-5,hi=Math.ceil(Math.max(...all)/10)*10+5;
- const W=900,H=360,L=56,R=20,TT=20,B=50;const X=i=>L+(W-L-R)*i/(months.length-1),Y=v=>TT+(H-TT-B)*(1-(v-lo)/(hi-lo));
- let s=`<svg class="chart" viewBox="0 0 ${W} ${H}">`;for(let v=Math.ceil(lo/20)*20;v<=hi;v+=20)s+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="#ddd"/><text x="${L-8}" y="${Y(v)+4}" font-size="12" text-anchor="end">${v}</text>`;
- months.forEach((m,i)=>{if(i%3===0)s+=`<text x="${X(i)}" y="${H-B+18}" font-size="11" text-anchor="middle">${m}</text>`});
- s+=`<polyline fill="none" stroke="#16130f" stroke-width="3" points="${rs.map(p=>X(p[0])+','+Y(p[1])).join(' ')}"/><polyline fill="none" stroke="#d6281b" stroke-width="3" stroke-dasharray="8 5" points="${cs.map(p=>X(p[0])+','+Y(p[1])).join(' ')}"/>`;
- cs.forEach(p=>s+=`<circle cx="${X(p[0])}" cy="${Y(p[1])}" r="5" fill="#d6281b"/>`);return s+'</svg><p class="muted">검정 실선: 실제 코스피(R1 시점=100) · 빨강 점선: 우리 반 주가지수</p>'}
-
-function gameTab(){const st=D.state,g=st.game,p=st.prices[g],h=st.history[g];const ord=D.orders.filter(o=>o.game===g&&o.round===st.round);const ordSet=new Set(ord.map(o=>o.player));
- const nextEv=D.effects[st.round];const ph={ready:'다음 라운드 대기',open:'주문 받는 중',closed:'라운드 결과 공개 중',over:'게임 종료'}[st.phase];
- return `<div class="card"><div class="status"><span>${g==='97'?'1997 외환위기':'2008 세계 금융위기'}</span><span>라운드 <b>${Math.min(st.round+1,6)}</b>/6</span><span class="ph ${st.phase}">${ph}</span><span>입장 <b>${D.players.length}</b>명</span><span>이번 라운드 주문 <b>${ord.length}</b>명</span></div>
- <p class="muted">${st.phase==='over'?'':`이번 라운드 사건: <b>${esc(nextEv?.title)}</b> · 사건 영향(선생님만 보임) ${nextEv?.e.map((x,i)=>CO[i].slice(0,1)+' '+(x>0?'+':'')+x+'%').join(' · ')}`}</p>
- <div class="row">
-  <button onclick="act('open')" ${st.phase==='ready'?'':'disabled'}>① 라운드 열기 (사건 공개)</button>
+function gameTab(){const st=D.state,g=st.game,p=st.prices[g],h=st.history[g];const ordN=D.orders.filter(o=>o.game===g&&o.round===st.round).length;
+ const evIdx=st.phase==='over'?-1:st.round;const ev=D.effects[evIdx];const pubEv=st.events[g].at(-1);const rn=Math.min(st.round+1,6);
+ const title=st.phase==='ready'?(ev?ev.title:''):(st.phase==='over'?(g==='97'?'1997 게임 끝 · 실제와 비교':'2008 게임 끝 · 실제와 비교'):pubEv?.title||'');
+ let top=`<div class="stage ${st.phase}"><div class="sl"><div class="rd">${g==='97'?'1997':'2008'} · R${rn}<small>/6</small></div><div class="ph ${st.phase}">${{ready:'다음 라운드 대기',open:'주문 받는 중',closed:'라운드 결과',over:'게임 종료'}[st.phase]}</div></div>
+  <div class="sm"><div class="evd">${st.phase==='ready'?'다음 사건 (아직 비공개)':esc((pubEv?.date||'').replace('-','.'))}</div><div class="evt">${esc(title.split('·').slice(st.phase==='over'?0:1).join('·').trim()||title)}</div>${st.phase==='open'?`<ul class="tnews">${pubEv.news.map(n=>`<li>${n}</li>`).join('')}</ul>`:''}</div>
+  <div class="sr">${st.phase==='open'?`<div id="tm" class="tm">--:--</div><i class="tbar"><u id="tmbar"></u></i><div class="sub">제출 <b id="cnt">${ordN}/${D.players.length}</b></div>`:`<div class="sub">입장 <b>${D.players.length}</b>명</div>`}</div></div>`;
+ let ctl=`<div class="ctl">
+  <button onclick="act('open')" ${st.phase==='ready'?'':'disabled'}>① 라운드 열기</button>
   <button onclick="act('close')" ${st.phase==='open'?'':'disabled'}>② 마감하고 주가 반영</button>
   <button onclick="act('next')" ${st.phase==='closed'?'':'disabled'}>③ ${st.round>=5?'게임 끝내고 실제와 비교':'다음 라운드로'}</button>
   ${g==='97'&&st.phase==='over'?`<button onclick="act('start08')">2008 게임 시작</button>`:''}
-  ${st.phase==='open'?`<button class="ghost" onclick="act('undoOpen')">열기 취소</button>`:''}</div>
- <p class="muted">진행: 라운드 열기 → 학생들 사건 읽고 주문(4~5분) → 마감 → 결과 설명(1분) → 다음 라운드. 주문하지 않은 학생은 보유를 그대로 유지합니다.</p></div>
- <div class="card"><h3>현재 주가</h3><table><tr>${CO.map(c=>`<th>${c}</th>`).join('')}</tr><tr>${p.map(x=>`<td class="n">${fmt(x)}</td>`).join('')}</tr></table>
- ${h.length?`<h3>라운드 기록</h3><table><tr><th>R</th><th>사건</th>${CO.map(c=>`<th>${c}<br>사건 / 반 영향 → 가격</th>`).join('')}<th>주문</th></tr>${h.map((x,k)=>`<tr><td>R${k+1}</td><td>${esc(x.title)}</td>${x.after.map((a,i)=>`<td class="n">${x.e[i]}% / ${x.d[i]}% → ${fmt(a)}</td>`).join('')}<td class="n">${x.ordered}/${x.players}</td></tr>`).join('')}</table>`:''}
- ${st.done['97']?'<h3>1997 게임: 실제 코스피와 비교</h3>'+chart('97'):''}${st.done['08']?'<h3>2008 게임: 실제 코스피와 비교</h3>'+chart('08'):''}</div>
- <div class="card"><h3>학생 (${D.players.length}명)</h3><table><tr><th>학번 이름</th><th>이번 라운드 주문</th><th>1997 평가액</th><th>2008 평가액</th><th>보고서 제출</th></tr>
- ${D.players.map(pl=>{const w=gg=>{const G=pl.games[gg];return G.cash+G.q.reduce((s,q,i)=>s+q*D.state.prices[gg][i],0)};const sub=D.submissions.find(s=>s.player===pl.id);return `<tr><td>${esc(pl.name)}</td><td class="${ordSet.has(pl.id)?'y':'no'}">${ordSet.has(pl.id)?'제출':'-'}</td><td class="n">${fmt(w('97'))}</td><td class="n">${fmt(w('08'))}</td><td>${sub?'<span class="y">'+new Date(sub.ts).toLocaleTimeString('ko-KR')+'</span>':'-'}</td></tr>`}).join('')}</table>
- <p class="muted">학생 접속 주소: <a href="${SITE}?room=${T.code}" target="_blank">${SITE}?room=${T.code}</a></p></div>`}
+  ${st.phase==='open'?`<button class="ghost" onclick="act('extend')">+1분</button><button class="ghost" onclick="act('undoOpen')">열기 취소</button>`:''}
+  <label class="lim">주문 시간 <select onchange="LIMIT=+this.value;localStorage.setItem('tcLimit',LIMIT)">${[180,240,300].map(v=>`<option value="${v}" ${v===LIMIT?'selected':''}>${v/60}분</option>`).join('')}</select></label>
+  ${st.phase==='ready'&&ev?`<span class="peek">선생님만 보임 · 사건 영향 ${ev.e.map((x,i)=>CO[i].slice(0,1)+' '+(x>0?'+':'')+x+'%').join(' · ')}</span>`:''}</div>`;
+ let body='';
+ if(st.phase==='over')body+=`<div class="card">${chart(g)}</div>`;
+ else body+=`<div class="card">${board(p,st.phase==='closed'?h.at(-1)?.before:null)}${st.phase==='closed'&&h.length?`<h3>왜 바뀌었나</h3>${bars(h.at(-1))}`:''}</div>`;
+ body+=`<details class="card"><summary>학생 ${D.players.length}명 · 주문 현황</summary><table><tr><th>학번 이름</th><th>이번 라운드</th><th>1997 평가액</th><th>2008 평가액</th><th>보고서</th></tr>
+ ${D.players.map(pl=>{const w=gg=>{const G=pl.games[gg];return G.cash+G.q.reduce((s,q,i)=>s+q*D.state.prices[gg][i],0)};const on=D.orders.some(o=>o.player===pl.id&&o.game===g&&o.round===st.round);const sub=D.submissions.find(s=>s.player===pl.id);return `<tr><td>${esc(pl.name)}</td><td data-pl="${pl.id}" class="${on?'y':'no'}">${on?'제출':'-'}</td><td class="n">${fmt(w('97'))}</td><td class="n">${fmt(w('08'))}</td><td>${sub?'<span class="y">'+new Date(sub.ts).toLocaleTimeString('ko-KR')+'</span>':'-'}</td></tr>`}).join('')}</table>
+ <p class="muted">학생 접속 주소: <a href="${SITE}?room=${T.code}" target="_blank">${SITE}?room=${T.code}</a></p></details>
+ ${h.length?`<details class="card"><summary>라운드 기록</summary><table><tr><th>R</th><th>사건</th>${CO.map(c=>`<th>${c}<br>사건 / 반 → 가격</th>`).join('')}<th>주문</th></tr>${h.map((x,k)=>`<tr><td>R${k+1}</td><td>${esc(x.title)}</td>${x.after.map((a,i)=>`<td class="n">${x.e[i]}% / ${x.d[i]}% → ${fmt(a)}</td>`).join('')}<td class="n">${x.ordered}/${x.players}</td></tr>`).join('')}</table></details>`:''}
+ ${st.done['97']&&g==='08'?`<details class="card"><summary>1997 게임: 실제와 비교 다시 보기</summary>${chart('97')}</details>`:''}`;
+ return top+ctl+body}
 
 function L(l,v){return `<p><b>${l}</b><br>${esc(v).replace(/\n/g,'<br>')}</p>`}
 function repTab(){const subs=[...D.submissions].sort((a,b)=>a.name.localeCompare(b.name));
@@ -98,9 +152,9 @@ function csv(){const rows=[['학번 이름','제출 시각','AI 도구','링크'
  const t='\ufeff'+rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/csv'}));a.download=`AI대화기록_방${T.code}.csv`;a.click()}
 
 function draw(){$('#code').textContent=T.code;const open=[...document.querySelectorAll('details[open]')].map(d=>d.querySelector('summary').textContent);
- $('#app').innerHTML=`<div class="tabs"><button class="${tab==='game'?'on':''}" onclick="tab='game';draw()">게임 진행</button><button class="${tab==='rep'?'on':''}" onclick="tab='rep';draw()">제출물·AI 대화 기록</button></div>`+(tab==='game'?gameTab():repTab());
- document.querySelectorAll('details').forEach(d=>{if(open.includes(d.querySelector('summary').textContent))d.open=true})}
-function start(){load();setInterval(()=>{if(tab==='game'||!document.querySelector('details[open]'))load()},3000)}
+ $('#app').innerHTML=`<div class="tabs"><button class="${tab==='game'?'on':''}" onclick="tab='game';lastKey='';draw()">게임 진행</button><button class="${tab==='rep'?'on':''}" onclick="tab='rep';lastKey='';draw()">제출물·AI 대화 기록</button></div>`+(tab==='game'?gameTab():repTab());
+ document.querySelectorAll('details').forEach(d=>{if(open.includes(d.querySelector('summary').textContent))d.open=true});countUp();tick()}
+function start(){load();setInterval(load,2500)}
 T.code&&T.pin?start():setup();
 </script>
 </body>

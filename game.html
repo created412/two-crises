@@ -136,6 +136,67 @@ td.n{text-align:right;white-space:nowrap;font-family:var(--mono)}
 .howto{font-size:14px;background:var(--paper);border:1px solid var(--rule);padding:10px 14px;margin:8px 0}
 .howto li{margin:2px 0}
 @media(max-width:700px){.slidebox iframe{height:380px}.linkrow{grid-template-columns:1fr}}
+
+/* ===== 가독성·모션 (라운드 화면) ===== */
+.live{position:sticky;top:0;z-index:20;font-size:16px}
+.live .rd{font-family:var(--display);font-size:26px;color:var(--led)}.live .rd small{font-size:15px;color:#b9b2a2;margin-left:2px}
+.live .me{margin-left:auto}.live .me em{font-style:normal;font-family:var(--mono);margin-left:6px}
+.live .up{color:#53d18f}.live .down{color:#ff7a6e}
+.timer{display:inline-flex;align-items:center;gap:10px}.timer b{font-family:var(--mono);font-size:26px;color:#fff}.timer i{display:block;width:120px;height:8px;background:#2a302b}.timer u{display:block;height:100%;background:var(--led);transition:width .5s linear}
+.timer.low b{color:#ff5a4e;animation:blink 1s steps(2) infinite}.timer.low u{background:#ff5a4e}
+@keyframes blink{50%{opacity:.35}}
+.wait .big{font-family:var(--display);font-size:72px;color:var(--ink);line-height:1;margin-bottom:10px}
+.event{border-width:3px}
+.evhead{display:flex;align-items:center;gap:16px;margin-bottom:6px}
+.stamp2{font-family:var(--display);color:#fff;background:var(--red);padding:4px 14px;font-size:20px;transform:rotate(-3deg)}
+.evdate{font-family:var(--mono);font-weight:700;font-size:34px;color:var(--red);letter-spacing:.04em}
+.evt{font-size:40px!important;margin:4px 0 12px!important}
+.evnews{list-style:none;margin:0 0 6px;padding:0}
+.evnews li{font-size:19px;line-height:1.6;padding:10px 0 10px 26px;border-top:1px solid var(--rule);position:relative}
+.evnews li::before{content:'';position:absolute;left:4px;top:21px;width:10px;height:10px;background:var(--red)}
+.event.fresh .stamp2{animation:stampIn .5s cubic-bezier(.2,1.6,.4,1) both}
+.event.fresh .evdate,.event.fresh .evt{animation:slideIn .6s ease-out both}
+.event.fresh .evnews li{animation:fadeUp .6s ease-out both}
+@keyframes stampIn{from{transform:scale(2.4) rotate(-12deg);opacity:0}to{transform:rotate(-3deg);opacity:1}}
+@keyframes slideIn{from{transform:translateX(-30px);opacity:0}to{transform:none;opacity:1}}
+@keyframes fadeUp{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
+.board .unit{font-size:13px;color:#b9b2a2;margin-top:-4px}
+.price{animation:none!important}
+.tile.fu{animation:flashU 1.6s ease-out .3s}.tile.fd{animation:flashD 1.6s ease-out .3s}
+@keyframes flashU{0%,100%{background:transparent}25%{background:rgba(83,209,143,.28)}}
+@keyframes flashD{0%,100%{background:transparent}25%{background:rgba(255,90,78,.3)}}
+.bars{margin:8px 0}
+.bh,.br{display:grid;grid-template-columns:150px 1fr 1fr 190px;gap:14px;align-items:center}
+.bh{font-size:13px;color:var(--ink2);padding-bottom:4px;border-bottom:2px solid var(--ink)}
+.br{padding:10px 0;border-bottom:1px solid var(--rule)}.br b{font-size:15px}
+.bw{position:relative;height:28px;background:linear-gradient(90deg,transparent calc(50% - 1px),#16130f calc(50% - 1px),#16130f calc(50% + 1px),transparent calc(50% + 1px)),#f1ebdf}
+.bw .b{position:absolute;top:4px;height:20px;width:0;animation:grow .9s ease-out .4s forwards}
+.bw .b.p{left:50%}.bw .b.n{right:50%}
+@keyframes grow{to{width:var(--w)}}
+.bw em{position:absolute;top:4px;font-style:normal;font-family:var(--mono);font-size:13px;font-weight:700;left:4px}
+.br strong{font-family:var(--mono);font-size:22px}.br strong small{display:block;font-size:12px;color:var(--ink2);font-weight:400}
+.chart.draw .ln{stroke-dashoffset:1;animation:drawLn 2.2s ease-in-out forwards}
+.chart.draw polyline.ln[stroke-dasharray]{stroke-dashoffset:0;animation:fadeIn 1.6s ease-out both}
+@keyframes drawLn{from{stroke-dasharray:1 1;stroke-dashoffset:1}to{stroke-dasharray:1 1;stroke-dashoffset:0}}
+.chart.draw .dt,.chart.draw .lb{opacity:0;animation:fadeIn .5s ease-out forwards}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.qgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.qi{display:grid;grid-template-columns:52px 1fr;grid-template-rows:auto auto;gap:4px 10px;align-items:center;border:1.5px solid var(--ink);padding:8px;background:#fff;margin:0;font-weight:700}
+.qi img{grid-row:1/3;width:52px;height:52px;object-fit:cover}
+.qi span{font-size:14px}.qi small{display:block;font-family:var(--mono);color:var(--red);font-weight:700}
+.qi input{font-size:20px;padding:6px 8px}
+.calc{font-size:15px;margin:10px 0;padding:8px 12px;background:var(--paper)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+details.card summary{cursor:pointer;font-weight:700;font-size:16px}
+@media(max-width:800px){.qgrid{grid-template-columns:1fr 1fr}.two{grid-template-columns:1fr}.bh,.br{grid-template-columns:90px 1fr 1fr;}.br strong{grid-column:1/-1}.evt{font-size:28px!important}.live .me{margin-left:0}}
+@media(prefers-reduced-motion:reduce){.chart.draw .ln{stroke-dasharray:none!important;animation:none}.chart.draw .dt,.chart.draw .lb{opacity:1}.bw .b{width:var(--w)}}
+
+
+.evbody.has{display:grid;grid-template-columns:1.15fr 1fr;gap:24px;align-items:start}
+.evbody .media{margin:0;grid-template-columns:1fr!important}
+.evbody .media figure>img,.evbody .media .vbox{height:210px!important;max-width:none!important;width:100%;aspect-ratio:auto}
+.evbody .media figcaption{font-size:12px}
+@media(max-width:800px){.evbody.has{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -222,12 +283,13 @@ V[0]=()=>`<div class="card"><h2>오늘 할 일</h2>
 <p>올해 여러분은 <b>바나나 협상</b>(누가 이익·손해를 보나), <b>ODA 제안</b>(한 정책의 여러 효과), <b>ECOS 통계 탐구</b>(위기 때 환율·외채·금리)를 했습니다. 오늘은 그 통계를 <b>실제 판단</b>에 써 봅니다.</p>
 <p>반 전체가 <b>같은 시장</b>에서 투자합니다. 라운드마다 실제 역사 사건이 터지고, <b>사건의 영향</b>과 <b>우리 반의 매수·매도</b>가 함께 다음 주가를 정합니다. 게임이 끝나면 <b>실제 코스피</b>와 우리 반 주가를 비교합니다.</p>
 <div class="tip"><b>점수는 수익률로 매기지 않습니다.</b> 어떤 근거로 판단했고, 실제와 비교해 어떻게 해석을 고쳤는지가 점수입니다. 개인 평가입니다.</div>
-<h3>오늘 순서 (180분)</h3><ol class="flow">
-<li><b>내 자료 다시보기</b> 15분: 지난번 발표 슬라이드를 직접 열어 피드백대로 고친다</li>
-<li><b>1997 게임</b> 6라운드 + 실제와 비교 (약 40분)</li><li>휴식 10분</li>
-<li><b>2008 게임</b> 6라운드 + 실제와 비교 (약 38분)</li>
-<li><b>지표 비교·득실표·AI 검증</b> 38분: AI 대화 기록 링크도 함께 제출</li>
-<li><b>151분 전원 제출 → 2분 구술</b></li></ol>
+<h3>오늘 순서 (150분)</h3><ol class="flow">
+<li><b>안내·입장</b> 8분</li>
+<li><b>내 발표 슬라이드 고치기</b> 12분</li>
+<li><b>1997 게임</b> 6라운드(라운드당 4분 주문) + 실제와 비교 · 40분</li>
+<li><b>2008 게임</b> 6라운드 + 코스피·S&P 500과 비교 · 35분</li>
+<li><b>보고서</b> 지표 비교·득실표·AI 검증과 대화 링크 · 29분</li>
+<li><b>124분 전원 제출 → 2분 구술</b> · 26분</li></ol>
 <label for="code">학번과 이름</label><div class="muted">제출본에 그대로 들어갑니다.</div><input id="code" placeholder="예: 20315 김민준" autocomplete="off">
 <label for="room">방 코드 (선생님 화면의 4자리)</label><input id="room" inputmode="numeric" maxlength="4" placeholder="예: 4821">
 <div id="msg"></div></div>
@@ -256,85 +318,92 @@ ${ta('fix.evidence','그래서 내 통계가 말해 주는 위기의 신호는?'
 V[1].after=()=>{wire();document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{S.topic=+b.dataset.t;save();render()});$('#back').onclick=()=>go(0);$('#next').onclick=()=>{if(!filled('fix.after','fix.evidence'))return $('#msg').innerHTML='<div class="err">고친 내용과 위기 신호를 적어야 합니다.</div>';go(2)}};
 
 /* ---------- 2·3. 실시간 게임 ---------- */
-let LIVE=null,lastKey='',pollT=null;
+let LIVE=null,lastKey='',clockOff=0,shown={};
 function myWealth(g,p){const G=LIVE?.me?.games?.[g];if(!G)return START;return G.cash+G.q.reduce((s,q,i)=>s+q*p[i],0)}
-function classIndex(h){return h.map(x=>x.after.reduce((a,b)=>a+b,0)/4)}
-function chartSVG(g,st){const real=st.real?.[g]?.kospi||[];const h=st.history[g];if(!real.length||!h.length)return '';
- const months=real.map(r=>r[0]);const mi=d=>months.indexOf(d);const base=real[mi(h[0].date)]?.[1]||real[0][1];
- const rs=real.map(([d,v],i)=>[i,v/base*100]);const cs=h.map(x=>[mi(x.date),x.after.reduce((a,b)=>a+b,0)/4]);
- const all=[...rs.map(p=>p[1]),...cs.map(p=>p[1]),100];const lo=Math.floor(Math.min(...all)/10)*10-5,hi=Math.ceil(Math.max(...all)/10)*10+5;
- const W=900,H=380,L=56,R=20,T=20,B=56;const X=i=>L+(W-L-R)*i/(months.length-1),Y=v=>T+(H-T-B)*(1-(v-lo)/(hi-lo));
- let s=`<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="실제 코스피와 우리 반 주가 비교">`;
- for(let v=Math.ceil(lo/20)*20;v<=hi;v+=20)s+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="#ddd3bf"/><text x="${L-8}" y="${Y(v)+4}" font-size="12" text-anchor="end" fill="#4a4339">${v}</text>`;
- s+=`<line x1="${L}" x2="${W-R}" y1="${Y(100)}" y2="${Y(100)}" stroke="#16130f" stroke-dasharray="4 4"/>`;
- months.forEach((m,i)=>{if(i%3===0)s+=`<text x="${X(i)}" y="${H-B+18}" font-size="11" text-anchor="middle" fill="#4a4339">${m.replace('-','.')}</text>`});
- h.forEach((x,k)=>{const i=mi(x.date);s+=`<line x1="${X(i)}" x2="${X(i)}" y1="${T}" y2="${H-B}" stroke="#d6281b" stroke-opacity=".25"/><text x="${X(i)}" y="${H-B+36}" font-size="11" text-anchor="middle" fill="#d6281b">R${k+1}</text>`});
- s+=`<polyline fill="none" stroke="#16130f" stroke-width="3" points="${rs.map(p=>X(p[0])+','+Y(p[1])).join(' ')}"/>`;
- s+=`<polyline fill="none" stroke="#d6281b" stroke-width="3" stroke-dasharray="8 5" points="${cs.map(p=>X(p[0])+','+Y(p[1])).join(' ')}"/>`;
- cs.forEach(p=>s+=`<circle cx="${X(p[0])}" cy="${Y(p[1])}" r="5" fill="#d6281b"/>`);
- return s+'</svg><div class="legend"><span><i style="background:#16130f"></i>실제 코스피 (R1 시점=100, 월말 종가)</span><span><i style="background:#d6281b"></i>우리 반 주가지수 (네 회사 평균, 시작=100)</span></div><div class="muted">코스피: Yahoo Finance ^KS11 월말 종가. 빨간 세로선은 라운드 사건 시점.</div>'}
-function breakdown(x){return `<table class="bd"><tr><th>회사</th><th>이전 가격</th><th>사건 영향</th><th>우리 반 매수·매도 영향</th><th>새 가격</th><th>산 사람 / 판 사람</th></tr>${CO.map((c,i)=>`<tr><td>${c.k} ${c.name}</td><td class="n">${fmt(x.before[i])}</td><td class="n ${x.e[i]>0?'pos':x.e[i]<0?'neg':'e'}">${pct(x.e[i])}</td><td class="n ${x.d[i]>0?'pos':x.d[i]<0?'neg':'e'}">${pct(x.d[i])}</td><td class="n"><b>${fmt(x.after[i])}</b></td><td class="n">${x.buyers[i]}명 / ${x.sellers[i]}명</td></tr>`).join('')}</table><div class="muted">주문 낸 학생 ${x.ordered}/${x.players}명. 우리 반 영향 = 반 전체 자산 중 그 회사로 몰린 돈의 비중 × 0.4 (최대 ±15%). 사건 영향은 교육용으로 단순화한 값입니다.</div>`}
-function board(p,prev){return `<div class="board">${CO.map((c,i)=>{const ch=prev?(p[i]/prev[i]-1)*100:0;return `<div class="tile"><div class="nm"><b>${c.k} ${c.name}</b> ${c.type}</div><div class="price">${fmt(p[i])}<small>만원</small></div>${prev?`<div class="chg ${ch>=0?'up':'down'}">${ch>=0?'▲ +':'▼ '}${fmt(ch)}%</div>`:'<div class="chg" style="color:#b9b2a2">현재가</div>'}<div class="hold">보유 ${LIVE?.me?.games?.[g_]?.q?.[i]??0}주</div></div>`}).join('')}</div>`}
+const avg=a=>a.reduce((x,y)=>x+y,0)/a.length;
+/* 비교 그래프: 실제 지수들 + 우리 반, 선이 그려지는 애니메이션 */
+function chartSVG(g,st){const R=st.real?.[g];const h=st.history[g];if(!R||!h.length)return '';
+ const months=R.kospi.map(r=>r[0]);const mi=d=>months.indexOf(d);
+ const norm=s=>{const base=(s.find(r=>r[0]===h[0].date)||s[0])[1];return s.map(([d,v])=>[mi(d),v/base*100])};
+ const series=[{n:'실제 코스피',c:'#16130f',w:4,d:'',pts:norm(R.kospi)}];
+ if(R.sp500)series.push({n:'실제 S&P 500 (미국)',c:'#1d4ed8',w:3,d:'',pts:norm(R.sp500)});
+ series.push({n:'우리 반 주가지수',c:'#d6281b',w:4,d:'10 6',pts:h.map(x=>[mi(x.date),avg(x.after)]),dots:true});
+ const all=series.flatMap(s=>s.pts.map(p=>p[1])).concat(100);const lo=Math.floor(Math.min(...all)/10)*10-5,hi=Math.ceil(Math.max(...all)/10)*10+5;
+ const W=960,H=420,L=56,Rr=150,T=24,B=58;const X=i=>L+(W-L-Rr)*i/(months.length-1),Y=v=>T+(H-T-B)*(1-(v-lo)/(hi-lo));
+ let s=`<svg class="chart draw" viewBox="0 0 ${W} ${H}" role="img" aria-label="실제 지수와 우리 반 주가 비교">`;
+ for(let v=Math.ceil(lo/20)*20;v<=hi;v+=20)s+=`<line x1="${L}" x2="${W-Rr}" y1="${Y(v)}" y2="${Y(v)}" stroke="#e4dbc8"/><text x="${L-8}" y="${Y(v)+4}" font-size="13" text-anchor="end" fill="#4a4339">${v}</text>`;
+ s+=`<line x1="${L}" x2="${W-Rr}" y1="${Y(100)}" y2="${Y(100)}" stroke="#16130f" stroke-dasharray="3 4"/><text x="${W-Rr+6}" y="${Y(100)+4}" font-size="12" fill="#4a4339">시작=100</text>`;
+ months.forEach((m,i)=>{if(i%3===0)s+=`<text x="${X(i)}" y="${H-B+20}" font-size="12" text-anchor="middle" fill="#4a4339">${m.replace('-','.')}</text>`});
+ h.forEach((x,k)=>{const i=mi(x.date);s+=`<line x1="${X(i)}" x2="${X(i)}" y1="${T}" y2="${H-B}" stroke="#d6281b" stroke-opacity=".18"/><text x="${X(i)}" y="${H-B+40}" font-size="12" font-weight="700" text-anchor="middle" fill="#d6281b">R${k+1}</text>`});
+ series.forEach((se,k)=>{const pts=se.pts.map(p=>X(p[0]).toFixed(1)+','+Y(p[1]).toFixed(1)).join(' ');const last=se.pts.at(-1);
+  s+=`<polyline class="ln" style="animation-delay:${k*0.6}s" ${se.d?'':'pathLength="1"'} fill="none" stroke="${se.c}" stroke-width="${se.w}" stroke-linejoin="round" ${se.d?`stroke-dasharray="${se.d}"`:''} points="${pts}"/>`;
+  if(se.dots)se.pts.forEach(p=>s+=`<circle class="dt" style="animation-delay:${k*0.6+0.9}s" cx="${X(p[0])}" cy="${Y(p[1])}" r="5" fill="${se.c}"/>`);
+  s+=`<text class="lb" style="animation-delay:${k*0.6+1}s" x="${X(last[0])+8}" y="${Y(last[1])+5}" font-size="14" font-weight="700" fill="${se.c}">${se.n.replace(' (미국)','').replace('실제 ','')} ${Math.round(last[1])}</text>`});
+ return s+`</svg><div class="legend">${series.map(se=>`<span><i style="background:${se.c}"></i>${se.n}</span>`).join('')}</div><div class="muted">세 선 모두 R1 시점=100으로 맞춘 값. 코스피: Yahoo Finance ^KS11, S&P 500: ^GSPC 월말 종가.</div>`}
+/* 결과: 회사별 막대 (사건 영향 / 우리 반 영향 / 최종 변화) */
+function bars(x){const mx=30;const bar=(v,c)=>{const w=Math.min(Math.abs(v),mx)/mx*50;return `<div class="bw"><span class="b ${v>=0?'p':'n'}" style="--w:${w}%;background:${c}"></span><em>${pct(v)}</em></div>`};
+ return `<div class="bars"><div class="bh"><span></span><span>사건 영향</span><span>우리 반 매수·매도</span><span>최종 변화</span></div>${CO.map((c,i)=>{const tot=(x.after[i]/x.before[i]-1)*100;return `<div class="br"><b>${c.k} ${c.name}</b>${bar(x.e[i],x.e[i]>=0?'#2fa86b':'#d6281b')}${bar(x.d[i],x.d[i]>=0?'#53d18f':'#ff7a6e')}<strong class="${tot>=0?'up':'down'}">${tot>=0?'▲':'▼'} ${pct(tot)}<small>${fmt(x.before[i])} → ${fmt(x.after[i])}</small></strong></div>`}).join('')}</div>
+ <div class="muted">산 사람/판 사람: ${CO.map((c,i)=>`${c.k} ${x.buyers[i]}/${x.sellers[i]}`).join(' · ')} · 주문 ${x.ordered}/${x.players}명 · 우리 반 영향 = 그 회사로 몰린 돈 비중 × 0.4 (최대 ±15%)</div>`}
+function board(g,p,prev){return `<div class="board">${CO.map((c,i)=>{const ch=prev?(p[i]/prev[i]-1)*100:0;return `<div class="tile ${prev?(ch>=0?'fu':'fd'):''}"><div class="nm"><b>${c.k} ${c.name}</b> ${c.type}</div><div class="price" data-from="${prev?prev[i]:p[i]}" data-to="${p[i]}">${fmt(prev?prev[i]:p[i])}</div><div class="unit">만원</div>${prev?`<div class="chg ${ch>=0?'up':'down'}">${ch>=0?'▲ +':'▼ '}${fmt(ch)}%</div>`:'<div class="chg" style="color:#b9b2a2">현재가</div>'}<div class="hold">내 보유 ${LIVE?.me?.games?.[g]?.q?.[i]??0}주</div></div>`}).join('')}</div>`}
+function countUp(){document.querySelectorAll('.price[data-from]').forEach(el=>{const a=+el.dataset.from,b=+el.dataset.to;if(a===b||matchMedia('(prefers-reduced-motion: reduce)').matches){el.textContent=fmt(b);return}const t0=performance.now(),D=1400;const step=t=>{const k=Math.min(1,(t-t0)/D),e=1-Math.pow(1-k,3);el.textContent=fmt(a+(b-a)*e);if(k<1)requestAnimationFrame(step)};setTimeout(()=>requestAnimationFrame(step),350)})}
+function timerHTML(st){return st.phase==='open'?`<span class="timer"><b id="tm">--:--</b><i><u id="tmbar"></u></i></span>`:''}
+function tickTimer(){const st=LIVE?.state;const el=document.getElementById('tm');if(!st||!el||st.phase!=='open'||!st.openedAt)return;const left=Math.max(0,st.limit*1000-((Date.now()+clockOff)-st.openedAt));const s=Math.ceil(left/1000);el.textContent=`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;const bar=document.getElementById('tmbar');if(bar)bar.style.width=(left/(st.limit*1000)*100)+'%';el.parentElement.classList.toggle('low',s<=30)}
+setInterval(tickTimer,500);
 let g_='97';
 function gameView(g){g_=g;
  if(!S.pid)return `<div class="card wait">먼저 시작 화면에서 입장하세요.</div>`;
  if(!LIVE)return `<div class="card wait">선생님 서버에 연결하는 중…</div>`;
- const st=LIVE.state;const h=st.history[g];const ev=st.events[g];
- const isCur=st.game===g;const over=st.done[g];
+ const st=LIVE.state;const h=st.history[g];const ev=st.events[g];const isCur=st.game===g;const over=st.done[g];
  if(!isCur&&!over)return `<div class="card wait">${g==='08'?'1997 게임이 끝나면 선생님이 2008 게임을 시작합니다.':'아직 시작 전입니다.'}</div>`;
- const p=st.prices[g];const last=h.at(-1);const phase=over&&!isCur?'over':st.phase;
- const curEv=phase==='ready'?null:ev.at(-1);
- const G=LIVE.me?.games?.[g]||{cash:START,q:[0,0,0,0]};const w=myWealth(g,p);
- let html=`<div class="live"><span>방 <b>${esc(S.room)}</b></span><span>${GNAME[g]}</span><span>라운드 <b>${Math.min(st.round+1,6)}</b>/6</span><span class="ph ${phase}">${{ready:'다음 라운드 대기',open:'주문 받는 중',closed:'라운드 결과',over:'게임 종료'}[phase]}</span>${phase==='open'?`<span>제출 <b id="cnt">${LIVE.ordered}/${LIVE.players}</b>명</span>`:''}</div>`;
- if(phase==='ready')html+=`<div class="card wait">${h.length?'지난 라운드 결과를 돌아보세요. ':''}선생님이 다음 라운드를 열면 새 사건이 공개됩니다.</div>`;
- if(curEv&&phase!=='over')html+=`<div class="card"><h2>${esc(curEv.title)}</h2>${curEv.news.map(n=>`<div class="news">${n}</div>`).join('')}${mediaHTML(curEv.media)}</div>`;
- html+=`<div class="card"><h3>${phase==='closed'||phase==='over'?'지금 주가':'현재 주가'}</h3>${board(p,phase==='closed'?last?.before:null)}
- <div class="stat"><div>내 평가액 <b>${fmt(w)}만원</b></div><div>현금 <b>${fmt(G.cash)}만원</b></div><div>수익률 <b>${pct((w/START-1)*100)}</b> <span class="muted">(점수 아님)</span></div></div>
- ${phase==='closed'&&last?`<h3>이번 라운드 주가는 왜 바뀌었나</h3>${breakdown(last)}`:''}</div>`;
+ const p=st.prices[g];const last=h.at(-1);const phase=over&&!isCur?'over':st.phase;const curEv=phase==='ready'||phase==='over'?null:ev.at(-1);
+ const G=LIVE.me?.games?.[g]||{cash:START,q:[0,0,0,0]};const w=myWealth(g,p);const rn=Math.min(st.round+1,6);
+ let html=`<div class="live"><span class="rd">${g==='97'?'1997':'2008'} · R${rn}<small>/6</small></span><span class="ph ${phase}">${{ready:'다음 라운드 대기',open:'주문 받는 중',closed:'라운드 결과',over:'게임 종료'}[phase]}</span>${timerHTML({...st,phase})}${phase==='open'?`<span>제출 <b id="cnt">${LIVE.ordered}/${LIVE.players}</b></span>`:''}<span class="me">내 평가액 <b>${fmt(w)}</b>만원 <em class="${w>=START?'up':'down'}">${pct((w/START-1)*100)}</em></span></div>`;
+ if(phase==='ready')html+=`<div class="card wait"><div class="big">R${rn}</div>${h.length?'지난 라운드 결과를 돌아보세요. ':''}선생님이 라운드를 열면 새 사건이 공개됩니다.</div>`;
+ let evH='';if(curEv)evH=`<div class="card event ${phase==='open'?'fresh':''}"><div class="evhead"><span class="stamp2">속보</span><span class="evdate">${curEv.date.replace('-','.')}</span></div><h2 class="evt">${esc(curEv.title.split('·').slice(1).join('·').trim()||curEv.title)}</h2><div class="evbody ${curEv.media?.length?'has':''}"><ul class="evnews">${curEv.news.map((n,i)=>`<li style="animation-delay:${.25+i*.35}s">${n}</li>`).join('')}</ul>${mediaHTML(curEv.media)}</div></div>`;
+ if(phase!=='closed')html+=evH;
+ if(phase!=='over')html+=`<div class="card"><h3>${phase==='closed'?'이번 라운드 주가 변화':'현재 주가'}</h3>${board(g,p,phase==='closed'?last?.before:null)}${phase==='closed'&&last?`<h3>왜 바뀌었나</h3>${bars(last)}`:''}</div>`;
+ if(phase==='closed')html+=evH.replace('card event','card event done');
  if(phase==='open')html+=orderForm(g,p,w,st.round);
- if(phase==='over'||over)html+=overView(g,st);
- html+=`<div class="card"><h3>지난 라운드</h3>${h.length?h.map((x,k)=>`<div class="log"><b>R${k+1}</b> ${esc(x.title)} · 평균 주가 ${fmt(x.after.reduce((a,b)=>a+b,0)/4)}</div>`).join(''):'<div class="muted">아직 없음</div>'}
- <h3>내 판단 기록</h3>${S.logs.filter(l=>l.game===g).map(l=>`<div class="log"><b>R${l.round+1}</b> ${l.q.map((q,i)=>CO[i].k+' '+q+'주').join(', ')} · 근거: ${esc(l.ind)}<br>새 정보: ${esc(l.info)}<br>기업 영향: ${esc(l.impact)}<br>선택: ${esc(l.why)}</div>`).join('')||'<div class="muted">아직 없음</div>'}</div>`;
- if(st.events[g].length&&phase!=='over')html+=`<div class="card"><h3>공통 지표 (지금까지 공개된 연도)</h3>${indTable(+(curEv||ev.at(-1)).date.slice(0,4)-(curEv?0:0),g==='97'?1996:2007)}</div>`;
+ if(phase==='over')html+=overView(g,st);
+ html+=`<details class="card"><summary>지난 라운드 · 내 판단 기록 · 공통 지표</summary>
+ ${h.map((x,k)=>`<div class="log"><b>R${k+1}</b> ${esc(x.title)} · 평균 주가 ${fmt(avg(x.after))}</div>`).join('')||'<div class="muted">아직 없음</div>'}
+ <h3>내 판단 기록</h3>${S.logs.filter(l=>l.game===g).map(l=>`<div class="log"><b>R${l.round+1}</b> ${l.q.map((q,i)=>CO[i].k+' '+q+'주').join(', ')} · 근거: ${esc(l.ind)}<br>본 것: ${esc(l.info)}<br>그래서: ${esc(l.why)}</div>`).join('')||'<div class="muted">아직 없음</div>'}
+ ${ev.length?`<h3>공통 지표 (지금까지 공개된 연도)</h3>${indTable(+ev.at(-1).date.slice(0,4),g==='97'?1996:2007)}`:''}</details>`;
  return html}
 function orderForm(g,p,w,r){const dk=g+'-'+r;const d=S.drafts[dk]||{};const mine=LIVE.me?.order;const G=LIVE.me?.games?.[g]||{q:[0,0,0,0]};
- const q=d.q||mine?.qty||G.q;const indOpts=[TOPICS[S.topic]?.t+' (내 ECOS 주제)',...Object.values(IND).map(x=>x.name),'오늘 사건 뉴스'];
- const first=g==='97'&&r===0;
- return `<div class="card"><h3>${first?'전략을 세우고 첫 주문':'이번 라운드 주문'} ${mine?'<span class="done-badge">제출됨 · 마감 전까지 수정 가능</span>':''}</h3>
+ const q=d.q||mine?.qty||G.q;const indOpts=[TOPICS[S.topic]?.t+' (내 ECOS 주제)',...Object.values(IND).map(x=>x.name),'오늘 사건 뉴스'];const first=g==='97'&&r===0;
+ return `<div class="card order"><h3>${first?'전략을 세우고 첫 주문':'이번 라운드 주문'} ${mine?'<span class="done-badge">제출됨 · 마감 전까지 수정 가능</span>':''}</h3>
  ${first?`${ta('strategy.basis','어떤 회사에 왜 투자하나? (내 통계와 연결)')}${ta('strategy.cash','현금은 얼마나, 왜 남기나?')}${ta('strategy.change','어떤 정보가 나오면 판단을 바꿀까?')}`:''}
- <label>목표 보유 주식 수 (내 평가액 ${fmt(w)}만원 안에서)</label>
- <div class="grid">${CO.map((c,i)=>`<div><span class="muted">${c.k} ${c.name} (${fmt(p[i])}만원)</span><input type="number" min="0" step="1" id="q${i}" value="${q[i]}"></div>`).join('')}</div>
- <div id="calc" class="muted"></div>
- <label>근거로 쓴 지표·자료</label><select id="ind"><option value="">선택</option>${indOpts.map(o=>`<option ${o===(d.ind||mine?.note?.ind)?'selected':''}>${esc(o)}</option>`).join('')}</select>
- <label>새 정보 (무엇을 보았나)</label><textarea id="info">${esc(d.info??mine?.note?.info??'')}</textarea>
- <label>기업 영향 (그 정보가 어느 회사에 어떻게 작용하나)</label><textarea id="impact">${esc(d.impact??mine?.note?.impact??'')}</textarea>
- <label>선택 (사고·팔고·유지하는 이유)</label><textarea id="why">${esc(d.why??mine?.note?.why??'')}</textarea>
- <div class="warn">다른 친구들의 주문도 주가를 움직입니다. 선생님이 마감하면 사건 영향과 반 전체 매수·매도가 함께 반영됩니다.</div>
+ <label>목표 보유 주식 수</label>
+ <div class="qgrid">${CO.map((c,i)=>`<label class="qi"><img src="${c.img}" alt=""><span>${c.k} ${c.name}<small>${fmt(p[i])}만원</small></span><input type="number" min="0" step="1" id="q${i}" value="${q[i]}"></label>`).join('')}</div>
+ <div id="calc" class="calc"></div>
+ <div class="two"><div><label>근거 지표·자료</label><select id="ind"><option value="">선택</option>${indOpts.map(o=>`<option ${o===(d.ind||mine?.note?.ind)?'selected':''}>${esc(o)}</option>`).join('')}</select>
+ <label>무엇을 보았나 (새 정보·숫자)</label><textarea id="info" placeholder="예: 외국 은행이 만기 연장을 거부, 환율 상한까지 상승">${esc(d.info??mine?.note?.info??'')}</textarea></div>
+ <div><label>그래서 이렇게 (어느 회사에 어떻게 작용해서 무엇을 사고팔았나)</label><textarea id="why" style="min-height:150px" placeholder="예: 달러 빚 많은 믿음은행이 위험 → 전부 팔고 수출하는 한빛수출을 산다">${esc(d.why??mine?.note?.why??'')}</textarea></div></div>
  <button id="confirm">${mine?'주문 수정하기':'주문 제출'}</button><div id="msg"></div></div>`}
-function overView(g,st){const R=S.reflect[g];return `<div class="card"><h2>${g==='97'?'1997':'2008'} 게임 끝 · 실제와 비교</h2>
+function overView(g,st){return `<div class="card"><h2>${g==='97'?'1997':'2008'} 게임 끝 · 실제와 비교</h2>
  ${chartSVG(g,st)}
- <table><tr><th>라운드</th><th>사건</th><th>우리 반 평균 주가</th></tr>${st.history[g].map((x,k)=>`<tr><td>R${k+1}</td><td>${esc(x.title)}</td><td class="n">${fmt(x.after.reduce((a,b)=>a+b,0)/4)}</td></tr>`).join('')}</table>
  ${ta(`reflect.${g}.before`,'게임 중 내 판단 (수정 전 해석)','어떤 근거로 무엇을 사고팔았나')}
- ${ta(`reflect.${g}.real`,'실제 코스피와 우리 반 그래프는 어디가 같고 어디가 달랐나? 왜 그랬을까?','예: 실제로는 1998년 상반기에 더 떨어졌는데 우리 반은 R6에서 반등했다. 우리 반이 수출기업을 많이 산 영향…')}
+ ${ta(`reflect.${g}.real`,g==='08'?'코스피·S&P 500·우리 반 그래프는 어디가 같고 어디가 달랐나? 왜 그랬을까?':'실제 코스피와 우리 반 그래프는 어디가 같고 어디가 달랐나? 왜 그랬을까?',g==='08'?'예: 미국에서 시작된 위기인데 2008년 10월 코스피가 S&P 500보다 더 크게 떨어졌다. 외국인 자금이 빠져나간 영향…':'예: 실제로는 1998년 상반기에 더 떨어졌는데 우리 반은 R6에서 반등했다…')}
  ${ta(`reflect.${g}.after`,'그래서 고친 해석 (수정 후)','근거 지표를 다시 읽고 바꾼 생각')}
  <button id="toNext">${g==='97'?'2008 게임으로':'보고서 쓰러 가기'}</button><div id="msg2"></div></div>`}
-function gameAfter(){const g=g_;wire();const st=LIVE?.state;if(!st)return;
+function gameAfter(){const g=g_;wire();countUp();tickTimer();const st=LIVE?.state;if(!st)return;
  const tb=$('#toNext');if(tb)tb.onclick=()=>{if(!filled(`reflect.${g}.before`,`reflect.${g}.real`,`reflect.${g}.after`))return $('#msg2').innerHTML='<div class="err">세 칸을 채우세요.</div>';go(g==='97'?3:4)};
  if(st.phase!=='open'||st.game!==g)return;
  const p=st.prices[g],r=st.round,dk=g+'-'+r,w=myWealth(g,p);
- const keep=()=>{S.drafts[dk]={q:CO.map((_,i)=>Math.max(0,Math.floor(+$('#q'+i).value||0))),ind:$('#ind').value,info:$('#info').value,impact:$('#impact').value,why:$('#why').value};save()};
- const calc=()=>{const q=CO.map((_,i)=>Math.max(0,Math.floor(+$('#q'+i).value||0)));const cost=q.reduce((s,x,i)=>s+x*p[i],0);const cash=w-cost;$('#calc').innerHTML=`주문 후 현금 <b class="${cash<0?'down':''}">${fmt(cash)}만원</b>`;return{q,cash}};
- ['q0','q1','q2','q3','ind','info','impact','why'].forEach(id=>$('#'+id).addEventListener('input',()=>{keep();calc()}));$('#ind').addEventListener('change',keep);calc();
- $('#confirm').onclick=async()=>{const{q,cash}=calc();const note={ind:$('#ind').value,info:$('#info').value.trim(),impact:$('#impact').value.trim(),why:$('#why').value.trim()};
+ const keep=()=>{S.drafts[dk]={q:CO.map((_,i)=>Math.max(0,Math.floor(+$('#q'+i).value||0))),ind:$('#ind').value,info:$('#info').value,why:$('#why').value};save()};
+ const calc=()=>{const q=CO.map((_,i)=>Math.max(0,Math.floor(+$('#q'+i).value||0)));const cost=q.reduce((s,x,i)=>s+x*p[i],0);const cash=w-cost;$('#calc').innerHTML=`주식 <b>${fmt(cost)}</b>만원 + 현금 <b class="${cash<0?'down':''}">${fmt(cash)}</b>만원 = 내 평가액 ${fmt(w)}만원${cash<0?' · <b class="down">현금이 부족합니다</b>':''}`;return{q,cash}};
+ ['q0','q1','q2','q3','info','why'].forEach(id=>$('#'+id).addEventListener('input',()=>{keep();calc()}));$('#ind').addEventListener('change',keep);calc();
+ $('#confirm').onclick=async()=>{const{q,cash}=calc();const note={ind:$('#ind').value,info:$('#info').value.trim(),impact:'',why:$('#why').value.trim()};
   if(cash<0)return $('#msg').innerHTML='<div class="err">현금이 부족합니다.</div>';
   if(g==='97'&&r===0&&!filled('strategy.basis','strategy.cash','strategy.change'))return $('#msg').innerHTML='<div class="err">전략 세 칸을 먼저 쓰세요.</div>';
-  if(!note.ind||note.info.length<5||note.impact.length<5||note.why.length<5)return $('#msg').innerHTML='<div class="err">근거 지표와 세 칸을 모두 적어야 주문이 됩니다.</div>';
+  if(!note.ind||note.info.length<5||note.why.length<5)return $('#msg').innerHTML='<div class="err">근거 지표와 두 칸을 적어야 주문이 됩니다.</div>';
   try{await api(`/rooms/${S.room}/order`,{pid:S.pid,game:g,round:r,qty:q,note});S.logs=S.logs.filter(l=>!(l.game===g&&l.round===r));S.logs.push({game:g,round:r,q,...note});delete S.drafts[dk];save();lastKey='';await poll()}catch(e){$('#msg').innerHTML=`<div class="err">${esc(e.message)}</div>`}}}
 V[2]=()=>gameView('97');V[3]=()=>gameView('08');V[2].after=gameAfter;V[3].after=gameAfter;
-async function poll(){if(!S.room||!S.pid)return;try{LIVE=await api(`/rooms/${S.room}?pid=${S.pid}`);}catch(e){return}
+async function poll(){if(!S.room||!S.pid)return;try{const t0=Date.now();LIVE=await api(`/rooms/${S.room}?pid=${S.pid}`);clockOff=LIVE.state.now-Math.round((t0+Date.now())/2);}catch(e){return}
  if(S.stage!==2&&S.stage!==3)return;const st=LIVE.state,g=S.stage===2?'97':'08';
- const key=[st.game,st.round,st.phase,st.history[g].length,st.done[g],!!LIVE.me?.order].join('|');
- if(key!==lastKey){lastKey=key;const y=scrollY;render();if(st.phase!=='open')scrollTo(0,y)}
+ const key=[st.game,st.round,st.phase,st.history[g].length,st.done[g],!!LIVE.me?.order,st.limit].join('|');
+ if(key!==lastKey){const opened=st.phase==='open'&&!lastKey.includes('|open|');lastKey=key;const y=scrollY;render();if(opened||st.phase==='closed')scrollTo(0,0);else scrollTo(0,y)}
  else{const c=$('#cnt');if(c)c.textContent=`${LIVE.ordered}/${LIVE.players}`}}
 setInterval(poll,2500);
 
@@ -392,14 +461,14 @@ function report(){const t=TOPICS[S.topic]||{};const L=(l,v)=>`<p><b>${l}</b><br>
  return `<h2>국제 금융 구조 분석 보고서 · ${esc(S.code)}</h2><p class="muted">방 ${esc(S.room)} · 작성 ${new Date().toLocaleString('ko-KR')}</p>
  <h3>내 ECOS 주제: ${esc(t.t)}</h3>${L('고칠 부분',S.fix.before)}${L('슬라이드에서 고친 것',S.fix.after)}${L('위기 신호',S.fix.evidence)}
  <h3>투자 전략과 판단 기록</h3>${L('투자 근거',S.strategy.basis)}${L('현금 비중',S.strategy.cash)}${L('판단 변경 조건',S.strategy.change)}
- <table><tr><th>게임·라운드</th><th>보유</th><th>근거</th><th>새 정보 → 기업 영향 → 선택</th></tr>${S.logs.map(l=>`<tr><td>${l.game} R${l.round+1}</td><td>${l.q.map((q,i)=>CO[i].k+q).join(' ')}</td><td>${esc(l.ind)}</td><td>${esc(l.info)} → ${esc(l.impact)} → ${esc(l.why)}</td></tr>`).join('')}</table>
+ <table><tr><th>게임·라운드</th><th>보유</th><th>근거</th><th>본 것 → 그래서</th></tr>${S.logs.map(l=>`<tr><td>${l.game} R${l.round+1}</td><td>${l.q.map((q,i)=>CO[i].k+q).join(' ')}</td><td>${esc(l.ind)}</td><td>${esc(l.info)} → ${l.impact?esc(l.impact)+' → ':''}${esc(l.why)}</td></tr>`).join('')}</table>
  ${['97','08'].map(g=>`<h3>${g==='97'?'1997':'2008'} 게임 후 실제와 비교한 해석 수정</h3>${L('수정 전',S.reflect[g].before)}${L('실제와 비교',S.reflect[g].real)}${L('수정 후',S.reflect[g].after)}`).join('')}
  <h3>1. 지표 비교 (8)</h3>${L('두 위기 대응',S.compare.crisis)}${L('한국·태국',S.compare.country)}${L('근거 위치',S.compare.where)}${L('내 통계·실제 코스피의 기여',S.compare.mine)}
  <h3>2. 구조와 득실 (6)</h3>${L('쟁점',S.issue.issue)}${L('구조적 원인',S.issue.cause)}${L('대안 A',S.issue.altA)}${L('대안 B',S.issue.altB)}
  <table><tr><th>이해관계자</th><th>A</th><th>B</th></tr>${STAKE.map((s,i)=>`<tr><td>${s}</td><td>${esc(S.issue.table['a'+i])}</td><td>${esc(S.issue.table['b'+i])}</td></tr>`).join('')}</table>${L('결론',S.issue.choice)}${L('추적 로그 2회차',S.issue.log2)}
  <h3>3. AI 검증 (5)</h3>${L('검증 질문',S.ai.question)}<table>${AI.map(a=>`<tr><td>${a.id}. ${a.s}</td><td>${esc(S.ai.picks?.[a.id]?.v)}</td><td>${esc(S.ai.picks?.[a.id]?.fix)}</td></tr>`).join('')}</table>
  <h3>AI 대화 기록</h3>${S.ai.links.filter(l=>l.url.trim()).map(l=>`<p><b>${esc(l.tool||'AI')}</b> <a href="${esc(l.url)}">${esc(l.url)}</a><br>${esc(l.what)}</p>`).join('')}`}
-V[7]=()=>`<div class="card noprint"><h2>⑦ 제출</h2><p>확인한 뒤 <b>선생님에게 제출</b>을 누르세요. 151분 이후에는 수정하지 않습니다. 제출 직후 선생님과 2분 구술(질문 2개)이 있습니다.</p>
+V[7]=()=>`<div class="card noprint"><h2>⑦ 제출</h2><p>확인한 뒤 <b>선생님에게 제출</b>을 누르세요. 124분 이후에는 수정하지 않습니다. 제출 직후 선생님과 2분 구술(질문 2개)이 있습니다.</p>
 ${S.submittedAt?`<div class="tip"><span class="done-badge">제출됨</span> ${new Date(S.submittedAt).toLocaleString('ko-KR')}. 다시 누르면 최신 내용으로 덮어씁니다.</div>`:''}
 <div class="row"><button id="send">선생님에게 제출</button><button class="ghost" id="pdf">PDF로도 저장</button><button class="ghost" id="back">이전</button></div><div id="msg"></div></div><div class="card">${report()}</div>`;
 V[7].after=()=>{$('#back').onclick=()=>go(6);$('#pdf').onclick=()=>{$('#print').innerHTML=report();print()};
