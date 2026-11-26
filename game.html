@@ -378,7 +378,9 @@ function bars(x){const mx=30;const bar=(v,c)=>{const w=Math.min(Math.abs(v),mx)/
 function board(g,p,prev){return `<div class="board">${CO.map((c,i)=>{const ch=prev?(p[i]/prev[i]-1)*100:0;return `<div class="tile ${prev?(ch>=0?'fu':'fd'):''}"><div class="nm"><b>${c.k} ${c.name}</b> ${c.type}</div><div class="price" data-from="${prev?prev[i]:p[i]}" data-to="${p[i]}">${fmt(prev?prev[i]:p[i])}</div><div class="unit">만원</div>${prev?`<div class="chg ${ch>=0?'up':'down'}">${ch>=0?'▲ +':'▼ '}${fmt(ch)}%</div>`:'<div class="chg" style="color:#b9b2a2">현재가</div>'}<div class="hold">내 보유 ${LIVE?.me?.games?.[g]?.q?.[i]??0}주</div></div>`}).join('')}</div>`}
 function countUp(){document.querySelectorAll('.price[data-from]').forEach(el=>{const a=+el.dataset.from,b=+el.dataset.to;if(a===b||matchMedia('(prefers-reduced-motion: reduce)').matches){el.textContent=fmt(b);return}const t0=performance.now(),D=1400;const step=t=>{const k=Math.min(1,(t-t0)/D),e=1-Math.pow(1-k,3);el.textContent=fmt(a+(b-a)*e);if(k<1)requestAnimationFrame(step)};setTimeout(()=>requestAnimationFrame(step),350)})}
 function timerHTML(st){return st.phase==='open'?`<span class="timer"><b id="tm">--:--</b><i><u id="tmbar"></u></i></span>`:''}
-function tickTimer(){const st=LIVE?.state;const el=document.getElementById('tm');if(!st||!el||st.phase!=='open'||!st.openedAt)return;const left=Math.max(0,st.limit*1000-((Date.now()+clockOff)-st.openedAt));const s=Math.ceil(left/1000);el.textContent=`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;const bar=document.getElementById('tmbar');if(bar)bar.style.width=(left/(st.limit*1000)*100)+'%';el.parentElement.classList.toggle('low',s<=30)}
+function tickTimer(){const st=LIVE?.state;const el=document.getElementById('tm');if(!st||!el||st.phase!=='open'||!st.openedAt)return;const left=Math.max(0,st.limit*1000-((Date.now()+clockOff)-st.openedAt));const s=Math.ceil(left/1000);el.textContent=`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;const bar=document.getElementById('tmbar');if(bar)bar.style.width=(left/(st.limit*1000)*100)+'%';el.parentElement.classList.toggle('low',s<=30);
+ const ck=st.game+'|'+st.round;if(ck!==tmK){tmK=ck;tmS=s}else if(s!==tmS){tmS=s;if(s===30)sfx('warn');else if(s<=10&&s>3)sfx('tick');else if(s<=3&&s>=1)sfx('beep');else if(s===0)sfx('end')}}
+let tmK='',tmS=-1;
 setInterval(tickTimer,500);
 let g_='97';
 function gameView(g){g_=g;
@@ -433,14 +435,16 @@ function gameAfter(){const g=g_;wire();countUp();tickTimer();const st=LIVE?.stat
   if(cash<0)return $('#msg').innerHTML='<div class="err">현금이 부족합니다.</div>';
   if(g==='97'&&r===0&&!filled('strategy.basis'))return $('#msg').innerHTML='<div class="err">전략 한 줄을 먼저 쓰세요.</div>';
   if(!note.ind)return $('#msg').innerHTML='<div class="err">근거를 하나 고르세요.</div>';
-  try{await api(`/rooms/${S.room}/order`,{pid:S.pid,game:g,round:r,qty:q,note});S.logs=S.logs.filter(l=>!(l.game===g&&l.round===r));S.logs.push({game:g,round:r,q,...note});delete S.drafts[dk];save();lastKey='';await poll()}catch(e){$('#msg').innerHTML=`<div class="err">${esc(e.message)}</div>`}}}
+  try{await api(`/rooms/${S.room}/order`,{pid:S.pid,game:g,round:r,qty:q,note});S.logs=S.logs.filter(l=>!(l.game===g&&l.round===r));S.logs.push({game:g,round:r,q,...note});delete S.drafts[dk];save();sfx('order');lastKey='';await poll()}catch(e){$('#msg').innerHTML=`<div class="err">${esc(e.message)}</div>`}}}
 V[2]=()=>gameView('97');V[3]=()=>gameView('08');V[2].after=gameAfter;V[3].after=gameAfter;
 async function poll(){if(!S.room||!S.pid)return;try{const t0=Date.now();LIVE=await api(`/rooms/${S.room}?pid=${S.pid}&stage=${S.stage}`);lockBanner();clockOff=LIVE.state.now-Math.round((t0+Date.now())/2);}catch(e){return}
  bgm();
- if(S.stage!==2&&S.stage!==3)return;const st=LIVE.state,g=S.stage===2?'97':'08';
+ if(S.stage!==2&&S.stage!==3){fxK='';return}const st=LIVE.state,g=S.stage===2?'97':'08';
+ const fk=g+'|'+st.game;if(fxK===fk&&fxP!==st.phase&&st.game===g)sfx({open:'open',closed:'close',over:'over'}[st.phase]);fxK=fk;fxP=st.phase;
  const key=[st.game,st.round,st.phase,st.history[g].length,st.done[g],!!LIVE.me?.order,st.limit].join('|');
  if(key!==lastKey){const opened=st.phase==='open'&&!lastKey.includes('|open|');lastKey=key;const y=scrollY;render();if(opened||st.phase==='closed')scrollTo(0,0);else scrollTo(0,y)}
  else{const c=$('#cnt');if(c)c.textContent=`${LIVE.ordered}/${LIVE.players}`}}
+let fxK='',fxP='';
 setInterval(poll,2500);
 
 /* ---------- 온라인: 마감 배너·초안 자동 저장 ---------- */
@@ -531,9 +535,10 @@ V[7].after=()=>{$('#back').onclick=()=>go(6);$('#pdf').onclick=()=>{$('#print').
 
 function render(){nav();$('#app').innerHTML=V[S.stage]();V[S.stage].after&&V[S.stage].after();bgm()}
 function bgm(){try{window.BGM&&BGM.update(S.stage,LIVE?.state)}catch(e){}}
+function sfx(n){try{window.BGM&&BGM.sfx(n)}catch(e){}}
 $('#resetBtn').onclick=()=>{if(confirm('이 기기의 기록을 지우고 처음부터 할까요? (서버에 낸 주문은 그대로 남습니다)')){S=fresh();save();render()}};
 render();poll();
 </script>
-<script src="bgm.js?v=1126b"></script>
+<script src="bgm.js?v=1126c"></script>
 </body>
 </html>

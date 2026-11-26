@@ -36,19 +36,34 @@ async function sync(){if(busy)return;busy=true;try{
 function setVol(v){vol=v;localStorage.setItem('bgmVol2',v);if(cur)ramp(cur.g.gain,vol*cur.k,.2)}
 function toggle(){on=!on;localStorage.setItem('bgmOn',on?'1':'0');if(on)ctx();sync()}
 
+/* 효과음: 짧은 소리를 그때그때 만들어 낸다. 켜고 끄기와 크기는 배경음과 같이 움직인다 */
+let fxOut=null;
+function tone(t,f,dur,g,type,att){const o=ac.createOscillator(),e=ac.createGain();o.type=type||'sine';o.frequency.value=f;e.gain.setValueAtTime(0,t);e.gain.linearRampToValueAtTime(g,t+(att||.006));e.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(e);e.connect(fxOut);o.start(t);o.stop(t+dur+.05)}
+const FX={
+ open(t){[784,1047,1319].forEach((f,i)=>{tone(t+i*.11,f,.5,.2,'triangle');tone(t+i*.11,f*2,.2,.05)})},          // 라운드 시작(속보)
+ order(t){tone(t,1047,.12,.16);tone(t+.09,1568,.22,.16)},                                                      // 주문 접수
+ warn(t){tone(t,1319,.7,.15);tone(t+.2,988,.9,.15)},                                                           // 30초 남음
+ tick(t){tone(t,1100,.07,.2);tone(t,2200,.04,.05)},                                                            // 10~4초
+ beep(t){tone(t,880,.22,.26,'sine',.01)},                                                                      // 3·2·1초
+ end(t){tone(t,587,.7,.26,'sine',.01)},                                                                        // 시간 끝
+ close(t){for(const d of [0,.5])[[1,.2,1.8],[2,.09,1.2],[2.76,.06,.9],[5.4,.025,.5]].forEach(([r,g,dur])=>tone(t+d,740*r,dur,g))}, // 라운드 마감 종
+ over(t){[523,659,784,1047].forEach((f,i)=>tone(t+i*.15,f,1.8,.13,'triangle'))}                                // 게임 끝
+};
+function sfx(n){if(!on||!ac||ac.state!=='running'||!FX[n])return false;if(!fxOut){fxOut=ac.createGain();fxOut.connect(ac.destination)}fxOut.gain.value=Math.min(1,vol*2.6);FX[n](ac.currentTime+.02);return true}
+
 /* 왼쪽 아래 작은 조절기: 게임 단계에서만 보임 */
 let box=null;
 function ui(){if(!box){box=document.createElement('div');box.className='bgmbox';
-  box.innerHTML='<button type="button"></button><input type="range" min="0" max="0.5" step="0.01" aria-label="배경음 크기">';
+  box.innerHTML='<button type="button"></button><input type="range" min="0" max="0.5" step="0.01" aria-label="소리 크기">';
   const st=document.createElement('style');st.textContent=`.bgmbox{position:fixed;left:14px;bottom:14px;z-index:50;display:flex;align-items:center;gap:8px;background:#14110d;color:#f5efe2;padding:6px 12px;border-radius:999px;font:600 13px/1 'IBM Plex Sans KR',sans-serif;box-shadow:0 2px 10px rgba(0,0,0,.25);opacity:.85}
 .bgmbox:hover{opacity:1}.bgmbox button{all:unset;cursor:pointer;padding:4px 2px;color:#ffb627}.bgmbox input{width:80px;accent-color:#ffb627}.bgmbox.off button{color:#aaa}.bgmbox.off input{display:none}.bgmbox[hidden]{display:none}@media print{.bgmbox{display:none}}`;
   document.head.appendChild(st);document.body.appendChild(box);box.querySelector('button').onclick=toggle;
   const r=box.querySelector('input');r.value=vol;r.oninput=()=>setVol(+r.value)}
  box.hidden=!want;box.classList.toggle('off',!on);
- box.querySelector('button').textContent=!on?'♪ 배경음 꺼짐 (켜기)':(ac&&ac.state!=='running')?'♪ 배경음: 화면을 한 번 누르세요':`♪ 배경음 ${META[want]?.label||''}`}
+ box.querySelector('button').textContent=!on?'♪ 소리 꺼짐 (켜기)':(ac&&ac.state!=='running')?'♪ 소리: 화면을 한 번 누르세요':'♪ 소리 켜짐'}
 
 /* game.html에서 호출: stage 2=1997 게임, 3=2008 게임. 그 게임이 끝나면(실제와 비교·해석 수정) 서서히 꺼진다 */
 window.BGM={update(stage,st){let w=null;if(st){if(stage===2&&!st.done?.['97'])w='97';if(stage===3&&!st.done?.['08'])w='08'}
   if(w!==want){want=w;sync()}else if(w&&on&&!cur)sync();else ui()},
- stop(){want=null;sync()},get state(){return {want,on,playing:cur?.key||null,ctx:ac?.state||null,vol,k:cur?.k||null,info:Object.fromEntries(Object.entries(cache).map(([k,v])=>[k,{rms:v.rms,sec:v.sec,k:v.k}]))}}};
+ sfx,stop(){want=null;sync()},get state(){return {want,on,playing:cur?.key||null,ctx:ac?.state||null,vol,k:cur?.k||null,info:Object.fromEntries(Object.entries(cache).map(([k,v])=>[k,{rms:v.rms,sec:v.sec,k:v.k}]))}}};
 })();
