@@ -496,7 +496,8 @@ V[5]=()=>`<div class="card"><h2>⑤ 구조적 원인과 득실 저울질하기 <
 <div class="tip">바나나 협상에서 역할마다 이익이 달랐던 것처럼, 금융위기의 대응도 누군가에게는 이익, 누군가에게는 부담입니다.</div>
 ${ta('issue.issue','내가 추적하는 쟁점','기존 추적 쟁점을 이어 씁니다. 없으면 오늘 내 ECOS 주제로 하나 정하세요.')}
 ${ta('issue.cause','이 쟁점이 생긴 원인을 무역·금융 구조로 설명하기 '+pt(2,'쟁점과 함께'),'예: 수출 의존 · 경상수지 적자 · 단기외채 · 자본 자유화',true)}
-<div class="grid"><div>${ta('issue.altA','대안 A')}</div><div>${ta('issue.altB','대안 B')}</div></div>
+<div class="tip"><b>대안 A·B란?</b> 내 쟁점(위기)에 정부가 택할 수 있었던 <b>서로 다른 대응 두 가지</b>입니다. 무엇을 하는지 + 기대 효과를 한두 문장으로. 실제로 한 대응과 그 반대 선택을 비교하면 쉽습니다.<br>예) 1997 · A: IMF 고금리·긴축으로 외화 유출을 막는다 / B: 금리를 낮추고 돈을 풀어 기업 부도를 막는다<br>예) 1997 · A: 외환보유액을 써서 환율을 지킨다 / B: 환율 상승(원화 약세)을 그대로 둔다<br>예) 2008 · A: 기준금리를 크게 내리고 통화스와프를 맺는다 / B: 물가를 걱정해 금리를 유지한다</div>
+<div class="grid"><div>${ta('issue.altA','대안 A','무엇을 하나 + 기대 효과')}</div><div>${ta('issue.altB','대안 B','A와 다른 선택 + 기대 효과')}</div></div>
 <h3>이해관계자별 득실표 ${pt(2,'대안 A·B와 함께, 이해관계자별 이익·부담 구분')}</h3><table><tr><th>이해관계자</th><th>대안 A: 이익 / 부담</th><th>대안 B: 이익 / 부담</th></tr>
 ${STAKE.map((s,i)=>`<tr><td>${s}</td><td><textarea data-b="issue.table.a${i}" style="min-height:48px"></textarea></td><td><textarea data-b="issue.table.b${i}" style="min-height:48px"></textarea></td></tr>`).join('')}</table>
 ${ta('issue.choice','저울질 결과: 어떤 대안을 왜 지지하나? 누가 부담을 지고, 그 부담은 어떻게 줄이나? '+pt(2,'지지 이유·부담 주체·줄이는 방법'),'',true)}
