@@ -150,7 +150,7 @@ const STG=['시작','① 내 자료','② 1997','③ 2008','④ 지표','⑤ 득
 function copyLink(){const u=`${SITE}?room=${T.code}`;navigator.clipboard?.writeText(u).then(()=>alert('학생 링크를 복사했습니다. Zoom 채팅에 붙여 넣으세요.\n'+u),()=>prompt('복사하세요',u))}
 function openScreen(){window.open(`screen.html?room=${T.code}`,'twoCrisisScreen','width=1500,height=950')}
 function onlineBar(){const st=D.state;const live=D.players.filter(p=>D.now-p.seen<30000).length;const fin=D.submissions.filter(s=>s.status==='final').length,dr=D.submissions.filter(s=>s.status==='draft').length;
- return `<div class="onl"><button class="ghost" onclick="copyLink()">학생 링크 복사 (Zoom 채팅용)</button><button onclick="openScreen()">Zoom 공유 화면 열기</button>
+ return `<div class="onl"><button class="ghost" onclick="copyLink()">학생 링크 복사 (Zoom 채팅용)</button><button onclick="openScreen()">Zoom 공유 화면 열기</button><button class="ghost" onclick="window.open('slides.html#6','twoCrisisSlides')">설명 슬라이드 열기 (Zoom 공유용)</button>
  <span>접속 중 <b>${live}</b>/${D.players.length}</span><span>보고서 최종 <b>${fin}</b> · 초안 ${dr}</span>
  <button class="${st.locked?'':'warnb'}" onclick="act('${st.locked?'unlock':'lock'}')">${st.locked?'제출 마감 풀기':'보고서 제출 마감 (124분)'}</button>
  <span class="nos">⚠ 이 선생님 화면은 Zoom으로 공유하지 마세요. 공유는 「Zoom 공유 화면」 창으로.</span></div>`}
