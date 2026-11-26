@@ -2,7 +2,11 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#14110d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="두 번의 위기">
 <title>두 번의 위기 · 내 통계로 투자하기</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -115,6 +119,12 @@ td.n{text-align:right;white-space:nowrap;font-family:var(--mono)}
 #print{display:none}
 @media(max-width:700px){.board{grid-template-columns:1fr 1fr}.tile:nth-child(2){border-right:0}.tile:nth-child(-n+2){border-bottom:1px solid #2a302b}.price{font-size:36px}header h1{font-size:24px}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* 태블릿·터치 */
+button,a,.chip,.topic,summary{touch-action:manipulation}
+html{-webkit-text-size-adjust:100%}
+.tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%}
+@media (any-pointer:coarse){input:not([type=number]),textarea,select{font-size:16px!important}button{min-height:44px}.chip{min-height:48px}summary{padding:6px 0}}
+.tabnote{border:2px dashed var(--ink2);background:var(--sheet);padding:12px 16px;margin:12px 0;font-size:15px}.tabnote b{color:var(--ink)}
 @media print{header,nav,main,.noprint{display:none!important}#print{display:block;padding:0 10px;font-size:11pt}body{background:#fff}}
 
 /* ===== 실시간 라운드제 추가 스타일 ===== */
@@ -257,6 +267,7 @@ const IND={
  gdp:{name:'공통지표③ 실질 GDP 성장률',unit:'전년 대비 %',kr:{1996:7.99,1997:6.28,1998:-4.94,1999:11.62,2007:5.84,2008:3.00,2009:0.82,2010:6.98},th:{1996:5.65,1997:-2.75,1998:-7.63,1999:4.57,2007:5.44,2008:1.73,2009:-0.69,2010:7.51}}
 };
 const STAGES=['시작','① 내 자료 다시보기','② 1997 게임','③ 2008 게임','④ 지표 비교','⑤ 득실표·추적 로그','⑥ AI 검증·대화 기록','⑦ 제출'];
+const SLIDE_NO={"h2ffb0da23b839423_0_47":32,"h2ffb0da23b839423_0_10":5,"h660d3bbdace5f402_1_92":26,"h2ffb0da23b839423_0_15":7,"h2ffb0da23b839423_0_19":9,"h660d3bbdace5f402_1_84":16,"h2ffb0da23b839423_0_6":3,"h6d8ec6e81a385d3_0_16":1,"h2ffb0da23b839423_0_27":14,"h2ffb0da23b839423_0_43":29,"h660d3bbdace5f402_1_125":35,"h2ffb0da23b839423_0_23":11,"h660d3bbdace5f402_1_112":22}; // 2026-11-26 기준 발표 덱 순서
 const STAKE=['수출기업','수입업체·소비자','빚 많은 기업·노동자','은행·금융기관','정부','외국인 투자자'];
 const GNAME={'97':'1997년 외환위기','08':'2008년 세계 금융위기'};
 
@@ -276,17 +287,19 @@ const SCORE=[['지표 비교',8,[['두 위기 대응 비교','④',3],['한국·
  ['구조·득실',6,[['쟁점과 구조적 원인','⑤',2],['대안과 이해관계자별 득실표','⑤',2],['저울질 결과','⑤',2]]],
  ['비교·수정',6,[['1997 게임 후 해석 수정','②',2],['2008 게임 후 해석 수정','③',2],['추적 로그 2회차','⑤',2]]],
  ['AI 검증',5,[['AI로 찾은 정보 검증 (1건당 1점)','⑥',2],['AI 대화 기록 링크','⑥',1],['구술 2분 (질문당 1점)','제출 후',2]]]];
-function scoreTable(){return `<details class="sct"><summary>보고서 전체 배점 보기 (25점)</summary><table><tr><th>영역</th><th>문항</th><th>어디서</th><th>배점</th></tr>${SCORE.map(([a,m,it])=>it.map((x,i)=>`<tr>${i?'':`<td rowspan="${it.length}"><b>${a}</b><br>${m}점</td>`}<td>${x[0]}</td><td>${x[1]}</td><td class="n">${x[2]}</td></tr>`).join('')).join('')}</table><div class="muted">수익률·순위는 점수에 들어가지 않습니다.</div></details>`}
+function scoreTable(){return `<details class="sct"><summary>보고서 전체 배점 보기 (25점)</summary><div class="tscroll"><table><tr><th>영역</th><th>문항</th><th>어디서</th><th>배점</th></tr>${SCORE.map(([a,m,it])=>it.map((x,i)=>`<tr>${i?'':`<td rowspan="${it.length}"><b>${a}</b><br>${m}점</td>`}<td>${x[0]}</td><td>${x[1]}</td><td class="n">${x[2]}</td></tr>`).join('')).join('')}</table></div><div class="muted">수익률·순위는 점수에 들어가지 않습니다.</div></details>`}
 function ta(p,label,hint='',tall){return `<label>${label}</label>${hint?`<div class="muted">${hint}</div>`:''}<textarea data-b="${p}" ${tall?'style="min-height:120px"':''}></textarea>`}
 function wire(){document.querySelectorAll('[data-b]').forEach(el=>{el.value=get(el.dataset.b);el.addEventListener('input',()=>{set(el.dataset.b,el.value);save()})})}
 function filled(...ps){return ps.every(p=>String(get(p)).trim().length>=5)}
-function go(n){S.stage=n;save();render();scrollTo(0,0)}
+function go(n){S.stage=n;save();render();scrollTo(0,0);wake()}
+let wl=null;async function wake(){try{const need=S.stage===2||S.stage===3;if(need&&!wl&&navigator.wakeLock&&document.visibilityState==='visible'){wl=await navigator.wakeLock.request('screen');wl.addEventListener('release',()=>wl=null)}if(!need&&wl){wl.release();wl=null}}catch(e){}}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){wake();poll&&poll()}});
 async function api(path,body){const r=await fetch(API+path,body?{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)}:{cache:'no-store'});const j=await r.json().catch(()=>({error:'서버 응답 오류'}));if(!r.ok)throw new Error(j.error||('오류 '+r.status));return j}
 
 /* ---------- 공통 조각 ---------- */
 function nav(){$('#steps').innerHTML=STAGES.map((t,i)=>`<span class="${i===S.stage?'on':i<S.stage?'done':''}">${t}</span>`).join('');$('#who').textContent=S.code?(S.code+(S.room?' · 방 '+S.room:'')):''}
 function indTable(maxYear,from){const yrs=[1996,1997,1998,1999,2007,2008,2009,2010].filter(y=>y<=maxYear&&y>=from);
- return Object.values(IND).map(d=>`<h3>${d.name} <span class="badge">${d.unit}</span></h3><table><tr><th>연도</th>${yrs.map(y=>`<th>${y}</th>`).join('')}</tr><tr><td>한국</td>${yrs.map(y=>`<td class="n">${fmt(d.kr[y])}</td>`).join('')}</tr><tr><td>태국</td>${yrs.map(y=>`<td class="n">${fmt(d.th[y])}</td>`).join('')}</tr></table>`).join('')+`<div class="muted">출처: World Bank, World Development Indicators. 공개된 연도까지만 보입니다.</div>`}
+ return Object.values(IND).map(d=>`<h3>${d.name} <span class="badge">${d.unit}</span></h3><div class="tscroll"><table><tr><th>연도</th>${yrs.map(y=>`<th>${y}</th>`).join('')}</tr><tr><td>한국</td>${yrs.map(y=>`<td class="n">${fmt(d.kr[y])}</td>`).join('')}</tr><tr><td>태국</td>${yrs.map(y=>`<td class="n">${fmt(d.th[y])}</td>`).join('')}</tr></table></div>`).join('')+`<div class="muted">출처: World Bank, World Development Indicators. 공개된 연도까지만 보입니다.</div>`}
 function mediaHTML(m){if(!m||!m.length)return '';return '<div class="media m'+m.length+'">'+m.map(x=>x.yt?`<figure><div class="vbox" data-yt="${x.yt}"><img src="https://i.ytimg.com/vi/${x.yt}/hqdefault.jpg" alt="뉴스 영상 미리보기"><span class="play" aria-hidden="true">▶</span><span class="sr">영상 재생</span></div><figcaption>${x.cap}</figcaption></figure>`:`<figure><img src="${x.img}" alt="" loading="lazy" style="object-position:${x.pos||'50% 50%'}"><figcaption>${x.cap}</figcaption></figure>`).join('')+'</div>'}
 document.addEventListener('click',e=>{const b=e.target.closest('.vbox');if(!b||b.querySelector('iframe'))return;b.innerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${b.dataset.yt}?autoplay=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen title="뉴스 영상"></iframe>`});
 const pct=x=>(x>0?'+':'')+fmt(x)+'%';
@@ -305,7 +318,7 @@ V[0]=()=>`<div class="card"><h2>오늘 할 일</h2>
 <li><b>2008 게임</b> 4라운드 + 코스피·S&P 500과 비교</li>
 <li><b>보고서</b> 지표 비교·득실표·AI 검증과 대화 링크 · <b>52분</b> (채점은 보고서로 합니다)</li>
 <li><b>124분 전원 제출 → 2분 구술</b> · 26분</li></ol>
-<div class="tip"><b>Zoom 수업</b> · Zoom은 켜 둔 채로 이 사이트를 <b>다른 창</b>에서 엽니다. 화면을 반으로 나눠 왼쪽엔 Zoom(선생님 공유 화면), 오른쪽엔 이 게임을 띄우세요. 마이크는 끄고, 질문은 Zoom 채팅으로 합니다. 구술 때 선생님이 이름을 부릅니다.</div>
+<div class="tip"><b>Google Meet 수업</b> · Meet는 켜 둔 채로 이 사이트를 따로 엽니다. <b>컴퓨터</b>는 창 두 개를 나란히, <b>태블릿</b>은 화면 분할(아이패드: 위쪽 ··· 버튼 → Split View, 갤럭시 탭: 최근 앱에서 앱 아이콘 → 분할 화면으로 열기)로 한쪽엔 Meet, 한쪽엔 이 게임을 띄우세요. 사건과 타이머는 이 게임 화면에도 나오니 Meet 화면은 작아도 됩니다. 마이크는 끄고, 질문은 Meet 채팅으로 합니다. 구술 때 선생님이 이름을 부릅니다.</div>
 <div class="row" style="margin:6px 0 14px"><a href="slides.html#6" target="_blank" rel="noopener"><button class="ghost" type="button">게임·보고서 미리 보기 (화면으로)</button></a></div>
 <label for="code">학번과 이름</label><div class="muted">제출본에 그대로 들어갑니다.</div><input id="code" placeholder="예: 20315 김민준" autocomplete="off">
 <label for="room">방 코드 (선생님 화면의 4자리)</label><input id="room" inputmode="numeric" maxlength="4" placeholder="예: 4821">
@@ -326,6 +339,7 @@ return `<div class="card"><h2>① 지난번 내 발표 슬라이드를 직접 �
 <div class="topics">${TOPICS.map((x,i)=>[x,i]).sort((a,b)=>(a[0].n?0:1)-(b[0].n?0:1)||(a[0].n||'').localeCompare(b[0].n||'','ko')).map(([x,i])=>`<button class="topic ${S.topic===i?'sel':''} ${x.n?'':'none'}" data-t="${i}"><span class="tn">${x.n||'배정 학생 없음'}</span><b>${x.t}</b><span class="tq">${x.q}</span></button>`).join('')}</div>
 ${t?`<div class="tip"><b>${t.n?esc(t.n)+' · ':''}${t.t}</b><br><b>피드백에서 나온 보완점:</b> ${t.fb}<br><b>게임에서 특히 영향받는 회사:</b> ${t.co}</div>
 <div class="warn">다른 친구의 슬라이드와 선생님 피드백 장은 고치지 않습니다. 모든 수정은 버전 기록에 남습니다.</div>
+<div class="tabnote"><b>태블릿이면</b> 아래 화면에서는 수정이 안 될 수 있습니다. 「새 창에서 크게 열어 수정하기」를 누르고 <b>Google 슬라이드 앱</b>으로 여세요(앱이 없으면 설치, 학교 구글 계정으로 로그인).${t.s&&SLIDE_NO[t.s]?` 내 슬라이드는 <b>${SLIDE_NO[t.s]}번째 장</b>, 피드백은 바로 다음 장입니다.`:''}</div>
 <div class="slidebox"><iframe src="${src}" title="내 발표 슬라이드" allow="clipboard-write"></iframe></div>
 <div class="row"><a href="${src}" target="_blank" rel="noopener"><button class="ghost" type="button">새 창에서 크게 열어 수정하기</button></a>${t.s?'':'<span class="muted">이 주제는 발표 슬라이드가 없습니다. 공통 지표로 시작하세요.</span>'}</div>
 ${ta('fix.before','원래 어떻게 썼나 (고칠 부분)','예: 범례가 없어 네 개 선이 무엇인지 알 수 없었다')}
@@ -393,7 +407,7 @@ function orderForm(g,p,w,r){const dk=g+'-'+r;const d=S.drafts[dk]||{};const mine
  return `<div class="card order"><h3>${first?'첫 주문':'이번 라운드 주문'} ${mine?'<span class="done-badge">제출됨 · 마감 전까지 수정 가능</span>':''}</h3>
  ${first?ta('strategy.basis','내 전략 한 줄','예: 단기외채가 늘었으니 은행·건설은 피하고 수출기업 위주로, 현금은 절반'):''}
  <label>목표 보유 주식 수</label>
- <div class="qgrid">${CO.map((c,i)=>`<label class="qi"><img src="${c.img}" alt=""><span>${c.k} ${c.name}<small>${fmt(p[i])}만원</small></span><input type="number" min="0" step="1" id="q${i}" value="${q[i]}"></label>`).join('')}</div>
+ <div class="qgrid">${CO.map((c,i)=>`<label class="qi"><img src="${c.img}" alt=""><span>${c.k} ${c.name}<small>${fmt(p[i])}만원</small></span><input type="number" min="0" step="1" inputmode="numeric" pattern="[0-9]*" enterkeyhint="done" onfocus="this.select()" id="q${i}" value="${q[i]}"></label>`).join('')}</div>
  <div id="calc" class="calc"></div>
  <label>이번 판단에서 가장 크게 본 근거 하나</label>
  <div class="chips" id="ind">${opts.map(([v,s])=>`<button type="button" class="chip ${cur===v?'on':''}" data-v="${esc(v)}">${esc(s)}</button>`).join('')}</div>
@@ -429,7 +443,7 @@ async function poll(){if(!S.room||!S.pid)return;try{const t0=Date.now();LIVE=awa
 setInterval(poll,2500);
 
 /* ---------- 온라인: 마감 배너·초안 자동 저장 ---------- */
-function lockBanner(){let b=document.getElementById('lockbar');const on=!!LIVE?.state?.locked;if(on&&!b){b=document.createElement('div');b.id='lockbar';b.className='lockbar';b.textContent='제출이 마감되었습니다. 지금부터는 고칠 수 없습니다. Zoom에서 선생님 안내를 기다리세요.';document.body.prepend(b)}if(!on&&b)b.remove();const sb=document.getElementById('send');if(sb)sb.disabled=on}
+function lockBanner(){let b=document.getElementById('lockbar');const on=!!LIVE?.state?.locked;if(on&&!b){b=document.createElement('div');b.id='lockbar';b.className='lockbar';b.textContent='제출이 마감되었습니다. 지금부터는 고칠 수 없습니다. Meet에서 선생님 안내를 기다리세요.';document.body.prepend(b)}if(!on&&b)b.remove();const sb=document.getElementById('send');if(sb)sb.disabled=on}
 let lastDraft='';async function autoDraft(){if(!S.pid||S.stage<4||LIVE?.state?.locked)return;const r=JSON.stringify(reportObj());if(r===lastDraft)return;try{await api(`/rooms/${S.room}/submit`,{pid:S.pid,report:reportObj(),draft:true});lastDraft=r;const el=document.getElementById('autosave');if(el)el.textContent='자동 저장됨 '+new Date().toLocaleTimeString('ko-KR')}catch(e){}}
 setInterval(autoDraft,40000);
 const POLICY=[

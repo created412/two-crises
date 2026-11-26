@@ -86,9 +86,9 @@ details.card summary{cursor:pointer;font-weight:700}
 <section id="slidePane" hidden>
  <div class="sbar"><button class="ghost" onclick="sgo(-1)">◀ 이전</button><span class="pg" id="spg">-</span><button class="ghost" onclick="sgo(1)">다음 ▶</button>
   <select id="ssel" onchange="sto(+this.value)"></select>
-  <button onclick="openSlideWin()">Zoom 공유용 슬라이드 창 열기</button></div>
+  <button onclick="openSlideWin()">Meet 공유용 슬라이드 창 열기</button></div>
  <iframe class="sframe" id="sframe" title="수업 슬라이드" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
- <div class="swarn"><b>Zoom으로는 「공유용 슬라이드 창」만 공유하세요.</b> 이 화면에서 넘기면 공유 창도 같이 넘어갑니다. 방향키로도 넘길 수 있습니다. 게임·채점 탭은 공유하면 안 됩니다.</div>
+ <div class="swarn"><b>Meet에서는 「발표 시작 → 창」으로 「공유용 슬라이드 창」만 공유하세요.</b> 이 화면에서 넘기면 공유 창도 같이 넘어갑니다. 방향키로도 넘길 수 있습니다. 게임·채점 탭은 공유하면 안 됩니다.</div>
 </section>
 <script>
 'use strict';
@@ -162,15 +162,15 @@ function gameTab(){const st=D.state,g=st.game,p=st.prices[g],h=st.history[g];con
  ${st.done['97']&&g==='08'?`<details class="card"><summary>1997 게임: 실제와 비교 다시 보기</summary>${chart('97')}</details>`:''}`;
  return top+ctl+body}
 
-/* ===== 온라인(Zoom) 운영: 링크·공유 화면·접속 상태·마감 ===== */
+/* ===== 온라인(Google Meet) 운영: 링크·공유 화면·접속 상태·마감 ===== */
 const STG=['시작','① 내 자료','② 1997','③ 2008','④ 지표','⑤ 득실','⑥ AI','⑦ 제출'];
-function copyLink(){const u=`${SITE}?room=${T.code}`;navigator.clipboard?.writeText(u).then(()=>alert('학생 링크를 복사했습니다. Zoom 채팅에 붙여 넣으세요.\n'+u),()=>prompt('복사하세요',u))}
+function copyLink(){const u=`${SITE}?room=${T.code}`;navigator.clipboard?.writeText(u).then(()=>alert('학생 링크를 복사했습니다. Meet 채팅(통화 중 메시지)에 붙여 넣으세요.\n'+u),()=>prompt('복사하세요',u))}
 function openScreen(){window.open(`screen.html?room=${T.code}`,'twoCrisisScreen','width=1500,height=950')}
 function onlineBar(){const st=D.state;const live=D.players.filter(p=>D.now-p.seen<30000).length;const fin=D.submissions.filter(s=>s.status==='final').length,dr=D.submissions.filter(s=>s.status==='draft').length;
- return `<div class="onl"><button class="ghost" onclick="copyLink()">학생 링크 복사 (Zoom 채팅용)</button><button onclick="openScreen()">Zoom 공유 화면 열기</button>
+ return `<div class="onl"><button class="ghost" onclick="copyLink()">학생 링크 복사 (Meet 채팅용)</button><button onclick="openScreen()">Meet 공유 화면 열기</button>
  <span>접속 중 <b>${live}</b>/${D.players.length}</span><span>보고서 최종 <b>${fin}</b> · 초안 ${dr}</span>
  <button class="${st.locked?'':'warnb'}" onclick="act('${st.locked?'unlock':'lock'}')">${st.locked?'제출 마감 풀기':'보고서 제출 마감 (124분)'}</button>
- <span class="nos">⚠ 이 선생님 화면은 Zoom으로 공유하지 마세요. 공유는 「Zoom 공유 화면」 창으로.</span></div>`}
+ <span class="nos">⚠ 이 선생님 화면은 Meet로 공유하지 마세요. 공유는 「발표 시작 → 창」에서 「Meet 공유 화면」 창이나 「공유용 슬라이드 창」만.</span></div>`}
 function presence(pl){const ago=Math.round((D.now-pl.seen)/1000);const on=pl.seen&&ago<30;return `<span class="dot ${on?'on':''}"></span>${on?'접속':pl.seen?Math.floor(ago/60)+'분 전':'-'} · ${pl.stage!=null?STG[pl.stage]||'':''}`}
 
 /* ===== 채점·구술 ===== */

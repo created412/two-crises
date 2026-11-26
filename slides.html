@@ -175,6 +175,7 @@ body.editing [data-edit]{outline:2px dashed rgba(214,40,27,.6);outline-offset:4p
 .ori.rep .on{width:auto;padding:0 16px;border-radius:0;font-size:30px}
 .ori.rep .on::after{content:'점';font-size:20px;margin-left:2px}
 .ori .on.red{background:var(--red);color:#fff}
+#rotHint{display:none}@media (orientation:portrait) and (max-width:1100px){#rotHint{display:block;position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#14110d;color:#f5efe2;padding:12px 20px;border-radius:999px;font:500 16px/1.3 'IBM Plex Sans KR',sans-serif;z-index:99;white-space:nowrap}#rotHint b{color:#ffb627}}@media print{#rotHint{display:none!important}}
 </style>
 </head>
 <body>
@@ -233,28 +234,28 @@ body.editing [data-edit]{outline:2px dashed rgba(214,40,27,.6);outline-offset:4p
   <div class="foot"><span>created412.github.io/two-crises · 학번 이름 + 방 코드로 입장</span><span>한 사람 한 기기</span></div>
 </section>
 
-<!-- ===== 3-2. Zoom 수업 준비 ===== -->
+<!-- ===== 3-2. Google Meet 수업 준비 ===== -->
 <section class="slide">
-  <div class="masthead"><b>Zoom 수업 준비</b><span>04</span></div>
+  <div class="masthead"><b>Google Meet 수업 준비</b><span>04</span></div>
   <div class="body">
-    <h2 class="reveal">화면은 둘, 왼쪽은 Zoom · 오른쪽은 게임</h2>
+    <h2 class="reveal">화면은 둘, 한쪽은 Meet · 한쪽은 게임</h2>
     <div style="display:grid;grid-template-columns:1.05fr 1fr;gap:60px">
       <ol class="todo reveal">
-        <li><div>Zoom <b>채팅의 링크</b>로 게임을 연다<small>created412.github.io/two-crises · 방 코드 4자리</small></div></li>
-        <li><div>창을 <b>반으로 나눈다</b><small>왼쪽 Zoom(선생님 공유 화면), 오른쪽 게임</small></div></li>
+        <li><div>Meet <b>채팅의 링크</b>로 게임을 연다<small>created412.github.io/two-crises · 방 코드 4자리</small></div></li>
+        <li><div>화면을 <b>반으로 나눈다</b><small>컴퓨터: 창 두 개 나란히 · 태블릿: 아이패드 Split View, 갤럭시 탭 분할 화면</small></div></li>
         <li><div><b>마이크는 끄고</b> 질문은 채팅으로<small>타이머가 끝나기 전에 주문 제출</small></div></li>
         <li><div>보고서는 <b>자동 저장</b>, 끝나면 「선생님에게 제출」<small>124분에 선생님이 제출을 마감합니다</small></div></li>
       </ol>
       <div class="reveal">
         <div class="board" style="padding:0;display:grid;grid-template-columns:1fr 1fr;height:330px">
-          <div style="border-right:4px solid #2a302b;padding:26px"><div style="font-size:24px;color:#b9b2a2">왼쪽 · Zoom</div><div style="font-family:var(--font-display);font-size:52px;margin-top:20px">선생님<br>공유 화면</div><div style="font-size:22px;color:#b9b2a2;margin-top:14px">사건 · 타이머 · 결과</div></div>
-          <div style="padding:26px;background:#f4efe4;color:#16130f"><div style="font-size:24px;color:#4a4339">오른쪽 · 게임</div><div style="font-family:var(--font-display);font-size:52px;margin-top:20px">내 주문<br>내 보고서</div><div style="font-size:22px;color:#4a4339;margin-top:14px">학번 이름으로 입장</div></div>
+          <div style="border-right:4px solid #2a302b;padding:26px"><div style="font-size:24px;color:#b9b2a2">한쪽 · Google Meet</div><div style="font-family:var(--font-display);font-size:52px;margin-top:20px">선생님<br>공유 화면</div><div style="font-size:22px;color:#b9b2a2;margin-top:14px">사건 · 타이머 · 결과</div></div>
+          <div style="padding:26px;background:#f4efe4;color:#16130f"><div style="font-size:24px;color:#4a4339">한쪽 · 게임</div><div style="font-family:var(--font-display);font-size:52px;margin-top:20px">내 주문<br>내 보고서</div><div style="font-size:22px;color:#4a4339;margin-top:14px">학번 이름으로 입장</div></div>
         </div>
         <p style="font-size:28px;color:var(--ink-2);margin-top:26px">구술 때는 선생님이 이름을 부르면 <b>마이크와 카메라를 켭니다.</b></p>
       </div>
     </div>
   </div>
-  <div class="foot"><span>기기 하나뿐이면 휴대폰으로 Zoom, 컴퓨터로 게임도 가능</span><span>04</span></div>
+  <div class="foot"><span>휴대폰으로 Meet, 태블릿·컴퓨터로 게임도 가능 · 사건과 타이머는 게임 화면에도 나옵니다</span><span>04</span></div>
 </section>
 
 <!-- ===== 4. 180분 흐름 ===== -->
@@ -263,7 +264,7 @@ body.editing [data-edit]{outline:2px dashed rgba(214,40,27,.6);outline-offset:4p
   <div class="body">
     <h2 class="reveal">게임은 짧게, 보고서는 길게</h2>
     <div class="tl reveal" style="grid-template-columns:repeat(7,1fr)">
-      <div><div class="t">0–5</div><div class="n">접속·입장</div><div class="d">Zoom 링크 · 학번 이름</div></div>
+      <div><div class="t">0–5</div><div class="n">접속·입장</div><div class="d">Meet 채팅 링크 · 학번 이름</div></div>
       <div class="hot"><div class="t">5–17</div><div class="n">설명 듣기</div><div class="d">게임·보고서 화면 미리 보기</div></div>
       <div><div class="t">17–27</div><div class="n">내 자료 다시보기</div><div class="d">발표 슬라이드 직접 수정</div></div>
       <div class="hot"><div class="t">27–51</div><div class="n">1997 게임</div><div class="d">4라운드 × 3분 + 실제와 비교</div></div>
@@ -287,7 +288,7 @@ body.editing [data-edit]{outline:2px dashed rgba(214,40,27,.6);outline-offset:4p
       <figure><div class="on">3</div><img src="img/guide_result.webp" alt="결과 화면"><figcaption><b>결과 확인</b>사건 영향 + <u>우리 반 매수·매도</u>가 주가를 바꿈</figcaption></figure>
       <figure><div class="on red">4</div><img src="img/guide_compare.webp" alt="실제와 비교 화면"><figcaption><b>게임 끝 · 실제와 비교</b>수정 전 → 실제 → <u>수정 후</u> 쓰기 (채점)</figcaption></figure>
     </div>
-    <div class="example reveal" style="margin-top:30px;font-size:30px"><span class="lab">이것만 기억</span>1997 게임 4라운드, 2008 게임 4라운드. 라운드마다 <b>3분 타이머</b>가 Zoom 공유 화면과 내 화면에 함께 뜹니다. 수익률은 점수가 아닙니다.</div>
+    <div class="example reveal" style="margin-top:30px;font-size:30px"><span class="lab">이것만 기억</span>1997 게임 4라운드, 2008 게임 4라운드. 라운드마다 <b>3분 타이머</b>가 Meet 공유 화면과 내 화면에 함께 뜹니다. 수익률은 점수가 아닙니다.</div>
   </div>
   <div class="foot"><span>설명 6분 · 첫 라운드는 선생님과 함께 천천히</span><span>00</span></div>
 </section>
@@ -305,7 +306,7 @@ body.editing [data-edit]{outline:2px dashed rgba(214,40,27,.6);outline-offset:4p
     </div>
     <div class="example reveal" style="margin-top:30px;font-size:30px"><span class="lab">보고서 시간 52분</span>모든 칸은 게임 사이트 안에 있습니다. <b>40초마다 자동 저장</b>, 124분에 마감, 끝나면 「선생님에게 제출」 → 2분 구술.</div>
   </div>
-  <div class="foot"><span>설명 6분 · 질문은 Zoom 채팅으로</span><span>00</span></div>
+  <div class="foot"><span>설명 6분 · 질문은 Meet 채팅으로</span><span>00</span></div>
 </section>
 
 <!-- ===== 5. 네 회사 ===== -->
@@ -526,7 +527,7 @@ body.editing [data-edit]{outline:2px dashed rgba(214,40,27,.6);outline-offset:4p
       <ol class="todo reveal">
         <li><div><b>선생님에게 제출</b> 버튼<small>PDF로도 저장 가능</small></div></li>
         <li><div>124분 이후 <b>수정 금지</b><small>구술 순서가 늦어도 똑같이</small></div></li>
-        <li><div>이름이 불리면 <b>마이크·카메라를 켜고</b> 2분 구술<small>질문 2개, Zoom에서 진행</small></div></li>
+        <li><div>이름이 불리면 <b>마이크·카메라를 켜고</b> 2분 구술<small>질문 2개, Meet에서 진행</small></div></li>
       </ol>
       <div class="reveal">
         <div class="board"><div style="font-size:24px;color:#b9b2a2">이런 질문이 나올 수 있다</div>
@@ -629,5 +630,6 @@ document.addEventListener('keydown',e=>{
 });
 document.addEventListener('input',()=>editor.isActive&&editor.save());
 </script>
+<div id="rotHint">태블릿·휴대폰은 <b>가로로 돌리면</b> 크게 보입니다 · 옆으로 밀어서 넘기기</div>
 </body>
 </html>
