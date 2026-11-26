@@ -66,6 +66,7 @@ details.card summary{cursor:pointer;font-weight:700}
 .dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#bbb;margin-right:6px}.dot.on{background:#2fa86b}
 .gd summary{display:flex;gap:14px;align-items:center}.gn{font-weight:700;font-size:17px}.tot{font-family:var(--mono);font-weight:700;color:var(--red);margin-left:auto}
 .gwrap{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:12px}.gwrap h4{margin:10px 0 4px}.gwrap select,.gwrap textarea{width:100%;font:inherit;border:1.5px solid var(--ink);padding:8px;font-size:14px}.gwrap textarea{min-height:70px}
+.ar{margin:16px 0 6px!important;border-top:2px solid var(--ink);padding-top:8px}.ar span[id]{font-family:'IBM Plex Mono',monospace;color:var(--red,#c8321e)}.itm{display:grid;grid-template-columns:150px 1fr;gap:8px;align-items:center;margin:4px 0;font-size:14px}.itm b{font-weight:400;color:#777}
 .gwrap label{display:block;font-weight:700;margin:10px 0 4px}.oq li{margin:6px 0;font-size:16px}.mini p{font-size:13px;margin:4px 0}
 .oclock{position:fixed;right:24px;bottom:24px;z-index:60;font-family:var(--mono);font-size:40px;font-weight:700;background:#16130f;color:#ffb020;padding:8px 20px;border:2px solid #16130f}.oclock:empty{display:none}.oclock.low{color:#ff5a4e}
 
@@ -179,6 +180,24 @@ const RUB=[
  {k:'c',n:'비교·수정',max:6,lv:[[6,'실제 지수와 비교해 해석을 실제로 수정하고 추적 로그 2회차에 과정을 기록'],[5,'비교를 반영해 해석을 수정하고 추적 로그 작성'],[4,'수정이 부분적이거나 기록이 소략'],[3,'수정·추적 로그가 없음 (2회차 미제출 시 최저점)']]},
  {k:'d',n:'AI 검증',max:5,lv:[[5,'AI 정보의 오류·출처 없는 서술·편향을 2건 이상 원자료로 교정하고 구술에서 자기 논리로 설명'],[4,'오류 1건을 원자료로 교정하고 구술 수행'],[3,'AI 활용 기록은 냈으나 검증이 형식적'],[2,'AI 활용 기록 미제출 또는 구술 미수행']]}];
 const QB=['네 주장을 지탱하는 숫자 하나를 골라, 어느 자료의 몇 년 값인지와 뜻을 설명해 보세요.','1997년과 2008년 정부 대응은 무엇이 달랐고, 공통 지표 어디에서 그 차이가 보이나요?','한국과 태국을 비교했을 때 같은 점 또는 다른 점 하나를 근거와 함께 말해 보세요.','네가 지지한 대안에서 이익을 보는 집단과 부담을 지는 집단은 누구인가요?','AI 문장 중 틀렸다고 판단한 것 하나를 골라, 원자료로 어떻게 확인했는지 설명해 보세요.','AI 대화 기록에서 채택하지 않은 답은 무엇이고, 왜 버렸나요?','게임에서 실제 코스피와 우리 반 주가가 가장 크게 달랐던 시점과 이유는 무엇인가요?','2008년에 코스피와 S&P 500이 다르게 움직인 구간을 하나 골라 이유를 설명해 보세요.','발표 슬라이드에서 무엇을 고쳤고, 왜 그것이 더 정확한가요?','게임 중 판단을 바꾼 라운드 하나와, 그때 본 근거를 말해 보세요.'];
+
+/* 문항별 배점: 영역 점수 = max(최저점, 문항 합) */
+const ITEMS={
+ a:{floor:3,it:[['a1','두 위기 대응 비교',3,['세 지표 변화와 두 대응(고금리 vs 금리 인하·스와프)을 연결','지표 1~2개로 비교','지표 없이 서술']],
+  ['a2','한국·태국 비교',2,['같은 점·다른 점을 지표로 대조','지표 없이 대조']],
+  ['a3','근거 위치',2,['지표 번호·연도·국가·값까지 명시','일부만 명시']],
+  ['a4','내 통계와 연결',1,['내 ECOS 통계·실제 코스피와 연결']]]},
+ b:{floor:2,it:[['b1','쟁점과 구조적 원인',2,['무역·금융 구조(단기외채·경상수지·자본 자유화 등)로 원인 규명','원인을 서술하나 구조 연결이 약함']],
+  ['b2','대안과 득실표',2,['이해관계자별 이익·부담을 구분해 두 대안 비교','득실이 뭉뚱그려짐']],
+  ['b3','저울질 결과',2,['지지 이유·부담 주체·완화책까지 제시','지지 이유만 제시']]]},
+ c:{floor:3,it:[['c1','1997 게임 후 해석 수정',2,['수정 전→실제 비교→수정 후가 실제로 바뀜','비교만 하고 수정이 형식적']],
+  ['c2','2008 게임 후 해석 수정',2,['수정 전→실제 비교→수정 후가 실제로 바뀜','비교만 하고 수정이 형식적']],
+  ['c3','추적 로그 2회차',2,['수정 전→수정 후→바꾼 근거를 기록','기록이 소략']]]},
+ d:{floor:2,it:[['d1','틀린 AI 문장 교정',2,['2건 이상 원자료로 교정','1건 교정']],
+  ['d2','AI 대화 기록 링크',1,['링크 + 채택하지 않은 답과 확인 방법']],
+  ['d3','구술 2분',2,['질문 2개 모두 자기 논리로 설명','1개만 설명']]]}};
+function areaOf(g,k){const it=ITEMS[k].it;if(!it.some(x=>g[x[0]]!==undefined&&g[x[0]]!==''))return g[k]||'';return Math.max(ITEMS[k].floor,it.reduce((s,x)=>s+(+g[x[0]]||0),0))}
+function itemSel(id,g,x){const [key,name,max,lv]=x;return `<div class="itm"><span>${name} <b>/${max}</b></span><select onchange="setG('${id}','${key}',this.value)"><option value="">-</option>${lv.map((t,i)=>`<option value="${max-i}" ${String(g[key])===String(max-i)?'selected':''}>${max-i}점 · ${t}</option>`).join('')}<option value="0" ${String(g[key])==='0'?'selected':''}>0점 · 없음</option></select></div>`}
 let G={},oralT=null,oralEnd=0;
 function gradeOf(id){return G[id]||D.grades?.[id]||{}}
 function total(g){if(g.sp==='9'||g.sp==='8')return +g.sp;const v=RUB.map(r=>+g[r.k]||0);return v.every(x=>x>0)?v.reduce((a,b)=>a+b,0):''}
@@ -193,17 +212,17 @@ function gradeTab(){const subs=Object.fromEntries(D.submissions.map(s=>[s.player
    <label>구술 메모</label><textarea id="om_${pl.id}" oninput="setG('${pl.id}','oral',this.value)">${esc(g.oral||'')}</textarea>
    <h4>보고서 빠르게 보기</h4>${r?`<div class="mini"><p><b>근거 위치</b> ${esc(r.compare?.where)}</p><p><b>결론</b> ${esc(r.issue?.choice)}</p><p><b>추적 로그 2회차</b> ${esc(r.issue?.log2)}</p><p><b>AI 대화</b> ${(r.ai?.links||[]).map(l=>`<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.tool||'링크')}</a>`).join(' · ')||'없음'}</p></div><p class="muted">전체 보고서는 「제출물·AI 대화 기록」 탭</p>`:'<p class="muted">제출물 없음</p>'}
   </div><div>
-   ${RUB.map(rb=>`<label>${rb.n} (${rb.max}점)</label><select onchange="setG('${pl.id}','${rb.k}',this.value)"><option value="">선택</option>${rb.lv.map(([v,t])=>`<option value="${v}" ${+g[rb.k]===v?'selected':''}>${v}점 · ${t}</option>`).join('')}</select>`).join('')}
+   ${RUB.map(rb=>`<h4 class="ar">${rb.n} <span id="ar_${rb.k}_${pl.id}">${areaOf(g,rb.k)!==''?areaOf(g,rb.k):'-'}</span> / ${rb.max}점 <span class="muted">최저 ${ITEMS[rb.k].floor}</span></h4>${ITEMS[rb.k].it.map(x=>itemSel(pl.id,g,x)).join('')}`).join('')}
    <label>특수 처리</label><select onchange="setG('${pl.id}','sp',this.value)"><option value="">해당 없음</option><option value="9" ${g.sp==='9'?'selected':''}>본인 의사에 의한 미제출·백지·미응시 (9점)</option><option value="8" ${g.sp==='8'?'selected':''}>장기 미인정 결석 (8점)</option></select>
    <label>채점 메모</label><textarea oninput="setG('${pl.id}','memo',this.value)">${esc(g.memo||'')}</textarea>
    <div class="row"><b class="tot" id="tot_${pl.id}">${tt!==''?'합계 '+tt+'점':''}</b><button onclick="saveG('${pl.id}')">저장</button></div>
   </div></div></details>`}).join('')}`}
-function setG(id,k,v){G[id]={...gradeOf(id),...(G[id]||{}),[k]:v};const t=total(G[id]);const el=document.getElementById('tot_'+id);if(el)el.textContent=t!==''?'합계 '+t+'점':''}
+function setG(id,k,v){G[id]={...gradeOf(id),...(G[id]||{}),[k]:v};const ak=k[0];if(ITEMS[ak]&&k.length===2){G[id][ak]=areaOf(G[id],ak);const el=document.getElementById(`ar_${ak}_${id}`);if(el)el.textContent=G[id][ak]!==''?G[id][ak]:'-'}const t=total(G[id]);const el=document.getElementById('tot_'+id);if(el)el.textContent=t!==''?'합계 '+t+'점':''}
 function pickQ(id){const a=[...QB.keys()].sort(()=>Math.random()-.5).slice(0,2);G[id]={...gradeOf(id),...(G[id]||{}),q:a};G.__open=id;lastKey='';draw()}
 async function saveG(id){const d={...gradeOf(id),...(G[id]||{})};delete d.ts;try{await api(`/rooms/${T.code}/teacher`,{pin:T.pin,action:'grade',player:id,data:d});delete G[id];G.__open=id;lastKey='';await load()}catch(e){alert(e.message)}}
 function startOral(){oralEnd=Date.now()+120000;clearInterval(oralT);oralT=setInterval(()=>{const el=document.getElementById('oralClock');const s=Math.max(0,Math.ceil((oralEnd-Date.now())/1000));if(el)el.textContent=`구술 ${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;if(el)el.classList.toggle('low',s<=20);if(!s)clearInterval(oralT)},300)}
-function gradeCsv(){const rows=[['학번 이름','지표 비교(8)','구조·득실(6)','비교·수정(6)','AI 검증(5)','특수','합계','구술 질문','구술 메모','채점 메모','AI 대화 링크']];
- D.players.forEach(pl=>{const g=gradeOf(pl.id);const s=D.submissions.find(x=>x.player===pl.id);rows.push([pl.name,g.a||'',g.b||'',g.c||'',g.d||'',g.sp||'',total(g),(g.q||[]).map(i=>QB[i]).join(' / '),g.oral||'',g.memo||'',(s?.report?.ai?.links||[]).map(l=>l.url).join(' ')])});
+function gradeCsv(){const IK=Object.values(ITEMS).flatMap(a=>a.it);const rows=[['학번 이름',...IK.map(x=>x[1]+'('+x[2]+')'),'지표 비교(8)','구조·득실(6)','비교·수정(6)','AI 검증(5)','특수','합계','구술 질문','구술 메모','채점 메모','AI 대화 링크']];
+ D.players.forEach(pl=>{const g=gradeOf(pl.id);const s=D.submissions.find(x=>x.player===pl.id);rows.push([pl.name,...IK.map(x=>g[x[0]]??''),g.a||'',g.b||'',g.c||'',g.d||'',g.sp||'',total(g),(g.q||[]).map(i=>QB[i]).join(' / '),g.oral||'',g.memo||'',(s?.report?.ai?.links||[]).map(l=>l.url).join(' ')])});
  const t='\ufeff'+rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/csv'}));a.download=`채점표_방${T.code}.csv`;a.click()}
 
 function L(l,v){return `<p><b>${l}</b><br>${esc(v).replace(/\n/g,'<br>')}</p>`}

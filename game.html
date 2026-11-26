@@ -81,6 +81,8 @@ table{width:100%;border-collapse:collapse;font-size:14px;margin:6px 0;background
 th,td{border:1px solid var(--ink);padding:6px 9px;text-align:left;vertical-align:top}
 th{background:var(--ink);color:var(--paper);font-weight:500}
 td.n{text-align:right;white-space:nowrap;font-family:var(--mono)}
+.pt{display:inline-block;background:var(--ink);color:#f5efe2;font-family:var(--body);font-size:12px;font-weight:700;padding:2px 8px;margin-left:8px;vertical-align:middle;letter-spacing:0}.pt i{font-style:normal;font-weight:400;margin-left:6px;color:#e9dfc9}
+.sct{margin:10px 0 4px}.sct summary{cursor:pointer;font-weight:700}.sct table{margin-top:8px}.sct td.n{text-align:center;font-weight:700}
 .badge{display:inline-block;font-family:var(--body);font-size:12px;border:1px solid var(--ink2);padding:1px 8px;margin-left:8px;color:var(--ink2);vertical-align:middle;font-weight:500}
 /* ECOS 주제 고르기 */
 .topics{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:0;border-top:2px solid var(--ink);border-left:1px solid var(--rule)}
@@ -274,6 +276,12 @@ const esc=v=>String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 const fmt=n=>Number(n).toLocaleString('ko-KR',{maximumFractionDigits:1});
 function get(p){return p.split('.').reduce((o,k)=>o?.[k],S)??''}
 function set(p,v){const ks=p.split('.');let o=S;ks.slice(0,-1).forEach(k=>{o[k]??={};o=o[k]});o[ks.at(-1)]=v}
+function pt(n,t){return `<span class="pt">${n}점${t?`<i>${t}</i>`:''}</span>`}
+const SCORE=[['지표 비교',8,[['두 위기 대응 비교','④',3],['한국·태국 비교','④',2],['근거 위치','④',2],['내 통계와 연결','④',1]]],
+ ['구조·득실',6,[['쟁점과 구조적 원인','⑤',2],['대안과 이해관계자별 득실표','⑤',2],['저울질 결과','⑤',2]]],
+ ['비교·수정',6,[['1997 게임 후 해석 수정','②',2],['2008 게임 후 해석 수정','③',2],['추적 로그 2회차','⑤',2]]],
+ ['AI 검증',5,[['틀린 AI 문장 교정 (1건당 1점)','⑥',2],['AI 대화 기록 링크','⑥',1],['구술 2분 (질문당 1점)','제출 후',2]]]];
+function scoreTable(){return `<details class="sct"><summary>보고서 전체 배점 보기 (25점)</summary><table><tr><th>영역</th><th>문항</th><th>어디서</th><th>배점</th></tr>${SCORE.map(([a,m,it])=>it.map((x,i)=>`<tr>${i?'':`<td rowspan="${it.length}"><b>${a}</b><br>${m}점</td>`}<td>${x[0]}</td><td>${x[1]}</td><td class="n">${x[2]}</td></tr>`).join('')).join('')}</table><div class="muted">수익률·순위는 점수에 들어가지 않습니다.</div></details>`}
 function ta(p,label,hint='',tall){return `<label>${label}</label>${hint?`<div class="muted">${hint}</div>`:''}<textarea data-b="${p}" ${tall?'style="min-height:120px"':''}></textarea>`}
 function wire(){document.querySelectorAll('[data-b]').forEach(el=>{el.value=get(el.dataset.b);el.addEventListener('input',()=>{set(el.dataset.b,el.value);save()})})}
 function filled(...ps){return ps.every(p=>String(get(p)).trim().length>=5)}
@@ -398,7 +406,7 @@ function orderForm(g,p,w,r){const dk=g+'-'+r;const d=S.drafts[dk]||{};const mine
  <button id="confirm">${mine?'주문 수정하기':'주문 제출'}</button><div id="msg"></div></div>`}
 function overView(g,st){return `<div class="card"><h2>${g==='97'?'1997':'2008'} 게임 끝 · 실제와 비교</h2>
  ${chartSVG(g,st)}
- <div class="tip"><b>여기가 채점되는 부분입니다 (비교·수정 6점).</b> 라운드마다 고른 근거와 메모를 아래 「지난 라운드 · 내 판단 기록」에서 다시 보며 쓰세요.</div>
+ <div class="tip"><b>여기가 채점되는 부분입니다. 비교·수정 6점 중 이 게임 ${pt(2)}</b> 세 칸을 이어서 「수정 전 → 실제와 비교 → 수정 후」가 드러나야 합니다. 라운드마다 고른 근거와 메모를 아래 「지난 라운드 · 내 판단 기록」에서 다시 보며 쓰세요.</div>
  ${ta(`reflect.${g}.before`,'게임 중 내 판단 (수정 전 해석)','어떤 근거로 무엇을 사고팔았나. 가장 중요했던 라운드 하나를 골라 구체적으로')}
  ${ta(`reflect.${g}.real`,g==='08'?'코스피·S&P 500·우리 반 그래프는 어디가 같고 어디가 달랐나? 왜 그랬을까?':'실제 코스피와 우리 반 그래프는 어디가 같고 어디가 달랐나? 왜 그랬을까?',g==='08'?'예: 미국에서 시작된 위기인데 2008년 10월 코스피가 S&P 500보다 더 크게 떨어졌다. 외국인 자금이 빠져나간 영향…':'예: 실제로는 1998년 상반기에 더 떨어졌는데 우리 반은 R4에서 반등했다…')}
  ${ta(`reflect.${g}.after`,'그래서 고친 해석 (수정 후)','근거 지표를 다시 읽고 바꾼 생각')}
@@ -438,37 +446,39 @@ function policyCards(){return `<h3>정책 대응 사실 카드</h3><div class="p
 
 /* ---------- 4. 지표 비교 ---------- */
 V[4]=()=>`<div class="card"><h2>④ 지표로 두 위기의 대응 비교하기 <span class="badge">8점</span></h2>
+${scoreTable()}
 <div class="tip">세 공통 지표를 모두 쓰고, 한국과 태국을 비교하고, <b>어느 표의 몇 년 값을 보았는지</b> 적으세요. 예: "공통지표② 1997→1998 한국 11.88→15.28"</div>
 ${indTable(2010,1996)}
 ${policyCards()}
-${ta('compare.crisis','1997년과 2008년, 한국 정부의 대응은 어떻게 달랐고 지표는 어떻게 움직였나?','IMF 고금리 vs 기준금리 인하·통화스와프',true)}
-${ta('compare.country','한국과 태국을 비교하면 무엇이 같고 무엇이 다른가?','',true)}
-${ta('compare.where','내가 읽은 근거 위치 목록','지표 번호 · 연도 · 국가 · 값')}
-${ta('compare.mine','내 ECOS 주제 통계와 게임의 실제 코스피 비교는 이 분석에 무엇을 더해 주나?','')}
+${ta('compare.crisis','1997년과 2008년, 한국 정부의 대응은 어떻게 달랐고 지표는 어떻게 움직였나? '+pt(3,'세 지표 변화와 두 대응을 연결'),'IMF 고금리 vs 기준금리 인하·통화스와프',true)}
+${ta('compare.country','한국과 태국을 비교하면 무엇이 같고 무엇이 다른가? '+pt(2,'같은 점·다른 점을 지표로'),'',true)}
+${ta('compare.where','내가 읽은 근거 위치 목록 '+pt(2,'지표 번호·연도·국가·값'),'지표 번호 · 연도 · 국가 · 값')}
+${ta('compare.mine','내 ECOS 주제 통계와 게임의 실제 코스피 비교는 이 분석에 무엇을 더해 주나? '+pt(1),'')}
 <div class="row"><button class="ghost" id="back">이전</button><button id="next">다음</button></div><div id="msg"></div></div>`;
 V[4].after=()=>{wire();$('#back').onclick=()=>go(3);$('#next').onclick=()=>filled('compare.crisis','compare.country','compare.where')?go(5):$('#msg').innerHTML='<div class="err">세 칸을 채우세요.</div>'};
 
 /* ---------- 5. 득실표·추적 로그 ---------- */
-V[5]=()=>`<div class="card"><h2>⑤ 구조적 원인과 득실 저울질하기 <span class="badge">6점</span></h2>
+V[5]=()=>`<div class="card"><h2>⑤ 구조적 원인과 득실 저울질하기 <span class="badge">구조·득실 6점</span><span class="badge">추적 로그 2점</span></h2>
 <div class="tip">바나나 협상에서 역할마다 이익이 달랐던 것처럼, 금융위기의 대응도 누군가에게는 이익, 누군가에게는 부담입니다.</div>
 ${ta('issue.issue','내가 추적하는 쟁점','기존 추적 쟁점을 이어 씁니다. 없으면 오늘 내 ECOS 주제로 하나 정하세요.')}
-${ta('issue.cause','이 쟁점이 생긴 원인을 무역·금융 구조로 설명하기','예: 수출 의존 · 경상수지 적자 · 단기외채 · 자본 자유화',true)}
+${ta('issue.cause','이 쟁점이 생긴 원인을 무역·금융 구조로 설명하기 '+pt(2,'쟁점과 함께'),'예: 수출 의존 · 경상수지 적자 · 단기외채 · 자본 자유화',true)}
 <div class="grid"><div>${ta('issue.altA','대안 A')}</div><div>${ta('issue.altB','대안 B')}</div></div>
-<h3>이해관계자별 득실표</h3><table><tr><th>이해관계자</th><th>대안 A: 이익 / 부담</th><th>대안 B: 이익 / 부담</th></tr>
+<h3>이해관계자별 득실표 ${pt(2,'대안 A·B와 함께, 이해관계자별 이익·부담 구분')}</h3><table><tr><th>이해관계자</th><th>대안 A: 이익 / 부담</th><th>대안 B: 이익 / 부담</th></tr>
 ${STAKE.map((s,i)=>`<tr><td>${s}</td><td><textarea data-b="issue.table.a${i}" style="min-height:48px"></textarea></td><td><textarea data-b="issue.table.b${i}" style="min-height:48px"></textarea></td></tr>`).join('')}</table>
-${ta('issue.choice','저울질 결과: 어떤 대안을 왜 지지하나? 누가 부담을 지고, 그 부담은 어떻게 줄이나?','',true)}
-${ta('issue.log2','추적 로그 2회차: 1회차 이후, 두 번의 게임과 실제 그래프 비교를 거치며 내 쟁점에 대한 생각은 어떻게 바뀌었나','수정 전 → 수정 후 → 바꾼 근거',true)}
+${ta('issue.choice','저울질 결과: 어떤 대안을 왜 지지하나? 누가 부담을 지고, 그 부담은 어떻게 줄이나? '+pt(2,'지지 이유·부담 주체·줄이는 방법'),'',true)}
+${ta('issue.log2','추적 로그 2회차: 1회차 이후, 두 번의 게임과 실제 그래프 비교를 거치며 내 쟁점에 대한 생각은 어떻게 바뀌었나 '+pt(2,'비교·수정 영역'),'수정 전 → 수정 후 → 바꾼 근거',true)}
 <div class="row"><button class="ghost" id="back">이전</button><button id="next">다음</button></div><div id="msg"></div></div>`;
 V[5].after=()=>{wire();$('#back').onclick=()=>go(4);$('#next').onclick=()=>filled('issue.issue','issue.cause','issue.altA','issue.altB','issue.choice','issue.log2')?go(6):$('#msg').innerHTML='<div class="err">쟁점·원인·대안·결론·추적 로그 2회차를 채우세요.</div>'};
 
 /* ---------- 6. AI 검증·대화 기록 ---------- */
 V[6]=()=>`<div class="card"><h2>⑥ AI가 준 정보 검증하기 <span class="badge">5점</span></h2>
+<div class="muted">문장 교정 2점 + 대화 기록 링크 1점 + 제출 후 구술 2분 2점(질문당 1점)</div>
 <div class="warn">AI는 자료 검색·용어 이해·표 정리에만 씁니다. 지표 해석과 득실 분석을 AI에게 쓰게 하면 부정행위입니다. AI 입력창에 이름·학번·학교 이름을 넣지 마세요.</div>
-<h3>1. 연습 문장 검증</h3><p class="muted">맞는 문장과 틀린 문장이 섞여 있습니다. 2개 이상 원자료로 교정하세요.</p>
+<h3>1. 연습 문장 검증 ${pt(2,'틀린 문장을 원자료로 교정 1건당 1점')}</h3><p class="muted">맞는 문장과 틀린 문장이 섞여 있습니다. 2개 이상 원자료로 교정하세요.</p>
 ${ta('ai.question','검증하기 전에 내가 세운 질문','예: 이 숫자는 어느 표의 몇 년 값인가? 이 용어 정의는 맞나?')}
 <table><tr><th>AI 문장</th><th>판정</th><th>원자료 위치와 교정</th></tr>
 ${AI.map(a=>`<tr><td><b>${a.id}</b> ${a.s}</td><td style="width:110px"><select data-b="ai.picks.${a.id}.v"><option value="">-</option><option>맞음</option><option>틀림</option><option>근거 부족</option></select></td><td><textarea data-b="ai.picks.${a.id}.fix" style="min-height:48px"></textarea></td></tr>`).join('')}</table>
-<h3>2. 내 AI 대화 기록 링크 제출</h3>
+<h3>2. 내 AI 대화 기록 링크 제출 ${pt(1,'링크 + 채택하지 않은 답과 확인 방법')}</h3>
 <p>오늘 AI로 무엇을 묻고, 어떤 답을 의심하고, 어떻게 확인했는지 선생님이 직접 볼 수 있게 <b>대화 공유 링크</b>를 붙입니다. 이 링크도 평가에 반영됩니다.</p>
 <div class="howto"><b>공유 링크 만드는 법</b><ul>
 <li>ChatGPT: 대화 오른쪽 위 <b>공유</b> → 링크 만들기 → 복사 (chatgpt.com/share/…)</li>
@@ -498,7 +508,7 @@ function report(){const t=TOPICS[S.topic]||{};const L=(l,v)=>`<p><b>${l}</b><br>
  <table><tr><th>이해관계자</th><th>A</th><th>B</th></tr>${STAKE.map((s,i)=>`<tr><td>${s}</td><td>${esc(S.issue.table['a'+i])}</td><td>${esc(S.issue.table['b'+i])}</td></tr>`).join('')}</table>${L('결론',S.issue.choice)}${L('추적 로그 2회차',S.issue.log2)}
  <h3>3. AI 검증 (5)</h3>${L('검증 질문',S.ai.question)}<table>${AI.map(a=>`<tr><td>${a.id}. ${a.s}</td><td>${esc(S.ai.picks?.[a.id]?.v)}</td><td>${esc(S.ai.picks?.[a.id]?.fix)}</td></tr>`).join('')}</table>
  <h3>AI 대화 기록</h3>${S.ai.links.filter(l=>l.url.trim()).map(l=>`<p><b>${esc(l.tool||'AI')}</b> <a href="${esc(l.url)}">${esc(l.url)}</a><br>${esc(l.what)}</p>`).join('')}`}
-V[7]=()=>`<div class="card noprint"><h2>⑦ 제출</h2><p>확인한 뒤 <b>선생님에게 제출</b>을 누르세요. 124분 이후에는 수정하지 않습니다. 제출 직후 선생님과 2분 구술(질문 2개)이 있습니다.</p>
+V[7]=()=>`<div class="card noprint"><h2>⑦ 제출</h2><p>확인한 뒤 <b>선생님에게 제출</b>을 누르세요. 124분 이후에는 수정하지 않습니다. 제출 직후 선생님과 2분 구술(질문 2개)이 있습니다. 구술은 AI 검증 영역 ${pt(2,'질문당 1점, 내 보고서 근거로 내 말로 설명')}입니다.</p>
 ${S.submittedAt?`<div class="tip"><span class="done-badge">제출됨</span> ${new Date(S.submittedAt).toLocaleString('ko-KR')}. 다시 누르면 최신 내용으로 덮어씁니다.</div>`:''}
 <div class="muted" id="autosave">보고서는 40초마다 선생님에게 자동 저장됩니다(초안). 끝나면 꼭 「선생님에게 제출」을 누르세요.</div><div class="row"><button id="send" ${LIVE?.state?.locked?'disabled':''}>선생님에게 제출</button><button class="ghost" id="pdf">PDF로도 저장</button><button class="ghost" id="back">이전</button></div><div id="msg"></div></div><div class="card">${report()}</div>`;
 V[7].after=()=>{$('#back').onclick=()=>go(6);$('#pdf').onclick=()=>{$('#print').innerHTML=report();print()};
