@@ -81,9 +81,10 @@ table{width:100%;border-collapse:collapse;font-size:14px;margin:6px 0;background
 th,td{border:1px solid var(--ink);padding:6px 9px;text-align:left;vertical-align:top}
 th{background:var(--ink);color:var(--paper);font-weight:500}
 td.n{text-align:right;white-space:nowrap;font-family:var(--mono)}
-.pt{display:inline-block;background:var(--ink);color:#f5efe2;font-family:var(--body);font-size:12px;font-weight:700;padding:2px 8px;margin-left:8px;vertical-align:middle;letter-spacing:0}.pt i{font-style:normal;font-weight:400;margin-left:6px;color:#e9dfc9}
+.pt{display:inline-block;background:#1f4fa0;color:#fff;border-radius:3px;font-family:var(--body);font-size:12px;font-weight:700;padding:2px 8px;margin-left:8px;vertical-align:middle;letter-spacing:0}.pt i{font-style:normal;font-weight:400;margin-left:6px;color:#dce6f7}
+.badge.sc{border-color:#1f4fa0;color:#1f4fa0;font-weight:700}
 .chk{border:2px solid var(--ink);padding:12px 16px 4px;margin:14px 0;background:#fffdf7}.chk-h{font-weight:800;margin-bottom:2px}.ex{margin:8px 0 6px}.ex summary{cursor:pointer;font-weight:700}.ex th{width:150px;text-align:left}
-.sct{margin:10px 0 4px}.sct summary{cursor:pointer;font-weight:700}.sct table{margin-top:8px}.sct td.n{text-align:center;font-weight:700}
+.sct{margin:10px 0 4px}.sct summary{cursor:pointer;font-weight:700}.sct table{margin-top:8px}.sct td.n{text-align:center;font-weight:800;color:#1f4fa0}.sct summary{color:#1f4fa0}
 .badge{display:inline-block;font-family:var(--body);font-size:12px;border:1px solid var(--ink2);padding:1px 8px;margin-left:8px;color:var(--ink2);vertical-align:middle;font-weight:500}
 /* ECOS 주제 고르기 */
 .topics{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:0;border-top:2px solid var(--ink);border-left:1px solid var(--rule)}
@@ -439,7 +440,7 @@ const POLICY=[
 function policyCards(){return `<h3>정책 대응 사실 카드</h3><div class="pol">${POLICY.map(p=>`<div class="pc"><span class="pk">${p.c}</span><b>${p.t}</b><p>${p.b}</p><a href="${p.u}" target="_blank" rel="noopener">출처: ${p.s}</a></div>`).join('')}</div><div class="muted">공통지표②는 은행 대출금리이고, 위 카드의 콜금리·기준금리·정책금리와 같지 않습니다.</div>`}
 
 /* ---------- 4. 지표 비교 ---------- */
-V[4]=()=>`<div class="card"><h2>④ 지표로 두 위기의 대응 비교하기 <span class="badge">8점</span></h2>
+V[4]=()=>`<div class="card"><h2>④ 지표로 두 위기의 대응 비교하기 <span class="badge sc">8점</span></h2>
 ${scoreTable()}
 <div class="tip">세 공통 지표를 모두 쓰고, 한국과 태국을 비교하고, <b>어느 표의 몇 년 값을 보았는지</b> 적으세요. 예: "공통지표② 1997→1998 한국 11.88→15.28"</div>
 ${indTable(2010,1996)}
@@ -452,7 +453,7 @@ ${ta('compare.mine','내 ECOS 주제 통계와 게임의 실제 코스피 비교
 V[4].after=()=>{wire();$('#back').onclick=()=>go(3);$('#next').onclick=()=>filled('compare.crisis','compare.country','compare.where')?go(5):$('#msg').innerHTML='<div class="err">세 칸을 채우세요.</div>'};
 
 /* ---------- 5. 득실표·추적 로그 ---------- */
-V[5]=()=>`<div class="card"><h2>⑤ 구조적 원인과 득실 저울질하기 <span class="badge">구조·득실 6점</span><span class="badge">추적 로그 2점</span></h2>
+V[5]=()=>`<div class="card"><h2>⑤ 구조적 원인과 득실 저울질하기 <span class="badge sc">구조·득실 6점</span><span class="badge sc">추적 로그 2점</span></h2>
 <div class="tip">바나나 협상에서 역할마다 이익이 달랐던 것처럼, 금융위기의 대응도 누군가에게는 이익, 누군가에게는 부담입니다.</div>
 ${ta('issue.issue','내가 추적하는 쟁점','기존 추적 쟁점을 이어 씁니다. 없으면 오늘 내 ECOS 주제로 하나 정하세요.')}
 ${ta('issue.cause','이 쟁점이 생긴 원인을 무역·금융 구조로 설명하기 '+pt(2,'쟁점과 함께'),'예: 수출 의존 · 경상수지 적자 · 단기외채 · 자본 자유화',true)}
@@ -465,7 +466,7 @@ ${ta('issue.log2','추적 로그 2회차: 1회차 이후, 두 번의 게임과 �
 V[5].after=()=>{wire();$('#back').onclick=()=>go(4);$('#next').onclick=()=>filled('issue.issue','issue.cause','issue.altA','issue.altB','issue.choice','issue.log2')?go(6):$('#msg').innerHTML='<div class="err">쟁점·원인·대안·결론·추적 로그 2회차를 채우세요.</div>'};
 
 /* ---------- 6. AI 검증·대화 기록 ---------- */
-V[6]=()=>`<div class="card"><h2>⑥ AI로 찾은 정보 스스로 검증하기 <span class="badge">5점</span></h2>
+V[6]=()=>`<div class="card"><h2>⑥ AI로 찾은 정보 스스로 검증하기 <span class="badge sc">5점</span></h2>
 <div class="muted">검증 기록 2점 + 대화 기록 링크 1점 + 제출 후 구술 2분 2점(질문당 1점)</div>
 <div class="warn">AI는 자료 검색·용어 이해·표 정리에만 씁니다. 지표 해석과 득실 분석을 AI에게 쓰게 하면 부정행위입니다. AI 입력창에 이름·학번·학교 이름을 넣지 마세요.</div>
 <div class="tip">보고서를 쓰면서 <b>AI로 찾은 정보</b>(숫자·용어 뜻·사건 날짜·정책 내용)를 그대로 옮기지 말고, <b>원자료에서 직접 확인</b>합니다. 틀렸거나, 출처가 없거나, 한쪽으로 치우친 부분을 찾아 고쳐 쓰세요.<br>확인할 곳: ④의 공통 지표 표 · 정책 대응 사실 카드의 출처 링크 · 내 ECOS 통계 · 한국은행 ECOS · 교과서</div>
