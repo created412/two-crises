@@ -436,6 +436,7 @@ function gameAfter(){const g=g_;wire();countUp();tickTimer();const st=LIVE?.stat
   try{await api(`/rooms/${S.room}/order`,{pid:S.pid,game:g,round:r,qty:q,note});S.logs=S.logs.filter(l=>!(l.game===g&&l.round===r));S.logs.push({game:g,round:r,q,...note});delete S.drafts[dk];save();lastKey='';await poll()}catch(e){$('#msg').innerHTML=`<div class="err">${esc(e.message)}</div>`}}}
 V[2]=()=>gameView('97');V[3]=()=>gameView('08');V[2].after=gameAfter;V[3].after=gameAfter;
 async function poll(){if(!S.room||!S.pid)return;try{const t0=Date.now();LIVE=await api(`/rooms/${S.room}?pid=${S.pid}&stage=${S.stage}`);lockBanner();clockOff=LIVE.state.now-Math.round((t0+Date.now())/2);}catch(e){return}
+ bgm();
  if(S.stage!==2&&S.stage!==3)return;const st=LIVE.state,g=S.stage===2?'97':'08';
  const key=[st.game,st.round,st.phase,st.history[g].length,st.done[g],!!LIVE.me?.order,st.limit].join('|');
  if(key!==lastKey){const opened=st.phase==='open'&&!lastKey.includes('|open|');lastKey=key;const y=scrollY;render();if(opened||st.phase==='closed')scrollTo(0,0);else scrollTo(0,y)}
@@ -528,9 +529,11 @@ ${S.submittedAt?`<div class="tip"><span class="done-badge">제출됨</span> ${ne
 V[7].after=()=>{$('#back').onclick=()=>go(6);$('#pdf').onclick=()=>{$('#print').innerHTML=report();print()};
  $('#send').onclick=async()=>{try{const j=await api(`/rooms/${S.room}/submit`,{pid:S.pid,report:reportObj()});S.submittedAt=j.ts;save();render()}catch(e){$('#msg').innerHTML=`<div class="err">${esc(e.message)}</div>`}}};
 
-function render(){nav();$('#app').innerHTML=V[S.stage]();V[S.stage].after&&V[S.stage].after()}
+function render(){nav();$('#app').innerHTML=V[S.stage]();V[S.stage].after&&V[S.stage].after();bgm()}
+function bgm(){try{window.BGM&&BGM.update(S.stage,LIVE?.state)}catch(e){}}
 $('#resetBtn').onclick=()=>{if(confirm('이 기기의 기록을 지우고 처음부터 할까요? (서버에 낸 주문은 그대로 남습니다)')){S=fresh();save();render()}};
 render();poll();
 </script>
+<script src="bgm.js?v=1126a"></script>
 </body>
 </html>
