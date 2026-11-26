@@ -179,7 +179,7 @@ const RUB=[
  {k:'b',n:'구조·득실',max:6,lv:[[6,'쟁점의 원인을 무역·금융 구조로 연결해 규명하고, 이해관계자별 득실표로 대안을 저울질'],[5,'원인을 구조와 연결하고 득실을 비교해 정리'],[4,'구조와 연결하나 이해관계자별 득실 구분이 뭉뚱그려짐'],[3,'원인을 서술하나 무역·금융 구조와의 연결이 드러나지 않음'],[2,'구조적 원인 규명과 득실 분석이 없음']]},
  {k:'c',n:'비교·수정',max:6,lv:[[6,'실제 지수와 비교해 해석을 실제로 수정하고 추적 로그 2회차에 과정을 기록'],[5,'비교를 반영해 해석을 수정하고 추적 로그 작성'],[4,'수정이 부분적이거나 기록이 소략'],[3,'수정·추적 로그가 없음 (2회차 미제출 시 최저점)']]},
  {k:'d',n:'AI 검증',max:5,lv:[[5,'AI 정보의 오류·출처 없는 서술·편향을 2건 이상 원자료로 교정하고 구술에서 자기 논리로 설명'],[4,'오류 1건을 원자료로 교정하고 구술 수행'],[3,'AI 활용 기록은 냈으나 검증이 형식적'],[2,'AI 활용 기록 미제출 또는 구술 미수행']]}];
-const QB=['네 주장을 지탱하는 숫자 하나를 골라, 어느 자료의 몇 년 값인지와 뜻을 설명해 보세요.','1997년과 2008년 정부 대응은 무엇이 달랐고, 공통 지표 어디에서 그 차이가 보이나요?','한국과 태국을 비교했을 때 같은 점 또는 다른 점 하나를 근거와 함께 말해 보세요.','네가 지지한 대안에서 이익을 보는 집단과 부담을 지는 집단은 누구인가요?','AI 문장 중 틀렸다고 판단한 것 하나를 골라, 원자료로 어떻게 확인했는지 설명해 보세요.','AI 대화 기록에서 채택하지 않은 답은 무엇이고, 왜 버렸나요?','게임에서 실제 코스피와 우리 반 주가가 가장 크게 달랐던 시점과 이유는 무엇인가요?','2008년에 코스피와 S&P 500이 다르게 움직인 구간을 하나 골라 이유를 설명해 보세요.','발표 슬라이드에서 무엇을 고쳤고, 왜 그것이 더 정확한가요?','게임 중 판단을 바꾼 라운드 하나와, 그때 본 근거를 말해 보세요.'];
+const QB=['네 주장을 지탱하는 숫자 하나를 골라, 어느 자료의 몇 년 값인지와 뜻을 설명해 보세요.','1997년과 2008년 정부 대응은 무엇이 달랐고, 공통 지표 어디에서 그 차이가 보이나요?','한국과 태국을 비교했을 때 같은 점 또는 다른 점 하나를 근거와 함께 말해 보세요.','네가 지지한 대안에서 이익을 보는 집단과 부담을 지는 집단은 누구인가요?','AI로 찾은 정보 중 하나를 골라, 어떤 원자료에서 어떻게 확인했고 보고서에 어떻게 반영했는지 설명해 보세요.','AI 대화 기록에서 채택하지 않은 답은 무엇이고, 왜 버렸나요?','게임에서 실제 코스피와 우리 반 주가가 가장 크게 달랐던 시점과 이유는 무엇인가요?','2008년에 코스피와 S&P 500이 다르게 움직인 구간을 하나 골라 이유를 설명해 보세요.','발표 슬라이드에서 무엇을 고쳤고, 왜 그것이 더 정확한가요?','게임 중 판단을 바꾼 라운드 하나와, 그때 본 근거를 말해 보세요.'];
 
 /* 문항별 배점: 영역 점수 = max(최저점, 문항 합) */
 const ITEMS={
@@ -193,7 +193,7 @@ const ITEMS={
  c:{floor:3,it:[['c1','1997 게임 후 해석 수정',2,['수정 전→실제 비교→수정 후가 실제로 바뀜','비교만 하고 수정이 형식적']],
   ['c2','2008 게임 후 해석 수정',2,['수정 전→실제 비교→수정 후가 실제로 바뀜','비교만 하고 수정이 형식적']],
   ['c3','추적 로그 2회차',2,['수정 전→수정 후→바꾼 근거를 기록','기록이 소략']]]},
- d:{floor:2,it:[['d1','틀린 AI 문장 교정',2,['2건 이상 원자료로 교정','1건 교정']],
+ d:{floor:2,it:[['d1','AI 정보 검증',2,['AI로 찾은 정보 2건 이상을 원자료로 확인·교정해 보고서에 반영','1건만 원자료로 확인']],
   ['d2','AI 대화 기록 링크',1,['링크 + 채택하지 않은 답과 확인 방법']],
   ['d3','구술 2분',2,['질문 2개 모두 자기 논리로 설명','1개만 설명']]]}};
 function areaOf(g,k){const it=ITEMS[k].it;if(!it.some(x=>g[x[0]]!==undefined&&g[x[0]]!==''))return g[k]||'';return Math.max(ITEMS[k].floor,it.reduce((s,x)=>s+(+g[x[0]]||0),0))}
@@ -210,7 +210,7 @@ function gradeTab(){const subs=Object.fromEntries(D.submissions.map(s=>[s.player
    <h4>구술 질문</h4><ol class="oq">${(g.q||[]).map(i=>`<li>${QB[i]}</li>`).join('')||'<li class="muted">아직 뽑지 않음</li>'}</ol>
    <div class="row"><button class="ghost" onclick="pickQ('${pl.id}')">질문 2개 뽑기</button><button onclick="startOral()">2분 타이머</button></div>
    <label>구술 메모</label><textarea id="om_${pl.id}" oninput="setG('${pl.id}','oral',this.value)">${esc(g.oral||'')}</textarea>
-   <h4>보고서 빠르게 보기</h4>${r?`<div class="mini"><p><b>근거 위치</b> ${esc(r.compare?.where)}</p><p><b>결론</b> ${esc(r.issue?.choice)}</p><p><b>추적 로그 2회차</b> ${esc(r.issue?.log2)}</p><p><b>AI 대화</b> ${(r.ai?.links||[]).map(l=>`<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.tool||'링크')}</a>`).join(' · ')||'없음'}</p></div><p class="muted">전체 보고서는 「제출물·AI 대화 기록」 탭</p>`:'<p class="muted">제출물 없음</p>'}
+   <h4>보고서 빠르게 보기</h4>${r?`<div class="mini"><p><b>근거 위치</b> ${esc(r.compare?.where)}</p><p><b>결론</b> ${esc(r.issue?.choice)}</p><p><b>추적 로그 2회차</b> ${esc(r.issue?.log2)}</p><p><b>AI 정보 검증</b> ${(r.ai?.checks||[]).length}건</p><p><b>AI 대화</b> ${(r.ai?.links||[]).map(l=>`<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.tool||'링크')}</a>`).join(' · ')||'없음'}</p></div><p class="muted">전체 보고서는 「제출물·AI 대화 기록」 탭</p>`:'<p class="muted">제출물 없음</p>'}
   </div><div>
    ${RUB.map(rb=>`<h4 class="ar">${rb.n} <span id="ar_${rb.k}_${pl.id}">${areaOf(g,rb.k)!==''?areaOf(g,rb.k):'-'}</span> / ${rb.max}점 <span class="muted">최저 ${ITEMS[rb.k].floor}</span></h4>${ITEMS[rb.k].it.map(x=>itemSel(pl.id,g,x)).join('')}`).join('')}
    <label>특수 처리</label><select onchange="setG('${pl.id}','sp',this.value)"><option value="">해당 없음</option><option value="9" ${g.sp==='9'?'selected':''}>본인 의사에 의한 미제출·백지·미응시 (9점)</option><option value="8" ${g.sp==='8'?'selected':''}>장기 미인정 결석 (8점)</option></select>
@@ -235,7 +235,7 @@ function repTab(){const subs=[...D.submissions].sort((a,b)=>a.name.localeCompare
   ${['97','08'].map(g=>`<h4>${g} 게임 후 해석 수정</h4>${L('수정 전',r.reflect?.[g]?.before)}${L('실제와 비교',r.reflect?.[g]?.real)}${L('수정 후',r.reflect?.[g]?.after)}`).join('')}
   <h4>지표 비교 (8)</h4>${L('두 위기',r.compare?.crisis)}${L('한국·태국',r.compare?.country)}${L('근거 위치',r.compare?.where)}
   <h4>구조와 득실 (6)</h4>${L('쟁점',r.issue?.issue)}${L('원인',r.issue?.cause)}${L('대안 A',r.issue?.altA)}${L('대안 B',r.issue?.altB)}${L('결론',r.issue?.choice)}${L('추적 로그 2회차',r.issue?.log2)}
-  <h4>AI 검증 (5)</h4>${L('검증 질문',r.ai?.question)}${Object.entries(r.ai?.picks||{}).map(([k,v])=>L(k+' '+(v.v||''),v.fix)).join('')}
+  <h4>AI로 찾은 정보 검증 (5)</h4>${(r.ai?.checks||[]).map((c,i)=>`<p><b>${i+1}. ${esc(c.v||'판정 없음')}</b> ${esc(c.use||'')}<br>AI 정보: ${esc(c.claim)}<br>원자료: ${esc(c.src)}<br>보고서: ${esc(c.fix)}</p>`).join('')||'<p class="muted">검증 기록 없음</p>'}
   ${(r.ai?.links||[]).map(l=>`<p><b>${esc(l.tool)}</b> <a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.url)}</a><br>${esc(l.what)}</p>`).join('')}</div></details>`}).join('')}</div>`}
 function csv(){const rows=[['학번 이름','제출 시각','AI 도구','링크','검증 내용']];D.submissions.forEach(s=>(s.report.ai?.links||[{}]).forEach(l=>rows.push([s.name,new Date(s.ts).toLocaleString('ko-KR'),l.tool||'',l.url||'',l.what||''])));
  const t='\ufeff'+rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/csv'}));a.download=`AI대화기록_방${T.code}.csv`;a.click()}

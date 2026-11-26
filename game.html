@@ -82,6 +82,7 @@ th,td{border:1px solid var(--ink);padding:6px 9px;text-align:left;vertical-align
 th{background:var(--ink);color:var(--paper);font-weight:500}
 td.n{text-align:right;white-space:nowrap;font-family:var(--mono)}
 .pt{display:inline-block;background:var(--ink);color:#f5efe2;font-family:var(--body);font-size:12px;font-weight:700;padding:2px 8px;margin-left:8px;vertical-align:middle;letter-spacing:0}.pt i{font-style:normal;font-weight:400;margin-left:6px;color:#e9dfc9}
+.chk{border:2px solid var(--ink);padding:12px 16px 4px;margin:14px 0;background:#fffdf7}.chk-h{font-weight:800;margin-bottom:2px}.ex{margin:8px 0 6px}.ex summary{cursor:pointer;font-weight:700}.ex th{width:150px;text-align:left}
 .sct{margin:10px 0 4px}.sct summary{cursor:pointer;font-weight:700}.sct table{margin-top:8px}.sct td.n{text-align:center;font-weight:700}
 .badge{display:inline-block;font-family:var(--body);font-size:12px;border:1px solid var(--ink2);padding:1px 8px;margin-left:8px;color:var(--ink2);vertical-align:middle;font-weight:500}
 /* ECOS 주제 고르기 */
@@ -255,19 +256,12 @@ const IND={
  gdp:{name:'공통지표③ 실질 GDP 성장률',unit:'전년 대비 %',kr:{1996:7.99,1997:6.28,1998:-4.94,1999:11.62,2007:5.84,2008:3.00,2009:0.82,2010:6.98},th:{1996:5.65,1997:-2.75,1998:-7.63,1999:4.57,2007:5.44,2008:1.73,2009:-0.69,2010:7.51}}
 };
 const STAGES=['시작','① 내 자료 다시보기','② 1997 게임','③ 2008 게임','④ 지표 비교','⑤ 득실표·추적 로그','⑥ AI 검증·대화 기록','⑦ 제출'];
-const AI=[
- {id:'A',s:'자료③에서 한국의 1998년 실질 GDP 성장률은 +4.94%이다.'},
- {id:'B',s:'원/달러 환율 숫자가 올라간다는 것은 1달러를 사는 데 필요한 원화가 줄어든다는 뜻이다.'},
- {id:'C',s:'공통지표②의 대출금리는 한국은행이 정한 기준금리 자체이다.'},
- {id:'D',s:'연평균 환율은 특정 날짜의 환율이나 그해 최고 환율과 다를 수 있다.'},
- {id:'E',s:'자료③에서 태국의 1998년 실질 GDP 성장률은 -2.75%이다.'}
-];
 const STAKE=['수출기업','수입업체·소비자','빚 많은 기업·노동자','은행·금융기관','정부','외국인 투자자'];
 const GNAME={'97':'1997년 외환위기','08':'2008년 세계 금융위기'};
 
 /* ---------- 상태 ---------- */
-function fresh(){return{stage:0,code:'',room:'',pid:'',topic:null,fix:{before:'',after:'',evidence:''},strategy:{basis:'',cash:'',change:''},drafts:{},logs:[],reflect:{'97':{before:'',real:'',after:''},'08':{before:'',real:'',after:''}},compare:{crisis:'',country:'',where:'',mine:''},issue:{issue:'',cause:'',altA:'',altB:'',table:{},choice:'',log2:''},ai:{question:'',picks:{},links:[{tool:'',url:'',what:''},{tool:'',url:'',what:''}],own:''},submittedAt:null}}
-function load(){try{const x=JSON.parse(localStorage.getItem(KEY));if(x&&x.reflect)return x}catch(e){}return fresh()}
+function fresh(){return{stage:0,code:'',room:'',pid:'',topic:null,fix:{before:'',after:'',evidence:''},strategy:{basis:'',cash:'',change:''},drafts:{},logs:[],reflect:{'97':{before:'',real:'',after:''},'08':{before:'',real:'',after:''}},compare:{crisis:'',country:'',where:'',mine:''},issue:{issue:'',cause:'',altA:'',altB:'',table:{},choice:'',log2:''},ai:{checks:[{},{}],links:[{tool:'',url:'',what:''},{tool:'',url:'',what:''}],own:''},submittedAt:null}}
+function load(){try{const x=JSON.parse(localStorage.getItem(KEY));if(x&&x.reflect){x.ai=x.ai||{};if(!Array.isArray(x.ai.checks))x.ai.checks=[{},{}];if(!x.ai.links)x.ai.links=[{tool:'',url:'',what:''}];return x}}catch(e){}return fresh()}
 let S=load();
 const qp=new URLSearchParams(location.search);if(qp.get('room')&&!S.room)S.room=qp.get('room');
 function save(){localStorage.setItem(KEY,JSON.stringify(S))}
@@ -280,7 +274,7 @@ function pt(n,t){return `<span class="pt">${n}점${t?`<i>${t}</i>`:''}</span>`}
 const SCORE=[['지표 비교',8,[['두 위기 대응 비교','④',3],['한국·태국 비교','④',2],['근거 위치','④',2],['내 통계와 연결','④',1]]],
  ['구조·득실',6,[['쟁점과 구조적 원인','⑤',2],['대안과 이해관계자별 득실표','⑤',2],['저울질 결과','⑤',2]]],
  ['비교·수정',6,[['1997 게임 후 해석 수정','②',2],['2008 게임 후 해석 수정','③',2],['추적 로그 2회차','⑤',2]]],
- ['AI 검증',5,[['틀린 AI 문장 교정 (1건당 1점)','⑥',2],['AI 대화 기록 링크','⑥',1],['구술 2분 (질문당 1점)','제출 후',2]]]];
+ ['AI 검증',5,[['AI로 찾은 정보 검증 (1건당 1점)','⑥',2],['AI 대화 기록 링크','⑥',1],['구술 2분 (질문당 1점)','제출 후',2]]]];
 function scoreTable(){return `<details class="sct"><summary>보고서 전체 배점 보기 (25점)</summary><table><tr><th>영역</th><th>문항</th><th>어디서</th><th>배점</th></tr>${SCORE.map(([a,m,it])=>it.map((x,i)=>`<tr>${i?'':`<td rowspan="${it.length}"><b>${a}</b><br>${m}점</td>`}<td>${x[0]}</td><td>${x[1]}</td><td class="n">${x[2]}</td></tr>`).join('')).join('')}</table><div class="muted">수익률·순위는 점수에 들어가지 않습니다.</div></details>`}
 function ta(p,label,hint='',tall){return `<label>${label}</label>${hint?`<div class="muted">${hint}</div>`:''}<textarea data-b="${p}" ${tall?'style="min-height:120px"':''}></textarea>`}
 function wire(){document.querySelectorAll('[data-b]').forEach(el=>{el.value=get(el.dataset.b);el.addEventListener('input',()=>{set(el.dataset.b,el.value);save()})})}
@@ -471,13 +465,18 @@ ${ta('issue.log2','추적 로그 2회차: 1회차 이후, 두 번의 게임과 �
 V[5].after=()=>{wire();$('#back').onclick=()=>go(4);$('#next').onclick=()=>filled('issue.issue','issue.cause','issue.altA','issue.altB','issue.choice','issue.log2')?go(6):$('#msg').innerHTML='<div class="err">쟁점·원인·대안·결론·추적 로그 2회차를 채우세요.</div>'};
 
 /* ---------- 6. AI 검증·대화 기록 ---------- */
-V[6]=()=>`<div class="card"><h2>⑥ AI가 준 정보 검증하기 <span class="badge">5점</span></h2>
-<div class="muted">문장 교정 2점 + 대화 기록 링크 1점 + 제출 후 구술 2분 2점(질문당 1점)</div>
+V[6]=()=>`<div class="card"><h2>⑥ AI로 찾은 정보 스스로 검증하기 <span class="badge">5점</span></h2>
+<div class="muted">검증 기록 2점 + 대화 기록 링크 1점 + 제출 후 구술 2분 2점(질문당 1점)</div>
 <div class="warn">AI는 자료 검색·용어 이해·표 정리에만 씁니다. 지표 해석과 득실 분석을 AI에게 쓰게 하면 부정행위입니다. AI 입력창에 이름·학번·학교 이름을 넣지 마세요.</div>
-<h3>1. 연습 문장 검증 ${pt(2,'틀린 문장을 원자료로 교정 1건당 1점')}</h3><p class="muted">맞는 문장과 틀린 문장이 섞여 있습니다. 2개 이상 원자료로 교정하세요.</p>
-${ta('ai.question','검증하기 전에 내가 세운 질문','예: 이 숫자는 어느 표의 몇 년 값인가? 이 용어 정의는 맞나?')}
-<table><tr><th>AI 문장</th><th>판정</th><th>원자료 위치와 교정</th></tr>
-${AI.map(a=>`<tr><td><b>${a.id}</b> ${a.s}</td><td style="width:110px"><select data-b="ai.picks.${a.id}.v"><option value="">-</option><option>맞음</option><option>틀림</option><option>근거 부족</option></select></td><td><textarea data-b="ai.picks.${a.id}.fix" style="min-height:48px"></textarea></td></tr>`).join('')}</table>
+<div class="tip">보고서를 쓰면서 <b>AI로 찾은 정보</b>(숫자·용어 뜻·사건 날짜·정책 내용)를 그대로 옮기지 말고, <b>원자료에서 직접 확인</b>합니다. 틀렸거나, 출처가 없거나, 한쪽으로 치우친 부분을 찾아 고쳐 쓰세요.<br>확인할 곳: ④의 공통 지표 표 · 정책 대응 사실 카드의 출처 링크 · 내 ECOS 통계 · 한국은행 ECOS · 교과서</div>
+<h3>1. AI로 찾은 정보 검증 기록 ${pt(2,'원자료로 확인한 정보 1건당 1점, 2건 이상')}</h3>
+<details class="ex"><summary>예시 보기</summary><table><tr><th>AI가 준 정보</th><td>1997년 외환위기 때 한국의 대출금리는 30%까지 올랐다.</td></tr><tr><th>확인한 원자료</th><td>공통지표② 한국 대출금리 1998년 15.28% (연평균) · 정책 카드: IMF 프로그램 초기 콜금리 연 30% 안팎 (IMF Letter of Intent 1997.12.24)</td></tr><tr><th>판정</th><td>일부 틀림</td></tr><tr><th>보고서에 쓴 내용</th><td>30%는 단기 시장금리(콜금리)이고, 은행 대출금리 연평균은 1998년 15.28%였다. 두 금리를 구분해서 썼다.</td></tr></table></details>
+${S.ai.checks.map((c,i)=>`<div class="chk"><div class="chk-h">검증 ${i+1}${i<2?'':' (추가)'}</div>
+${ta(`ai.checks.${i}.claim`,'AI가 준 정보 (받은 문장 그대로)','','')}
+<div class="grid"><div>${ta(`ai.checks.${i}.use`,'보고서 어디에 쓰려고 했나','예: ④ 두 위기 대응 비교')}</div><div><label>판정</label><select data-b="ai.checks.${i}.v"><option value="">-</option><option>맞음</option><option>틀림</option><option>일부 틀림</option><option>출처 없음·확인 불가</option><option>한쪽으로 치우침</option></select></div></div>
+${ta(`ai.checks.${i}.src`,'직접 확인한 원자료와 위치','예: 공통지표② 한국 1998년 15.28% / IMF Letter of Intent 1997.12.24')}
+${ta(`ai.checks.${i}.fix`,'그래서 보고서에는 이렇게 썼다 (고친 내용 또는 버린 이유)','')}</div>`).join('')}
+<button class="ghost" id="addChk" type="button">검증 칸 추가</button>
 <h3>2. 내 AI 대화 기록 링크 제출 ${pt(1,'링크 + 채택하지 않은 답과 확인 방법')}</h3>
 <p>오늘 AI로 무엇을 묻고, 어떤 답을 의심하고, 어떻게 확인했는지 선생님이 직접 볼 수 있게 <b>대화 공유 링크</b>를 붙입니다. 이 링크도 평가에 반영됩니다.</p>
 <div class="howto"><b>공유 링크 만드는 법</b><ul>
@@ -489,14 +488,14 @@ ${AI.map(a=>`<tr><td><b>${a.id}</b> ${a.s}</td><td style="width:110px"><select d
 ${S.ai.links.map((l,i)=>`<div class="linkrow"><select data-b="ai.links.${i}.tool"><option value="">AI 도구</option><option>ChatGPT</option><option>Gemini</option><option>Claude</option><option>뤼튼</option><option>퍼플렉시티</option><option>기타</option></select><input type="url" data-b="ai.links.${i}.url" placeholder="https://… 공유 링크 ${i+1}${i?' (선택)':''}"></div><textarea data-b="ai.links.${i}.what" style="min-height:56px" placeholder="이 대화에서 무엇을 물었고, 어떤 답을 채택하지 않았으며, 무엇으로 확인했나"></textarea>`).join('')}
 <button class="ghost" id="addLink" type="button">링크 칸 추가</button>
 <div class="row"><button class="ghost" id="back">이전</button><button id="next">제출 화면으로</button></div><div id="msg"></div></div>`;
-V[6].after=()=>{wire();$('#addLink').onclick=()=>{S.ai.links.push({tool:'',url:'',what:''});save();render()};$('#back').onclick=()=>go(5);
- $('#next').onclick=()=>{const n=AI.filter(a=>get(`ai.picks.${a.id}.v`)&&get(`ai.picks.${a.id}.v`)!=='맞음'&&String(get(`ai.picks.${a.id}.fix`)).trim().length>=5).length;
-  if(n<2)return $('#msg').innerHTML='<div class="err">틀렸거나 근거가 부족한 문장 2개 이상을 원자료로 교정하세요.</div>';
+V[6].after=()=>{wire();$('#addLink').onclick=()=>{S.ai.links.push({tool:'',url:'',what:''});save();render()};$('#addChk').onclick=()=>{S.ai.checks.push({});save();render()};$('#back').onclick=()=>go(5);
+ $('#next').onclick=()=>{const n=S.ai.checks.filter(c=>String(c.claim||'').trim().length>=5&&String(c.src||'').trim().length>=5&&c.v&&String(c.fix||'').trim().length>=5).length;
+  if(n<2)return $('#msg').innerHTML='<div class="err">AI로 찾은 정보 2건 이상을 원자료로 확인해 네 칸(정보·판정·원자료·보고서에 쓴 내용)을 채우세요.</div>';
   const ok=S.ai.links.filter(l=>/^https?:\/\/\S+\.\S+/.test(l.url.trim())&&l.what.trim().length>=5);
   if(!ok.length)return $('#msg').innerHTML='<div class="err">AI 대화 공유 링크 1개 이상과 그 대화에서 검증한 내용을 적으세요.</div>';go(7)}};
 
 /* ---------- 7. 제출 ---------- */
-function reportObj(){return{name:S.code,room:S.room,topic:TOPICS[S.topic]?.t||'',fix:S.fix,strategy:S.strategy,logs:S.logs,reflect:S.reflect,compare:S.compare,issue:S.issue,ai:{question:S.ai.question,picks:S.ai.picks,links:S.ai.links.filter(l=>l.url.trim()),own:S.ai.own},final:{'97':LIVE?.me?.games?.['97'],'08':LIVE?.me?.games?.['08']}}}
+function reportObj(){return{name:S.code,room:S.room,topic:TOPICS[S.topic]?.t||'',fix:S.fix,strategy:S.strategy,logs:S.logs,reflect:S.reflect,compare:S.compare,issue:S.issue,ai:{checks:S.ai.checks.filter(c=>String(c.claim||'').trim()),links:S.ai.links.filter(l=>l.url.trim()),own:S.ai.own},final:{'97':LIVE?.me?.games?.['97'],'08':LIVE?.me?.games?.['08']}}}
 function report(){const t=TOPICS[S.topic]||{};const L=(l,v)=>`<p><b>${l}</b><br>${esc(v).replace(/\n/g,'<br>')}</p>`;
  return `<h2>국제 금융 구조 분석 보고서 · ${esc(S.code)}</h2><p class="muted">방 ${esc(S.room)} · 작성 ${new Date().toLocaleString('ko-KR')}</p>
  <h3>내 ECOS 주제: ${esc(t.t)}</h3>${L('고칠 부분',S.fix.before)}${L('슬라이드에서 고친 것',S.fix.after)}${L('위기 신호',S.fix.evidence)}
@@ -506,7 +505,7 @@ function report(){const t=TOPICS[S.topic]||{};const L=(l,v)=>`<p><b>${l}</b><br>
  <h3>1. 지표 비교 (8)</h3>${L('두 위기 대응',S.compare.crisis)}${L('한국·태국',S.compare.country)}${L('근거 위치',S.compare.where)}${L('내 통계·실제 코스피의 기여',S.compare.mine)}
  <h3>2. 구조와 득실 (6)</h3>${L('쟁점',S.issue.issue)}${L('구조적 원인',S.issue.cause)}${L('대안 A',S.issue.altA)}${L('대안 B',S.issue.altB)}
  <table><tr><th>이해관계자</th><th>A</th><th>B</th></tr>${STAKE.map((s,i)=>`<tr><td>${s}</td><td>${esc(S.issue.table['a'+i])}</td><td>${esc(S.issue.table['b'+i])}</td></tr>`).join('')}</table>${L('결론',S.issue.choice)}${L('추적 로그 2회차',S.issue.log2)}
- <h3>3. AI 검증 (5)</h3>${L('검증 질문',S.ai.question)}<table>${AI.map(a=>`<tr><td>${a.id}. ${a.s}</td><td>${esc(S.ai.picks?.[a.id]?.v)}</td><td>${esc(S.ai.picks?.[a.id]?.fix)}</td></tr>`).join('')}</table>
+ <h3>3. AI로 찾은 정보 검증 (5)</h3><table><tr><th>AI가 준 정보</th><th>판정</th><th>확인한 원자료</th><th>보고서에 쓴 내용</th></tr>${S.ai.checks.filter(c=>String(c.claim||'').trim()).map(c=>`<tr><td>${esc(c.claim)}${c.use?`<br><span class="muted">${esc(c.use)}</span>`:''}</td><td>${esc(c.v)}</td><td>${esc(c.src)}</td><td>${esc(c.fix)}</td></tr>`).join('')}</table>
  <h3>AI 대화 기록</h3>${S.ai.links.filter(l=>l.url.trim()).map(l=>`<p><b>${esc(l.tool||'AI')}</b> <a href="${esc(l.url)}">${esc(l.url)}</a><br>${esc(l.what)}</p>`).join('')}`}
 V[7]=()=>`<div class="card noprint"><h2>⑦ 제출</h2><p>확인한 뒤 <b>선생님에게 제출</b>을 누르세요. 124분 이후에는 수정하지 않습니다. 제출 직후 선생님과 2분 구술(질문 2개)이 있습니다. 구술은 AI 검증 영역 ${pt(2,'질문당 1점, 내 보고서 근거로 내 말로 설명')}입니다.</p>
 ${S.submittedAt?`<div class="tip"><span class="done-badge">제출됨</span> ${new Date(S.submittedAt).toLocaleString('ko-KR')}. 다시 누르면 최신 내용으로 덮어씁니다.</div>`:''}
