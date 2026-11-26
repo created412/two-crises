@@ -161,6 +161,20 @@ th{background:var(--ink);color:var(--paper);font-weight:700}
 .edit-toggle{position:fixed;top:14px;left:14px;z-index:10001;opacity:0;pointer-events:none;transition:opacity .3s;border:0;border-radius:8px;padding:8px 12px;background:#16130f;color:#ffb020;font:600 14px 'IBM Plex Sans KR',sans-serif;cursor:pointer}
 .edit-toggle.show,.edit-toggle.active{opacity:1;pointer-events:auto}
 body.editing [data-edit]{outline:2px dashed rgba(214,40,27,.6);outline-offset:4px}
+
+/* 설명 슬라이드 */
+.ori{display:grid;grid-template-columns:repeat(4,1fr);gap:26px}
+.ori figure{margin:0;position:relative;background:#fffdf7;border:3px solid var(--ink);box-shadow:8px 8px 0 var(--ink)}
+.ori img{display:block;width:100%;height:300px;max-width:none;max-height:none;object-fit:cover;object-position:top;border-bottom:3px solid var(--ink)}
+.ori.rep img{object-position:top left}
+.ori img.fit{object-fit:contain;object-position:center;background:#fffdf7;padding:10px}
+.ori figcaption{padding:16px 18px 20px;font-size:24px;line-height:1.45;color:var(--ink-2)}
+.ori figcaption b{display:block;font-family:var(--font-display);font-weight:400;font-size:34px;color:var(--ink);margin-bottom:6px}
+.ori figcaption u{text-decoration:none;background:linear-gradient(transparent 60%,rgba(214,40,27,.25) 60%);color:var(--ink)}
+.ori .on{position:absolute;left:-14px;top:-18px;width:64px;height:64px;border-radius:50%;background:var(--ink);color:var(--led);font-family:var(--font-display);font-size:34px;display:flex;align-items:center;justify-content:center;z-index:2}
+.ori.rep .on{width:auto;padding:0 16px;border-radius:0;font-size:30px}
+.ori.rep .on::after{content:'점';font-size:20px;margin-left:2px}
+.ori .on.red{background:var(--red);color:#fff}
 </style>
 </head>
 <body>
@@ -248,17 +262,50 @@ body.editing [data-edit]{outline:2px dashed rgba(214,40,27,.6);outline-offset:4p
   <div class="masthead"><b>오늘의 흐름 · 150분</b><span>04</span></div>
   <div class="body">
     <h2 class="reveal">게임은 짧게, 보고서는 길게</h2>
-    <div class="tl reveal" style="grid-template-columns:repeat(6,1fr)">
-      <div><div class="t">0–8</div><div class="n">안내·입장</div><div class="d">학번 이름 + 방 코드</div></div>
-      <div class="hot"><div class="t">8–18</div><div class="n">내 자료 다시보기</div><div class="d">발표 슬라이드 직접 수정</div></div>
-      <div class="hot"><div class="t">18–42</div><div class="n">1997 게임</div><div class="d">4라운드 × 3분 + 실제와 비교</div></div>
-      <div class="hot"><div class="t">42–63</div><div class="n">2008 게임</div><div class="d">4라운드 + 코스피·S&amp;P 500 비교</div></div>
-      <div class="hot"><div class="t">63–124</div><div class="n">보고서 61분</div><div class="d">채점은 보고서로 · 지표 비교·득실표·AI 검증·대화 링크</div></div>
+    <div class="tl reveal" style="grid-template-columns:repeat(7,1fr)">
+      <div><div class="t">0–5</div><div class="n">접속·입장</div><div class="d">Zoom 링크 · 학번 이름</div></div>
+      <div class="hot"><div class="t">5–17</div><div class="n">설명 듣기</div><div class="d">게임·보고서 화면 미리 보기</div></div>
+      <div><div class="t">17–27</div><div class="n">내 자료 다시보기</div><div class="d">발표 슬라이드 직접 수정</div></div>
+      <div class="hot"><div class="t">27–51</div><div class="n">1997 게임</div><div class="d">4라운드 × 3분 + 실제와 비교</div></div>
+      <div class="hot"><div class="t">51–72</div><div class="n">2008 게임</div><div class="d">4라운드 + 코스피·S&amp;P 500 비교</div></div>
+      <div class="hot"><div class="t">72–124</div><div class="n">보고서 52분</div><div class="d">채점은 보고서로</div></div>
       <div><div class="t">124–150</div><div class="n">제출·구술</div><div class="d">124분 전원 제출 · 2분씩</div></div>
     </div>
     <div class="example reveal" style="margin-top:56px"><span class="lab">기억할 것</span>모든 과정은 <b>게임 화면 하나</b>에서 이어지고, 보고서는 끝에 <b>선생님에게 제출</b> 버튼으로 바로 냅니다.</div>
   </div>
   <div class="foot"><span>쉬는 시간 제외 150분 · 라운드마다 3분 타이머</span><span>13명 기준</span></div>
+</section>
+
+<!-- ===== 설명 1. 게임 한눈에 ===== -->
+<section class="slide">
+  <div class="masthead"><b>게임·보고서 설명 ① · 게임</b><span>00</span></div>
+  <div class="body">
+    <h2 class="reveal" style="font-size:72px;margin-bottom:26px">게임은 이 네 화면이 반복된다</h2>
+    <div class="ori reveal">
+      <figure><div class="on">1</div><img class="fit" src="img/guide_event.webp" alt="사건 공개 화면"><figcaption><b>사건이 터진다</b>실제 역사 사건 · 사진 · 당시 뉴스 영상</figcaption></figure>
+      <figure><div class="on">2</div><img class="fit" src="img/guide_order.webp" alt="주문 화면"><figcaption><b>3분 안에 주문</b>주식 수 + <u>근거 하나</u> 고르기 · 메모는 선택</figcaption></figure>
+      <figure><div class="on">3</div><img src="img/guide_result.webp" alt="결과 화면"><figcaption><b>결과 확인</b>사건 영향 + <u>우리 반 매수·매도</u>가 주가를 바꿈</figcaption></figure>
+      <figure><div class="on red">4</div><img src="img/guide_compare.webp" alt="실제와 비교 화면"><figcaption><b>게임 끝 · 실제와 비교</b>수정 전 → 실제 → <u>수정 후</u> 쓰기 (채점)</figcaption></figure>
+    </div>
+    <div class="example reveal" style="margin-top:30px;font-size:30px"><span class="lab">이것만 기억</span>1997 게임 4라운드, 2008 게임 4라운드. 라운드마다 <b>3분 타이머</b>가 Zoom 공유 화면과 내 화면에 함께 뜹니다. 수익률은 점수가 아닙니다.</div>
+  </div>
+  <div class="foot"><span>설명 6분 · 첫 라운드는 선생님과 함께 천천히</span><span>00</span></div>
+</section>
+
+<!-- ===== 설명 2. 보고서 한눈에 ===== -->
+<section class="slide">
+  <div class="masthead"><b>게임·보고서 설명 ② · 보고서</b><span>00</span></div>
+  <div class="body">
+    <h2 class="reveal" style="font-size:72px;margin-bottom:26px">채점은 보고서로 한다 · 25점</h2>
+    <div class="ori rep reveal">
+      <figure><div class="on">8</div><img src="img/guide_policy.webp" alt="정책 대응 카드와 지표 비교 화면"><figcaption><b>④ 지표 비교</b>공통 지표 3개 + 정책 카드로 1997 vs 2008, 한국 vs 태국. <u>몇 년 값인지까지</u></figcaption></figure>
+      <figure><div class="on">6</div><img src="img/guide_table.webp" alt="득실표 화면"><figcaption><b>⑤ 득실표 · 추적 로그</b>원인을 무역·금융 구조로, 대안 2개를 이해관계자별로 저울질 + 추적 로그 2회차</figcaption></figure>
+      <figure><div class="on">6</div><img src="img/guide_compare.webp" alt="실제와 비교 화면"><figcaption><b>게임 끝 해석 수정</b>게임이 끝날 때마다 실제 그래프와 비교해 고친 해석</figcaption></figure>
+      <figure><div class="on">5</div><img src="img/guide_ai.webp" alt="AI 대화 링크 제출 화면"><figcaption><b>⑥ AI 검증 · 대화 링크</b>AI 문장 오류 2개 이상 교정 + 내 AI 대화 공유 링크</figcaption></figure>
+    </div>
+    <div class="example reveal" style="margin-top:30px;font-size:30px"><span class="lab">보고서 시간 52분</span>모든 칸은 게임 사이트 안에 있습니다. <b>40초마다 자동 저장</b>, 124분에 마감, 끝나면 「선생님에게 제출」 → 2분 구술.</div>
+  </div>
+  <div class="foot"><span>설명 6분 · 질문은 Zoom 채팅으로</span><span>00</span></div>
 </section>
 
 <!-- ===== 5. 네 회사 ===== -->
@@ -279,7 +326,7 @@ body.editing [data-edit]{outline:2px dashed rgba(214,40,27,.6);outline-offset:4p
 
 <!-- ===== 6. STEP 1 ===== -->
 <section class="slide">
-  <div class="masthead"><b>STEP 1 · 15분</b><span>06</span></div>
+  <div class="masthead"><b>STEP 1 · 10분</b><span>06</span></div>
   <div class="body">
     <h2 class="reveal"><span class="tag">STEP 1</span>내 발표 슬라이드를 직접 고친다</h2>
     <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:60px">
@@ -294,7 +341,7 @@ body.editing [data-edit]{outline:2px dashed rgba(214,40,27,.6);outline-offset:4p
       </div>
     </div>
   </div>
-  <div class="foot"><span>시작 후 10–25분</span><span>06</span></div>
+  <div class="foot"><span>시작 후 17–27분</span><span>06</span></div>
 </section>
 
 <!-- ===== 7. 피드백 모음 ===== -->
@@ -354,7 +401,7 @@ body.editing [data-edit]{outline:2px dashed rgba(214,40,27,.6);outline-offset:4p
     <h1 class="reveal">1997</h1>
     <p class="sub reveal" style="font-size:40px">다음에 무슨 일이 생길지 모르는 상태에서 첫 전략을 세우고, 라운드마다 새 사건에 맞서 판단을 고치세요.</p>
   </div>
-  <div class="foot"><span>4라운드: 사건 → 주문 → 마감 → 결과 · 끝나면 실제 코스피와 비교</span><span>18–42분</span></div>
+  <div class="foot"><span>4라운드: 사건 → 주문 → 마감 → 결과 · 끝나면 실제 코스피와 비교</span><span>27–51분</span></div>
 </section>
 
 <!-- ===== 10. 2008 섹션 ===== -->
@@ -366,7 +413,7 @@ body.editing [data-edit]{outline:2px dashed rgba(214,40,27,.6);outline-offset:4p
     <h1 class="reveal">2008</h1>
     <p class="sub reveal" style="font-size:40px">1997년과 <span style="color:var(--led)">무엇이 같고 무엇이 다른가?</span> 지난 게임의 판단을 이번엔 어떻게 바꿀까?</p>
   </div>
-  <div class="foot"><span>4라운드 · 끝나면 코스피·S&amp;P 500과 비교하고 보고서로</span><span>42–63분</span></div>
+  <div class="foot"><span>4라운드 · 끝나면 코스피·S&amp;P 500과 비교하고 보고서로</span><span>51–72분</span></div>
 </section>
 
 <!-- ===== 10-2. 휴식 후: 실제 뉴스로 다시 보기 ===== -->
@@ -421,7 +468,7 @@ body.editing [data-edit]{outline:2px dashed rgba(214,40,27,.6);outline-offset:4p
       </div>
     </div>
   </div>
-  <div class="foot"><span>출처 World Bank WDI · 63분부터</span><span>11</span></div>
+  <div class="foot"><span>출처 World Bank WDI · 72분부터</span><span>11</span></div>
 </section>
 
 <!-- ===== 12. STEP 4 득실표 ===== -->
