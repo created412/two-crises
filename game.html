@@ -203,6 +203,11 @@ details.card summary{cursor:pointer;font-weight:700;font-size:16px}
 .pc{border:1.5px solid var(--ink);background:#fff;padding:12px 14px}.pc .pk{display:inline-block;font-family:var(--mono);font-size:12px;background:var(--ink);color:var(--paper);padding:2px 8px;margin-bottom:6px}
 .pc b{display:block;font-size:16px}.pc p{font-size:14px;margin:6px 0}.pc a{font-size:12px;color:#1d4ed8}
 @media(max-width:800px){.pol{grid-template-columns:1fr}}
+
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{background:#fff!important;color:var(--ink)!important;border:2px solid var(--ink)!important;box-shadow:none!important;padding:10px 18px!important;font-size:16px!important}
+.chip.on{background:var(--ink)!important;color:var(--led)!important}
+#why{font-size:16px}
 </style>
 </head>
 <body>
@@ -292,9 +297,9 @@ V[0]=()=>`<div class="card"><h2>오늘 할 일</h2>
 <h3>오늘 순서 (150분)</h3><ol class="flow">
 <li><b>안내·입장</b> 8분</li>
 <li><b>내 발표 슬라이드 고치기</b> 10분</li>
-<li><b>1997 게임</b> 4라운드(라운드당 4분 주문) + 실제와 비교 · 30분</li>
-<li><b>2008 게임</b> 4라운드 + 코스피·S&P 500과 비교 · 25분</li>
-<li><b>보고서</b> 지표 비교·득실표·AI 검증과 대화 링크 · <b>51분</b> (채점은 보고서로 합니다)</li>
+<li><b>1997 게임</b> 4라운드(라운드당 3분, 근거는 하나만 고르기) + 실제와 비교 · 24분</li>
+<li><b>2008 게임</b> 4라운드 + 코스피·S&P 500과 비교 · 21분</li>
+<li><b>보고서</b> 지표 비교·득실표·AI 검증과 대화 링크 · <b>61분</b> (채점은 보고서로 합니다)</li>
 <li><b>124분 전원 제출 → 2분 구술</b> · 26분</li></ol>
 <div class="tip"><b>Zoom 수업</b> · Zoom은 켜 둔 채로 이 사이트를 <b>다른 창</b>에서 엽니다. 화면을 반으로 나눠 왼쪽엔 Zoom(선생님 공유 화면), 오른쪽엔 이 게임을 띄우세요. 마이크는 끄고, 질문은 Zoom 채팅으로 합니다. 구술 때 선생님이 이름을 부릅니다.</div>
 <label for="code">학번과 이름</label><div class="muted">제출본에 그대로 들어갑니다.</div><input id="code" placeholder="예: 20315 김민준" autocomplete="off">
@@ -374,23 +379,25 @@ function gameView(g){g_=g;
  if(phase==='over')html+=overView(g,st);
  html+=`<details class="card"><summary>지난 라운드 · 내 판단 기록 · 공통 지표</summary>
  ${h.map((x,k)=>`<div class="log"><b>R${k+1}</b> ${esc(x.title)} · 평균 주가 ${fmt(avg(x.after))}</div>`).join('')||'<div class="muted">아직 없음</div>'}
- <h3>내 판단 기록</h3>${S.logs.filter(l=>l.game===g).map(l=>`<div class="log"><b>R${l.round+1}</b> ${l.q.map((q,i)=>CO[i].k+' '+q+'주').join(', ')} · 근거: ${esc(l.ind)}<br>본 것: ${esc(l.info)}<br>그래서: ${esc(l.why)}</div>`).join('')||'<div class="muted">아직 없음</div>'}
+ <h3>내 판단 기록</h3>${S.logs.filter(l=>l.game===g).map(l=>`<div class="log"><b>R${l.round+1}</b> ${l.q.map((q,i)=>CO[i].k+' '+q+'주').join(', ')} · 근거: ${esc(l.ind)}${l.why?'<br>메모: '+esc(l.why):''}</div>`).join('')||'<div class="muted">아직 없음</div>'}
  ${ev.length?`<h3>공통 지표 (지금까지 공개된 연도)</h3>${indTable(+ev.at(-1).date.slice(0,4),g==='97'?1996:2007)}`:''}</details>`;
  return html}
 function orderForm(g,p,w,r){const dk=g+'-'+r;const d=S.drafts[dk]||{};const mine=LIVE.me?.order;const G=LIVE.me?.games?.[g]||{q:[0,0,0,0]};
- const q=d.q||mine?.qty||G.q;const indOpts=[TOPICS[S.topic]?.t+' (내 ECOS 주제)',...Object.values(IND).map(x=>x.name),'오늘 사건 뉴스'];const first=g==='97'&&r===0;
- return `<div class="card order"><h3>${first?'전략을 세우고 첫 주문':'이번 라운드 주문'} ${mine?'<span class="done-badge">제출됨 · 마감 전까지 수정 가능</span>':''}</h3>
- ${first?`${ta('strategy.basis','어떤 회사에 왜 투자하나? (내 통계와 연결)')}${ta('strategy.cash','현금은 얼마나, 왜 남기나?')}${ta('strategy.change','어떤 정보가 나오면 판단을 바꿀까?')}`:''}
+ const q=d.q||mine?.qty||G.q;const first=g==='97'&&r===0;const cur=d.ind||mine?.note?.ind||'';
+ const opts=[[TOPICS[S.topic]?.t?TOPICS[S.topic].t+' (내 ECOS 주제)':'내 ECOS 주제','내 통계'],['공통지표① 환율','환율'],['공통지표② 대출금리','금리'],['공통지표③ 실질 GDP 성장률','성장률'],['오늘 사건 뉴스','뉴스']];
+ return `<div class="card order"><h3>${first?'첫 주문':'이번 라운드 주문'} ${mine?'<span class="done-badge">제출됨 · 마감 전까지 수정 가능</span>':''}</h3>
+ ${first?ta('strategy.basis','내 전략 한 줄','예: 단기외채가 늘었으니 은행·건설은 피하고 수출기업 위주로, 현금은 절반'):''}
  <label>목표 보유 주식 수</label>
  <div class="qgrid">${CO.map((c,i)=>`<label class="qi"><img src="${c.img}" alt=""><span>${c.k} ${c.name}<small>${fmt(p[i])}만원</small></span><input type="number" min="0" step="1" id="q${i}" value="${q[i]}"></label>`).join('')}</div>
  <div id="calc" class="calc"></div>
- <div class="two"><div><label>근거 지표·자료</label><select id="ind"><option value="">선택</option>${indOpts.map(o=>`<option ${o===(d.ind||mine?.note?.ind)?'selected':''}>${esc(o)}</option>`).join('')}</select>
- <label>무엇을 보았나 (새 정보·숫자)</label><textarea id="info" placeholder="예: 외국 은행이 만기 연장을 거부, 환율 상한까지 상승">${esc(d.info??mine?.note?.info??'')}</textarea></div>
- <div><label>그래서 이렇게 (어느 회사에 어떻게 작용해서 무엇을 사고팔았나)</label><textarea id="why" style="min-height:150px" placeholder="예: 달러 빚 많은 믿음은행이 위험 → 전부 팔고 수출하는 한빛수출을 산다">${esc(d.why??mine?.note?.why??'')}</textarea></div></div>
+ <label>이번 판단에서 가장 크게 본 근거 하나</label>
+ <div class="chips" id="ind">${opts.map(([v,s])=>`<button type="button" class="chip ${cur===v?'on':''}" data-v="${esc(v)}">${esc(s)}</button>`).join('')}</div>
+ <label>한 줄 메모 <span class="muted">(선택 · 나중에 「수정 전 해석」 쓸 때 도움이 됩니다)</span></label><input id="why" maxlength="200" value="${esc(d.why??mine?.note?.why??'')}" placeholder="예: 만기 연장 거부 → 은행 위험, 전부 판다">
  <button id="confirm">${mine?'주문 수정하기':'주문 제출'}</button><div id="msg"></div></div>`}
 function overView(g,st){return `<div class="card"><h2>${g==='97'?'1997':'2008'} 게임 끝 · 실제와 비교</h2>
  ${chartSVG(g,st)}
- ${ta(`reflect.${g}.before`,'게임 중 내 판단 (수정 전 해석)','어떤 근거로 무엇을 사고팔았나')}
+ <div class="tip"><b>여기가 채점되는 부분입니다 (비교·수정 6점).</b> 라운드마다 고른 근거와 메모를 아래 「지난 라운드 · 내 판단 기록」에서 다시 보며 쓰세요.</div>
+ ${ta(`reflect.${g}.before`,'게임 중 내 판단 (수정 전 해석)','어떤 근거로 무엇을 사고팔았나. 가장 중요했던 라운드 하나를 골라 구체적으로')}
  ${ta(`reflect.${g}.real`,g==='08'?'코스피·S&P 500·우리 반 그래프는 어디가 같고 어디가 달랐나? 왜 그랬을까?':'실제 코스피와 우리 반 그래프는 어디가 같고 어디가 달랐나? 왜 그랬을까?',g==='08'?'예: 미국에서 시작된 위기인데 2008년 10월 코스피가 S&P 500보다 더 크게 떨어졌다. 외국인 자금이 빠져나간 영향…':'예: 실제로는 1998년 상반기에 더 떨어졌는데 우리 반은 R4에서 반등했다…')}
  ${ta(`reflect.${g}.after`,'그래서 고친 해석 (수정 후)','근거 지표를 다시 읽고 바꾼 생각')}
  <button id="toNext">${g==='97'?'2008 게임으로':'보고서 쓰러 가기'}</button><div id="msg2"></div></div>`}
@@ -398,13 +405,15 @@ function gameAfter(){const g=g_;wire();countUp();tickTimer();const st=LIVE?.stat
  const tb=$('#toNext');if(tb)tb.onclick=()=>{if(!filled(`reflect.${g}.before`,`reflect.${g}.real`,`reflect.${g}.after`))return $('#msg2').innerHTML='<div class="err">세 칸을 채우세요.</div>';go(g==='97'?3:4)};
  if(st.phase!=='open'||st.game!==g)return;
  const p=st.prices[g],r=st.round,dk=g+'-'+r,w=myWealth(g,p);
- const keep=()=>{S.drafts[dk]={q:CO.map((_,i)=>Math.max(0,Math.floor(+$('#q'+i).value||0))),ind:$('#ind').value,info:$('#info').value,why:$('#why').value};save()};
+ let indV=(S.drafts[dk]?.ind)||LIVE.me?.order?.note?.ind||'';
+ const keep=()=>{S.drafts[dk]={q:CO.map((_,i)=>Math.max(0,Math.floor(+$('#q'+i).value||0))),ind:indV,why:$('#why').value};save()};
  const calc=()=>{const q=CO.map((_,i)=>Math.max(0,Math.floor(+$('#q'+i).value||0)));const cost=q.reduce((s,x,i)=>s+x*p[i],0);const cash=w-cost;$('#calc').innerHTML=`주식 <b>${fmt(cost)}</b>만원 + 현금 <b class="${cash<0?'down':''}">${fmt(cash)}</b>만원 = 내 평가액 ${fmt(w)}만원${cash<0?' · <b class="down">현금이 부족합니다</b>':''}`;return{q,cash}};
- ['q0','q1','q2','q3','info','why'].forEach(id=>$('#'+id).addEventListener('input',()=>{keep();calc()}));$('#ind').addEventListener('change',keep);calc();
- $('#confirm').onclick=async()=>{const{q,cash}=calc();const note={ind:$('#ind').value,info:$('#info').value.trim(),impact:'',why:$('#why').value.trim()};
+ ['q0','q1','q2','q3','why'].forEach(id=>$('#'+id).addEventListener('input',()=>{keep();calc()}));calc();
+ document.querySelectorAll('#ind .chip').forEach(b=>b.onclick=()=>{indV=b.dataset.v;document.querySelectorAll('#ind .chip').forEach(x=>x.classList.toggle('on',x===b));keep()});
+ $('#confirm').onclick=async()=>{const{q,cash}=calc();const note={ind:indV,info:'',impact:'',why:$('#why').value.trim()};
   if(cash<0)return $('#msg').innerHTML='<div class="err">현금이 부족합니다.</div>';
-  if(g==='97'&&r===0&&!filled('strategy.basis','strategy.cash','strategy.change'))return $('#msg').innerHTML='<div class="err">전략 세 칸을 먼저 쓰세요.</div>';
-  if(!note.ind||note.info.length<5||note.why.length<5)return $('#msg').innerHTML='<div class="err">근거 지표와 두 칸을 적어야 주문이 됩니다.</div>';
+  if(g==='97'&&r===0&&!filled('strategy.basis'))return $('#msg').innerHTML='<div class="err">전략 한 줄을 먼저 쓰세요.</div>';
+  if(!note.ind)return $('#msg').innerHTML='<div class="err">근거를 하나 고르세요.</div>';
   try{await api(`/rooms/${S.room}/order`,{pid:S.pid,game:g,round:r,qty:q,note});S.logs=S.logs.filter(l=>!(l.game===g&&l.round===r));S.logs.push({game:g,round:r,q,...note});delete S.drafts[dk];save();lastKey='';await poll()}catch(e){$('#msg').innerHTML=`<div class="err">${esc(e.message)}</div>`}}}
 V[2]=()=>gameView('97');V[3]=()=>gameView('08');V[2].after=gameAfter;V[3].after=gameAfter;
 async function poll(){if(!S.room||!S.pid)return;try{const t0=Date.now();LIVE=await api(`/rooms/${S.room}?pid=${S.pid}&stage=${S.stage}`);lockBanner();clockOff=LIVE.state.now-Math.round((t0+Date.now())/2);}catch(e){return}

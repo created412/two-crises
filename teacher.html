@@ -92,7 +92,7 @@ function setup(){$('#app').innerHTML=`<div class="card"><h2>새 방 만들기</h
 
 const avg=a=>a.reduce((x,y)=>x+y,0)/a.length;const pct=x=>(x>0?'+':'')+fmt(x)+'%';
 const COI=['img/co_a.webp','img/co_b.webp','img/co_c.webp','img/co_d.webp'];
-let clockOff=0,lastKey='',LIMIT=+(localStorage.getItem('tcLimit')||240);
+let clockOff=0,lastKey='',LIMIT=+(localStorage.getItem('tcLimit2')||180);
 function chart(g){const st=D.state;const R=st.real?.[g];const h=st.history[g];if(!R||!h.length)return '';
  const months=R.kospi.map(r=>r[0]);const mi=d=>months.indexOf(d);
  const norm=s=>{const base=(s.find(r=>r[0]===h[0].date)||s[0])[1];return s.map(([d,v])=>[mi(d),v/base*100])};
@@ -133,7 +133,7 @@ function gameTab(){const st=D.state,g=st.game,p=st.prices[g],h=st.history[g];con
   <button onclick="act('next')" ${st.phase==='closed'?'':'disabled'}>③ ${st.round>=NR-1?'게임 끝내고 실제와 비교':'다음 라운드로'}</button>
   ${g==='97'&&st.phase==='over'?`<button onclick="act('start08')">2008 게임 시작</button>`:''}
   ${st.phase==='open'?`<button class="ghost" onclick="act('extend')">+1분</button><button class="ghost" onclick="act('undoOpen')">열기 취소</button>`:''}
-  <label class="lim">주문 시간 <select onchange="LIMIT=+this.value;localStorage.setItem('tcLimit',LIMIT)">${[180,240,300].map(v=>`<option value="${v}" ${v===LIMIT?'selected':''}>${v/60}분</option>`).join('')}</select></label>
+  <label class="lim">주문 시간 <select onchange="LIMIT=+this.value;localStorage.setItem('tcLimit2',LIMIT)">${[120,180,240].map(v=>`<option value="${v}" ${v===LIMIT?'selected':''}>${v/60}분</option>`).join('')}</select></label>
   ${st.phase==='ready'&&ev?`<span class="peek">선생님만 보임 · 사건 영향 ${ev.e.map((x,i)=>CO[i].slice(0,1)+' '+(x>0?'+':'')+x+'%').join(' · ')}</span>`:''}</div>`;
  let body='';
  if(st.phase==='over')body+=`<div class="card">${chart(g)}</div>`;
@@ -196,7 +196,7 @@ function repTab(){const subs=[...D.submissions].sort((a,b)=>a.name.localeCompare
  <table style="margin-top:12px"><tr><th>학번 이름</th><th>상태 · 시각</th><th>AI 대화 기록 링크</th></tr>${subs.map(s=>`<tr><td>${esc(s.name)}</td><td>${s.status==='final'?'<b class="y">최종</b>':'초안(자동 저장)'} · ${new Date(s.ts).toLocaleString('ko-KR')}</td><td>${(s.report.ai?.links||[]).map(l=>`<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.tool||'링크')}</a>`).join(' · ')||'<span class="no">없음</span>'}</td></tr>`).join('')}</table>
  ${subs.map(s=>{const r=s.report;return `<details><summary>${esc(s.name)} · 보고서 펼치기</summary><div class="rep">
   <h4>내 자료</h4>${L('주제',r.topic)}${L('슬라이드에서 고친 것',r.fix?.after)}${L('위기 신호',r.fix?.evidence)}
-  <h4>게임 판단 기록</h4><table><tr><th>R</th><th>보유</th><th>근거</th><th>새 정보 → 기업 영향 → 선택</th></tr>${(r.logs||[]).map(l=>`<tr><td>${l.game} R${l.round+1}</td><td>${(l.q||[]).join(' / ')}</td><td>${esc(l.ind)}</td><td>${esc(l.info)} → ${esc(l.impact)} → ${esc(l.why)}</td></tr>`).join('')}</table>
+  <h4>게임 판단 기록</h4><table><tr><th>R</th><th>보유</th><th>근거</th><th>메모</th></tr>${(r.logs||[]).map(l=>`<tr><td>${l.game} R${l.round+1}</td><td>${(l.q||[]).join(' / ')}</td><td>${esc(l.ind)}</td><td>${esc(l.why||'')}</td></tr>`).join('')}</table>
   ${['97','08'].map(g=>`<h4>${g} 게임 후 해석 수정</h4>${L('수정 전',r.reflect?.[g]?.before)}${L('실제와 비교',r.reflect?.[g]?.real)}${L('수정 후',r.reflect?.[g]?.after)}`).join('')}
   <h4>지표 비교 (8)</h4>${L('두 위기',r.compare?.crisis)}${L('한국·태국',r.compare?.country)}${L('근거 위치',r.compare?.where)}
   <h4>구조와 득실 (6)</h4>${L('쟁점',r.issue?.issue)}${L('원인',r.issue?.cause)}${L('대안 A',r.issue?.altA)}${L('대안 B',r.issue?.altB)}${L('결론',r.issue?.choice)}${L('추적 로그 2회차',r.issue?.log2)}
