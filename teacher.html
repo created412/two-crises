@@ -68,17 +68,33 @@ details.card summary{cursor:pointer;font-weight:700}
 .gwrap{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:12px}.gwrap h4{margin:10px 0 4px}.gwrap select,.gwrap textarea{width:100%;font:inherit;border:1.5px solid var(--ink);padding:8px;font-size:14px}.gwrap textarea{min-height:70px}
 .gwrap label{display:block;font-weight:700;margin:10px 0 4px}.oq li{margin:6px 0;font-size:16px}.mini p{font-size:13px;margin:4px 0}
 .oclock{position:fixed;right:24px;bottom:24px;z-index:60;font-family:var(--mono);font-size:40px;font-weight:700;background:#16130f;color:#ffb020;padding:8px 20px;border:2px solid #16130f}.oclock:empty{display:none}.oclock.low{color:#ff5a4e}
+
+#slidePane{max-width:none;margin:0 auto;padding:0 24px 30px}
+#slidePane[hidden]{display:none}
+.sbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 auto 10px;width:min(100%,max(640px,calc((100vh - 430px)*16/9)))}
+.sbar select{flex:1;min-width:220px;padding:10px;font:inherit;border:2px solid var(--ink);background:var(--sheet)}
+.sbar .pg{font-family:'IBM Plex Mono',monospace;font-weight:700;min-width:70px;text-align:center}
+.sframe{display:block;margin:0 auto;width:min(100%,max(640px,calc((100vh - 430px)*16/9)));aspect-ratio:16/9;border:3px solid var(--ink);background:#f3efe4}
+.swarn{width:min(100%,max(640px,calc((100vh - 430px)*16/9)));margin:8px auto 0;font-size:14px;color:#555}
+.swarn b{color:var(--red,#c8321e)}
 </style>
 </head>
 <body>
 <header><h1>선생님 화면 · 두 번의 위기</h1><div class="row"><span>방 코드</span><span class="code" id="code">----</span></div></header>
 <main id="app"></main>
+<section id="slidePane" hidden>
+ <div class="sbar"><button class="ghost" onclick="sgo(-1)">◀ 이전</button><span class="pg" id="spg">-</span><button class="ghost" onclick="sgo(1)">다음 ▶</button>
+  <select id="ssel" onchange="sto(+this.value)"></select>
+  <button onclick="openSlideWin()">Zoom 공유용 슬라이드 창 열기</button></div>
+ <iframe class="sframe" id="sframe" title="수업 슬라이드" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
+ <div class="swarn"><b>Zoom으로는 「공유용 슬라이드 창」만 공유하세요.</b> 이 화면에서 넘기면 공유 창도 같이 넘어갑니다. 방향키로도 넘길 수 있습니다. 게임·채점 탭은 공유하면 안 됩니다.</div>
+</section>
 <script>
 'use strict';
 const API='https://two-crises-api.histo5731.workers.dev/api';
 const SITE='https://created412.github.io/two-crises/game.html';
 const CO=['A 한빛수출','B 바다유통','C 튼튼건설','D 믿음은행'];
-let T=JSON.parse(localStorage.getItem('twoCrisisTeacher')||'{}');let D=null;let tab='game';
+let T=JSON.parse(localStorage.getItem('twoCrisisTeacher')||'{}');let D=null;let tab=sessionStorage.getItem('tcTab')||'slides';
 const $=s=>document.querySelector(s);const esc=v=>String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fmt=n=>Number(n).toLocaleString('ko-KR',{maximumFractionDigits:1});
 async function api(p,b){const r=await fetch(API+p,b?{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(b)}:{cache:'no-store'});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||r.status);return j}
@@ -150,7 +166,7 @@ const STG=['시작','① 내 자료','② 1997','③ 2008','④ 지표','⑤ 득
 function copyLink(){const u=`${SITE}?room=${T.code}`;navigator.clipboard?.writeText(u).then(()=>alert('학생 링크를 복사했습니다. Zoom 채팅에 붙여 넣으세요.\n'+u),()=>prompt('복사하세요',u))}
 function openScreen(){window.open(`screen.html?room=${T.code}`,'twoCrisisScreen','width=1500,height=950')}
 function onlineBar(){const st=D.state;const live=D.players.filter(p=>D.now-p.seen<30000).length;const fin=D.submissions.filter(s=>s.status==='final').length,dr=D.submissions.filter(s=>s.status==='draft').length;
- return `<div class="onl"><button class="ghost" onclick="copyLink()">학생 링크 복사 (Zoom 채팅용)</button><button onclick="openScreen()">Zoom 공유 화면 열기</button><button class="ghost" onclick="window.open('slides.html#6','twoCrisisSlides')">설명 슬라이드 열기 (Zoom 공유용)</button>
+ return `<div class="onl"><button class="ghost" onclick="copyLink()">학생 링크 복사 (Zoom 채팅용)</button><button onclick="openScreen()">Zoom 공유 화면 열기</button>
  <span>접속 중 <b>${live}</b>/${D.players.length}</span><span>보고서 최종 <b>${fin}</b> · 초안 ${dr}</span>
  <button class="${st.locked?'':'warnb'}" onclick="act('${st.locked?'unlock':'lock'}')">${st.locked?'제출 마감 풀기':'보고서 제출 마감 (124분)'}</button>
  <span class="nos">⚠ 이 선생님 화면은 Zoom으로 공유하지 마세요. 공유는 「Zoom 공유 화면」 창으로.</span></div>`}
@@ -206,8 +222,24 @@ function csv(){const rows=[['학번 이름','제출 시각','AI 도구','링크'
  const t='\ufeff'+rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/csv'}));a.download=`AI대화기록_방${T.code}.csv`;a.click()}
 
 function draw(){$('#code').textContent=T.code;const open=[...document.querySelectorAll('details[open]')].map(d=>d.querySelector('summary').textContent);
- $('#app').innerHTML=onlineBar()+`<div class="tabs"><button class="${tab==='game'?'on':''}" onclick="tab='game';lastKey='';draw()">게임 진행</button><button class="${tab==='rep'?'on':''}" onclick="tab='rep';lastKey='';draw()">제출물·AI 대화 기록</button><button class="${tab==='grade'?'on':''}" onclick="tab='grade';lastKey='';draw()">채점·구술</button></div>`+(tab==='game'?gameTab():tab==='rep'?repTab():gradeTab());
+ $('#app').innerHTML=onlineBar()+`<div class="tabs"><button class="${tab==='slides'?'on':''}" onclick="tab='slides';lastKey='';draw()">수업 슬라이드</button><button class="${tab==='game'?'on':''}" onclick="tab='game';lastKey='';draw()">게임 진행</button><button class="${tab==='rep'?'on':''}" onclick="tab='rep';lastKey='';draw()">제출물·AI 대화 기록</button><button class="${tab==='grade'?'on':''}" onclick="tab='grade';lastKey='';draw()">채점·구술</button></div>`+(tab==='slides'?'':tab==='game'?gameTab():tab==='rep'?repTab():gradeTab());sessionStorage.setItem('tcTab',tab);showSlides(tab==='slides');
  document.querySelectorAll('details').forEach(d=>{if(open.includes(d.querySelector('summary').textContent))d.open=true});countUp();tick()}
+
+/* ---- 수업 슬라이드 (선생님 화면에 통합) ---- */
+let slideWin=null,sIdx=0;
+function sdeck(){try{return document.getElementById('sframe').contentWindow.deck}catch(e){return null}}
+function showSlides(on){const p=document.getElementById('slidePane');p.hidden=!on;const f=document.getElementById('sframe');if(on&&!f.src){f.src='slides.html#6';f.onload=initSlides}}
+function initSlides(){const d=sdeck();if(!d){setTimeout(initSlides,300);return}
+ const fd=document.getElementById('sframe').contentDocument;const sl=[...fd.querySelectorAll('.slide')];
+ document.getElementById('ssel').innerHTML=sl.map((s,i)=>{const t=(s.querySelector('h1,h2')?.textContent||s.querySelector('.masthead b')?.textContent||'').replace(/\s+/g,' ').trim().slice(0,40);return '<option value="'+i+'">'+String(i+1).padStart(2,'0')+'  '+t.replace(/</g,'&lt;')+'</option>'}).join('');
+ const _g=d.go.bind(d);d.go=n=>{_g(n);sIdx=d.i;syncSlideUI();try{if(slideWin&&!slideWin.closed&&slideWin.deck&&slideWin.deck.i!==d.i)slideWin.deck.go(d.i)}catch(e){}};
+ sIdx=d.i;syncSlideUI()}
+function syncSlideUI(){const d=sdeck();if(!d)return;document.getElementById('spg').textContent=(d.i+1)+' / '+d.slides.length;document.getElementById('ssel').value=d.i}
+function sgo(k){const d=sdeck();if(d)d.go(d.i+k)}
+function sto(n){const d=sdeck();if(d)d.go(n)}
+function openSlideWin(){const d=sdeck();const n=(d?d.i:5)+1;slideWin=window.open('slides.html#'+n,'twoCrisisSlides','width=1600,height=900');}
+document.addEventListener('keydown',e=>{if(tab!=='slides'||document.getElementById('slidePane').hidden)return;if(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;
+ if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();sgo(1)}if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();sgo(-1)}});
 function start(){load();setInterval(load,2500)}
 T.code&&T.pin?start():setup();
 </script>

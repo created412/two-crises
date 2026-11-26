@@ -595,7 +595,7 @@ document.querySelectorAll('.slide').forEach((s,i)=>{const n=String(i+1).padStart
 const ytReset=()=>document.querySelectorAll('.vbox').forEach(b=>{if(b.querySelector('iframe')){b.innerHTML=b.dataset.thumb}});
 document.querySelectorAll('.vbox').forEach(b=>{b.dataset.thumb=b.innerHTML;b.addEventListener('click',()=>{if(b.querySelector('iframe'))return;b.innerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${b.dataset.yt}?autoplay=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen title="뉴스 영상"></iframe>`})});
 
-const deck=new SlidePresentation();
+const deck=new SlidePresentation();window.deck=deck;
 const _go=deck.go.bind(deck);deck.go=n=>{ytReset();_go(n)};
 
 /* ===========================================
