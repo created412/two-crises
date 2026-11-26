@@ -119,6 +119,18 @@ td.n{text-align:right;white-space:nowrap;font-family:var(--mono)}
 #print{display:none}
 @media(max-width:700px){.board{grid-template-columns:1fr 1fr}.tile:nth-child(2){border-right:0}.tile:nth-child(-n+2){border-bottom:1px solid #2a302b}.price{font-size:36px}header h1{font-size:24px}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* 내 메모 패널 */
+#memoBtn{position:fixed;right:16px;bottom:16px;z-index:60;box-shadow:4px 4px 0 var(--red)}
+#memoPanel{position:fixed;top:0;right:0;bottom:0;width:min(380px,40vw);z-index:59;background:#fffdf7;border-left:3px solid var(--ink);box-shadow:-6px 0 18px rgba(0,0,0,.15);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:18px 18px 90px;font-size:15px}
+#memoPanel[hidden]{display:none}
+#memoPanel h3{margin:16px 0 6px;font-size:17px}#memoPanel .mh{display:flex;justify-content:space-between;align-items:center;gap:8px}#memoPanel .mh h2{font-size:22px;margin:0}
+#memoPanel .ml{border-left:4px solid var(--ink);padding:6px 10px;margin:6px 0;background:var(--sheet)}#memoPanel .ml b{font-family:'IBM Plex Mono',monospace}
+#memoPanel .mtag{display:inline-block;background:var(--ink);color:#f5efe2;font-size:12px;padding:1px 7px;margin-right:6px}
+#memoPanel .mq{color:#555;font-size:13px}#memoPanel .none{color:#888}
+@media(min-width:701px){body.memo-open main,body.memo-open nav,body.memo-open header{margin-right:calc(min(380px,40vw) + 12px)}}
+@media(max-width:700px){#memoPanel{top:auto;left:0;width:auto;height:45vh;border-left:0;border-top:3px solid var(--ink);padding-bottom:20px}body.memo-open main{padding-bottom:47vh}body.memo-open #memoBtn{bottom:calc(45vh + 10px)}}
+@media print{#memoBtn,#memoPanel{display:none!important}}
+
 /* 태블릿·터치 */
 button,a,.chip,.topic,summary{touch-action:manipulation}
 html{-webkit-text-size-adjust:100%}
@@ -541,7 +553,23 @@ ${S.submittedAt?`<div class="tip"><span class="done-badge">제출됨</span> ${ne
 V[7].after=()=>{$('#back').onclick=()=>go(6);$('#pdf').onclick=()=>{$('#print').innerHTML=report();print()};
  $('#send').onclick=async()=>{try{const j=await api(`/rooms/${S.room}/submit`,{pid:S.pid,report:reportObj()});S.submittedAt=j.ts;save();render()}catch(e){$('#msg').innerHTML=`<div class="err">${esc(e.message)}</div>`}}};
 
-function render(){nav();$('#app').innerHTML=V[S.stage]();V[S.stage].after&&V[S.stage].after();bgm()}
+
+/* ---------- 내 메모 패널: 보고서 쓰는 동안 내가 남긴 기록을 옆에 띄워 둔다 ---------- */
+function memoHTML(){const L=(a,b)=>b&&String(b).trim()?`<div class="ml"><span class="mtag">${a}</span>${esc(b).replace(/\n/g,'<br>')}</div>`:'';
+ const lg=gk=>{const ls=S.logs.filter(l=>l.game===gk).sort((a,b)=>a.round-b.round);return ls.length?ls.map(l=>`<div class="ml"><b>R${l.round+1}</b> <span class="mtag">근거: ${esc(l.ind||'-')}</span>${l.why?esc(l.why):'<span class="none">메모 없음</span>'}<div class="mq">${l.q.map((q,i)=>CO[i].k+' '+q+'주').join(' · ')}</div></div>`).join(''):'<div class="none">기록 없음</div>'};
+ const t=TOPICS[S.topic];
+ return `<div class="mh"><h2>내 메모</h2><button class="ghost" type="button" onclick="toggleMemo(false)">닫기</button></div>
+ <div class="muted">게임 중 내가 남긴 기록입니다. 보면서 보고서를 쓰세요.</div>
+ <h3>투자 전략 한 줄</h3>${L('R1 전략',S.strategy?.basis)||'<div class="none">없음</div>'}
+ <h3>① 내 발표 슬라이드${t?' · '+esc(t.t):''}</h3>${L('고칠 부분',S.fix?.before)}${L('고친 것',S.fix?.after)}${L('위기 신호',S.fix?.evidence)||''}
+ <h3>1997 게임 · 라운드별 근거와 메모</h3>${lg('97')}
+ <h3>2008 게임 · 라운드별 근거와 메모</h3>${lg('08')}`}
+function toggleMemo(on){S.memoOpen=on??!S.memoOpen;save();drawMemo()}
+function drawMemo(){let b=document.getElementById('memoBtn'),p=document.getElementById('memoPanel');
+ if(!b){b=document.createElement('button');b.id='memoBtn';b.type='button';b.onclick=()=>toggleMemo();document.body.appendChild(b);p=document.createElement('aside');p.id='memoPanel';p.setAttribute('aria-label','내 메모');document.body.appendChild(p)}
+ const show=S.pid&&S.stage>=2&&S.stage<=7;b.hidden=!show;const open=show&&!!S.memoOpen;p.hidden=!open;document.body.classList.toggle('memo-open',open);
+ b.textContent=open?'내 메모 닫기':'내 메모 보기';if(open){const y=p.scrollTop;p.innerHTML=memoHTML();p.scrollTop=y}}
+function render(){nav();$('#app').innerHTML=V[S.stage]();V[S.stage].after&&V[S.stage].after();bgm();drawMemo()}
 function bgm(){try{window.BGM&&BGM.update(S.stage,LIVE?.state)}catch(e){}}
 function sfx(n){try{window.BGM&&BGM.sfx(n)}catch(e){}}
 $('#resetBtn').onclick=()=>{if(confirm('이 기기의 기록을 지우고 처음부터 할까요? (서버에 낸 주문은 그대로 남습니다)')){S=fresh();save();render()}};
