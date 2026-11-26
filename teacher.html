@@ -21,7 +21,7 @@ input{font:inherit;border:1.5px solid var(--ink);padding:9px 10px;width:220px}
 .row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
 .muted{color:var(--ink2);font-size:14px}.err{color:var(--red);font-weight:700}
 table{width:100%;border-collapse:collapse;font-size:14px;background:#fff}th,td{border:1px solid var(--ink);padding:6px 8px;text-align:left;vertical-align:top}th{background:var(--ink);color:var(--paper);font-weight:500}
-td.n{text-align:right;font-family:var(--mono)}.y{color:var(--ok);font-weight:700}.no{color:var(--red)}
+td.n{text-align:right;font-family:var(--mono)}.rkh{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}button.rkb{padding:6px 14px;font-size:14px;background:var(--sheet);color:var(--ink);box-shadow:none}button.rkb.on{background:var(--ink);color:var(--paper)}table.rk td.rn{font-family:var(--display);font-size:20px;text-align:center;width:64px}table.rk tr.top td{background:#fff6dc}table.rk tr.r1 td{background:#ffe9a8;font-size:16px}table.rk tr.r1 td.rn{color:var(--red);font-size:26px}table.rk b.up{color:var(--ok)}table.rk b.down{color:var(--red)}.y{color:var(--ok);font-weight:700}.no{color:var(--red)}
 .status{display:flex;gap:24px;flex-wrap:wrap;font-size:18px;margin-bottom:12px}.status b{font-family:var(--mono)}
 .ph{padding:3px 12px;border:2px solid var(--ink);font-weight:700}.ph.open{background:var(--red);color:#fff;border-color:var(--red)}.ph.closed{background:var(--led)}
 .tabs{display:flex;gap:0;margin-bottom:16px}.tabs button{box-shadow:none;background:var(--sheet);color:var(--ink)}.tabs button.on{background:var(--ink);color:var(--paper)}
@@ -135,8 +135,22 @@ setInterval(tick,500);
 async function act(a){if(a==='close'&&!confirm('이번 라운드를 마감하고 주가를 반영할까요?'))return;if(a==='lock'&&!confirm('보고서 제출을 마감할까요? 이후 학생은 제출·수정할 수 없고, 지금까지 저장된 초안과 최종본이 남습니다.'))return;try{await api(`/rooms/${T.code}/teacher`,{pin:T.pin,action:a,limit:LIMIT});lastKey='';await load()}catch(e){alert(e.message)}}
 async function load(){try{const t0=Date.now();D=await api(`/rooms/${T.code}/teacher?pin=${encodeURIComponent(T.pin)}`);clockOff=D.state.now-Math.round((t0+Date.now())/2);
  const st=D.state;const ordN=D.orders.filter(o=>o.game===st.game&&o.round===st.round).length;const key=tab==='grade'?[tab,D.players.length,Object.keys(D.grades||{}).length].join('|'):[tab,st.game,st.round,st.phase,st.history[st.game].length,st.limit,st.locked,D.submissions.length,D.submissions.filter(s=>s.status==='final').length,D.players.length].join('|');
- if(key!==lastKey){lastKey=key;draw()}else{const c=document.getElementById('cnt');if(c)c.textContent=`${ordN}/${D.players.length}`;document.querySelectorAll('[data-pl]').forEach(td=>{const on=D.orders.some(o=>o.player===td.dataset.pl&&o.game===st.game&&o.round===st.round);td.className=on?'y':'no';td.textContent=on?'제출':'-'});document.querySelectorAll('[data-pr]').forEach(td=>{const pl=D.players.find(p=>p.id===td.dataset.pr);if(pl)td.innerHTML=presence(pl)})}
+ if(key!==lastKey){lastKey=key;draw()}else{const c=document.getElementById('cnt');if(c)c.textContent=`${ordN}/${D.players.length}`;document.querySelectorAll('[data-pl]').forEach(td=>{const on=D.orders.some(o=>o.player===td.dataset.pl&&o.game===st.game&&o.round===st.round);td.className=on?'y':'no';td.textContent=on?'제출':'-'});document.querySelectorAll('[data-pr]').forEach(td=>{const pl=D.players.find(p=>p.id===td.dataset.pr);if(pl)td.innerHTML=presence(pl)});const rk=document.getElementById('rk');if(rk){const h=rankHTML();if(rk.dataset.h!==h){rk.dataset.h=h;rk.innerHTML=h}}}
 }catch(e){$('#app').innerHTML=`<div class="card"><p class="err">${esc(e.message)}</p><button id="re">다른 방 열기</button></div>`;$('#re').onclick=()=>{T={};saveT();setup()}}}
+
+/* ===== 실시간 투자 순위 (선생님만 봄, 2.5초마다 갱신) ===== */
+const START=10000;let rkSort='',rkGame='';
+function rkSet(m){rkSort=m;const el=document.getElementById('rk');if(el)el.innerHTML=rankHTML()}
+function rankHTML(){const st=D.state,P=st.prices;if(rkGame!==st.game){rkGame=st.game;rkSort=''}const on08=st.game==='08';const mode=rkSort||st.game;
+ const val=(pl,g)=>{const G=pl.games[g];return G.cash+G.q.reduce((x,q,i)=>x+q*P[g][i],0)};
+ const rows=D.players.map(pl=>{const a=val(pl,'97'),b=val(pl,'08');return{pl,a,b,v:mode==='97'?a:mode==='08'?b:a+b}}).sort((x,y)=>y.v-x.v||x.pl.name.localeCompare(y.pl.name));
+ let rank=0,prev=null;rows.forEach((r,i)=>{if(prev===null||Math.abs(r.v-prev)>.05)rank=i+1;prev=r.v;r.rank=rank});
+ const ret=(v,base)=>{const x=(v/base-1)*100;return `<b class="${x>0?'up':x<0?'down':''}">${pct(x)}</b>`};
+ const btn=(m,t)=>`<button class="rkb ${mode===m?'on':''}" onclick="rkSet('${m}')">${t}</button>`;
+ const one=mode!=='sum';
+ return `<div class="rkh">${btn('97','1997 게임')}${on08?btn('08','2008 게임')+btn('sum','두 게임 합계'):''}<span class="muted">평가액 = 현금 + 보유 주식 × 지금 주가 · 라운드를 마감할 때 바뀝니다 · 시작 ${fmt(START)}만원</span></div>
+ ${rows.length?`<table class="rk"><tr><th>등수</th><th>학번 이름</th>${one?`<th>평가액(만원)</th><th>수익률</th><th>보유 주식 A·B·C·D</th><th>현금(만원)</th>`:`<th>1997</th><th>2008</th><th>합계 평가액(만원)</th><th>합계 수익률</th>`}</tr>
+ ${rows.map(r=>{const G=r.pl.games[mode==='sum'?'97':mode];return `<tr class="${r.rank<=3?'top r'+r.rank:''}"><td class="rn">${r.rank}</td><td>${esc(r.pl.name)}</td>${one?`<td class="n"><b>${fmt(r.v)}</b></td><td class="n">${ret(r.v,START)}</td><td class="n">${G.q.join(' · ')}</td><td class="n">${fmt(G.cash)}</td>`:`<td class="n">${fmt(r.a)} ${ret(r.a,START)}</td><td class="n">${fmt(r.b)} ${ret(r.b,START)}</td><td class="n"><b>${fmt(r.v)}</b></td><td class="n">${ret(r.v,2*START)}</td>`}</tr>`}).join('')}</table>`:'<p class="muted">아직 입장한 학생이 없습니다.</p>'}`}
 
 function gameTab(){const st=D.state,g=st.game,p=st.prices[g],h=st.history[g];const ordN=D.orders.filter(o=>o.game===g&&o.round===st.round).length;
  const evIdx=st.phase==='over'?-1:st.round;const ev=D.effects[evIdx];const pubEv=st.events[g].at(-1);const NR=st.rounds||4;const rn=Math.min(st.round+1,NR);
@@ -155,6 +169,7 @@ function gameTab(){const st=D.state,g=st.game,p=st.prices[g],h=st.history[g];con
  let body='';
  if(st.phase==='over')body+=`<div class="card">${chart(g)}</div>`;
  else body+=`<div class="card">${board(p,st.phase==='closed'?h.at(-1)?.before:null)}${st.phase==='closed'&&h.length?`<h3>왜 바뀌었나</h3>${bars(h.at(-1))}`:''}</div>`;
+ body+=`<details class="card" open><summary>실시간 투자 순위 · 선생님만 보임</summary><div id="rk">${rankHTML()}</div></details>`;
  body+=`<details class="card" open><summary>학생 ${D.players.length}명 · 접속·주문 현황</summary><table><tr><th>학번 이름</th><th>접속 · 단계</th><th>이번 라운드</th><th>1997 평가액</th><th>2008 평가액</th><th>보고서</th></tr>
  ${D.players.map(pl=>{const w=gg=>{const G=pl.games[gg];return G.cash+G.q.reduce((s,q,i)=>s+q*D.state.prices[gg][i],0)};const on=D.orders.some(o=>o.player===pl.id&&o.game===g&&o.round===st.round);const sub=D.submissions.find(s=>s.player===pl.id);return `<tr><td>${esc(pl.name)}</td><td data-pr="${pl.id}">${presence(pl)}</td><td data-pl="${pl.id}" class="${on?'y':'no'}">${on?'제출':'-'}</td><td class="n">${fmt(w('97'))}</td><td class="n">${fmt(w('08'))}</td><td>${sub?'<span class="'+(sub.status==='final'?'y':'')+'">'+(sub.status==='final'?'최종 ':'초안 ')+new Date(sub.ts).toLocaleTimeString('ko-KR')+'</span>':'-'}</td></tr>`}).join('')}</table>
  <p class="muted">학생 접속 주소: <a href="${SITE}?room=${T.code}" target="_blank">${SITE}?room=${T.code}</a></p></details>
