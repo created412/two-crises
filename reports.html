@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>보고서 모아보기 · 두 번의 위기</title>
+<meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#f4efe4;--sheet:#fffdf7;--ink:#16130f;--ink2:#5a5246;--rule:#d9cfbb;--red:#d6281b;--board:#0f1411;--led:#ffb020;--ok:#1f7a4d;--blue:#1f4fa0;--display:'Black Han Sans',sans-serif;--body:'IBM Plex Sans KR',sans-serif;--mono:'IBM Plex Mono',monospace}
+*{box-sizing:border-box}html,body{margin:0}body{font-family:var(--body);background:var(--paper);color:var(--ink);line-height:1.65}
+header{position:sticky;top:0;z-index:20;background:var(--board);color:var(--paper);padding:10px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+header h1{margin:0;font-family:var(--display);font-weight:400;font-size:22px}
+header .code{font-family:var(--mono);color:var(--led);font-size:22px;letter-spacing:.08em}
+.chip{padding:3px 10px;border:1.5px solid #556;font-size:13px;font-weight:700}.chip.lock{background:var(--red);border-color:var(--red);color:#fff}.chip.open{background:var(--led);color:var(--ink);border-color:var(--led)}
+header .sp{flex:1}
+button,.btn{font:inherit;font-size:14px;font-weight:700;border:2px solid var(--ink);background:var(--sheet);color:var(--ink);padding:7px 14px;cursor:pointer;text-decoration:none;display:inline-block}
+header button{border-color:#8d877a;background:transparent;color:var(--paper)}header button:hover{background:#2a302b}
+header label{font-size:13px;display:flex;gap:6px;align-items:center;cursor:pointer}
+.wrap{display:grid;grid-template-columns:270px 1fr;min-height:calc(100vh - 52px)}
+aside{border-right:2px solid var(--ink);background:#efe8d9;position:sticky;top:52px;height:calc(100vh - 52px);overflow:auto}
+aside .ov{display:block;width:100%;text-align:left;border:0;border-bottom:2px solid var(--ink);padding:12px 16px;background:var(--ink);color:var(--paper);font-size:15px}
+aside .ov.on{background:var(--red)}
+.st{display:grid;grid-template-columns:1fr auto;gap:2px 8px;padding:10px 16px;border-bottom:1px solid var(--rule);cursor:pointer}
+.st:hover{background:#e6ddc9}.st.on{background:var(--sheet);box-shadow:inset 5px 0 0 var(--red)}
+.st .nm{font-weight:700;font-size:15px}.st .sc{font-family:var(--mono);font-weight:700;color:var(--red);font-size:14px}
+.st .mt{grid-column:1/3;font-size:12px;color:var(--ink2);display:flex;gap:8px;align-items:center}
+.bars4{display:inline-flex;gap:3px}.bars4 i{display:inline-block;width:18px;height:6px;background:#cfc4ae}.bars4 i.f{background:var(--ok)}.bars4 i.h{background:var(--led)}
+.tag{font-size:11px;font-weight:700;padding:0 5px;border:1px solid currentColor}.tag.fin{color:var(--ok)}.tag.dr{color:#b7791f}.tag.no{color:var(--red)}
+main{padding:26px 30px 80px;max-width:1180px;min-width:0}
+.sheet{background:var(--sheet);border:2px solid var(--ink);box-shadow:6px 6px 0 var(--ink);padding:28px 36px;margin-bottom:28px}
+.rh{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;border-bottom:3px double var(--ink);padding-bottom:14px;margin-bottom:6px}
+.rh h2{margin:0;font-family:var(--display);font-weight:400;font-size:34px;line-height:1.1}
+.rh .tp{font-size:16px;color:var(--ink2);margin-top:6px}.rh .tp b{color:var(--ink)}
+.rh .meta{text-align:right;font-size:13px;color:var(--ink2);white-space:nowrap}.rh .meta b{font-family:var(--mono);color:var(--ink);font-size:15px}
+.grd{font-family:var(--mono);font-size:30px;font-weight:700;color:var(--red);line-height:1}
+.area{margin-top:26px}
+.area>h3{display:flex;align-items:baseline;gap:10px;margin:0 0 10px;font-family:var(--display);font-weight:400;font-size:23px;border-bottom:2px solid var(--ink);padding-bottom:4px}
+.area>h3 .pt{font-family:var(--mono);font-size:14px;background:var(--ink);color:var(--paper);padding:1px 8px}
+.area>h3 .gs{margin-left:auto;font-family:var(--mono);font-size:16px;color:var(--red)}
+.q{margin:14px 0 4px;font-size:14px;font-weight:700;color:var(--blue)}.q .ip{font-family:var(--mono);font-size:12px;color:var(--ink2);font-weight:500;margin-left:6px}
+.a{white-space:pre-wrap;word-break:break-word;font-size:16px;margin:0;padding:2px 0 2px 14px;border-left:3px solid var(--rule)}
+.a.empty{color:var(--red);font-style:italic;border-left-color:var(--red)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1.5px solid var(--ink);margin-top:8px}
+.trio>div{padding:10px 12px;border-right:1px solid var(--rule)}.trio>div:last-child{border-right:0}
+.trio .q{margin-top:0}.trio .a{border-left:0;padding-left:0;font-size:15px}
+.trio>div:nth-child(2){background:#f7f2e6}
+table{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}th,td{border:1px solid var(--ink);padding:7px 9px;text-align:left;vertical-align:top;white-space:pre-wrap;word-break:break-word}th{background:var(--ink);color:var(--paper);font-weight:500}
+td.n,th.n{text-align:right;font-family:var(--mono);white-space:nowrap}
+.v{font-weight:700;white-space:nowrap}.v.bad{color:var(--red)}.v.good{color:var(--ok)}
+.lk{margin:10px 0;padding:10px 12px;border:1.5px dashed var(--ink2)}.lk a{color:var(--blue);word-break:break-all;font-family:var(--mono);font-size:13px}
+details.apx{margin-top:26px;border-top:2px solid var(--ink);padding-top:8px}details.apx summary{cursor:pointer;font-family:var(--display);font-size:19px}
+.muted{color:var(--ink2);font-size:13px}
+.navb{display:flex;justify-content:space-between;gap:10px;margin-top:22px}
+/* 한눈에 */
+.ovt{font-size:13.5px}.ovt th,.ovt td{white-space:nowrap;padding:6px 7px}.ovt th{white-space:normal;line-height:1.25}.ovt td.c{text-align:center;font-family:var(--mono)}.ovt tr:hover td{background:#fff6dc;cursor:pointer}
+.ovt .full{color:var(--ok);font-weight:700}.ovt .part{color:#b7791f;font-weight:700}.ovt .none{color:var(--red);font-weight:700}
+.login{max-width:460px;margin:60px auto}.login input{font:inherit;border:1.5px solid var(--ink);padding:9px;width:100%;margin:6px 0}
+.err{color:var(--red);font-weight:700}
+#printAll{display:none}
+@media print{
+ @page{size:A4;margin:14mm 13mm}
+ header,aside,.navb,.noprint{display:none!important}.wrap{display:block;min-height:0}main{padding:0;max-width:none}
+ body{background:#fff;font-size:12px}.sheet{box-shadow:none;border:0;padding:0;margin:0}
+ .a{font-size:12.5px}.rh h2{font-size:24px}.area{break-inside:auto}.area>h3{break-after:avoid}.q{break-after:avoid}
+ table,.trio,.lk{break-inside:avoid}details.apx{display:block}details.apx>*{display:block}
+ body.pall #wrap{display:none}body.pall #printAll{display:block}#printAll .sheet{break-after:page}
+}
+@media(max-width:900px){.wrap{grid-template-columns:1fr}aside{position:static;height:auto;max-height:40vh}.cols,.trio{grid-template-columns:1fr}main{padding:16px}}
+</style>
+</head>
+<body>
+<header><h1>보고서 모아보기</h1><span class="code" id="code">----</span><span id="lockChip"></span><span class="sp"></span>
+ <label><input type="checkbox" id="hideT" checked> 선생님 시험 계정 숨기기</label>
+ <button onclick="load(true)">새로고침</button><button onclick="printOne()">이 보고서 PDF</button><button onclick="printAll()">전체 PDF (1명 1쪽부터)</button>
+ <button onclick="location.href='teacher.html'">선생님 화면</button></header>
+<div class="wrap" id="wrap"><aside id="side"></aside><main id="view"><p class="muted">불러오는 중…</p></main></div>
+<div id="printAll"></div>
+<script>
+'use strict';
+const API='https://two-crises-api.histo5731.workers.dev/api';
+const CO=['A 수출','B 수입유통','C 건설(빚 많음)','D 은행'];
+const STAKE=['수출기업','수입업체·소비자','빚 많은 기업·노동자','은행·금융기관','정부','외국인 투자자'];
+const TEACHER_NAME='이재영';
+const $=s=>document.querySelector(s);
+const esc=v=>String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt=n=>Number(n).toLocaleString('ko-KR',{maximumFractionDigits:1});
+const has=v=>String(v??'').trim().length>0;
+let T=JSON.parse(localStorage.getItem('twoCrisisTeacher')||'{}');
+const qp=new URLSearchParams(location.search);if(qp.get('room')&&qp.get('room')!==T.code)T={code:qp.get('room')};
+let D=null,cur=sessionStorage.getItem('repCur')||'__ov';
+$('#hideT').checked=localStorage.getItem('repHideT')!=='0';
+$('#hideT').onchange=e=>{localStorage.setItem('repHideT',e.target.checked?'1':'0');draw()};
+
+async function api(p){const r=await fetch(API+p,{cache:'no-store'});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||r.status);return j}
+function loginForm(msg){$('#wrap').innerHTML=`<div class="login sheet"><h2 style="font-family:var(--display);font-weight:400;margin-top:0">방 열기</h2><input id="lc" placeholder="방 코드" value="${esc(T.code||'')}"><input id="lp" type="password" placeholder="선생님 비밀번호"><button id="lg">열기</button>${msg?`<p class="err">${esc(msg)}</p>`:''}</div>`;
+ $('#lg').onclick=()=>{T={code:$('#lc').value.trim(),pin:$('#lp').value.trim()};localStorage.setItem('twoCrisisTeacher',JSON.stringify(T));location.reload()}}
+async function load(force){if(!T.code||!T.pin)return loginForm();
+ try{D=await api(`/rooms/${T.code}/teacher?pin=${encodeURIComponent(T.pin)}`)}catch(e){if(force||!D)return loginForm(e.message==='Failed to fetch'?'서버에 연결하지 못했습니다. 잠시 뒤 새로고침하세요.':e.message);return}
+ draw()}
+
+/* ---------- 데이터 정리 ---------- */
+function rows(){const subs=Object.fromEntries(D.submissions.map(s=>[s.player,s]));const hide=$('#hideT').checked;
+ return D.players.filter(p=>!(hide&&p.name.includes(TEACHER_NAME))).map(p=>({id:p.id,name:p.name,pl:p,s:subs[p.id]||null,r:subs[p.id]?.report||null,g:D.grades?.[p.id]||null})).sort((a,b)=>a.name.localeCompare(b.name,'ko'))}
+function gradeTotal(g){if(!g)return '';if(g.sp==='9'||g.sp==='8')return +g.sp;const v=['a','b','c','d'].map(k=>+g[k]||0);return v.every(x=>x>0)?v.reduce((a,b)=>a+b,0):''}
+function validChecks(r){return (r?.ai?.checks||[]).filter(c=>has(c.claim)&&has(c.src)&&has(c.v)&&has(c.fix))}
+function comp(r){if(!r)return null;const c=r.compare||{},i=r.issue||{},f=r.reflect||{};
+ const tcells=Object.values(i.table||{}).filter(has).length;
+ return{a:[c.crisis,c.country,c.where,c.mine].filter(has).length/4,
+  b:([i.issue,i.cause,i.altA,i.altB,i.choice].filter(has).length+Math.min(1,tcells/12))/6,
+  c:[f['97']?.before,f['97']?.real,f['97']?.after,f['08']?.before,f['08']?.real,f['08']?.after,i.log2].filter(has).length/7,
+  d:(Math.min(2,validChecks(r).length)+((r.ai?.links||[]).some(l=>has(l.url))?1:0))/3,tcells}}
+function chars(r){if(!r)return 0;const c=r.compare||{},i=r.issue||{},f=r.reflect||{};return [c.crisis,c.country,c.where,c.mine,i.issue,i.cause,i.altA,i.altB,i.choice,i.log2,...Object.values(i.table||{}),...['97','08'].flatMap(g=>[f[g]?.before,f[g]?.real,f[g]?.after]),...(r.ai?.checks||[]).flatMap(x=>[x.claim,x.src,x.fix]),...(r.ai?.links||[]).map(l=>l.what)].reduce((n,v)=>n+String(v||'').replace(/\s/g,'').length,0)}
+function worth(G,g){if(!G)return null;const p=D.state.prices[g];return G.cash+G.q.reduce((s,q,i)=>s+q*p[i],0)}
+const bar=x=>`<i class="${x>=1?'f':x>0?'h':''}"></i>`;
+const tagOf=s=>s?(s.status==='final'?'<span class="tag fin">최종</span>':'<span class="tag dr">초안만</span>'):'<span class="tag no">제출 없음</span>';
+const when=ts=>{const d=new Date(ts);return (d.getMonth()+1)+'/'+d.getDate()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')};
+
+/* ---------- 그리기 ---------- */
+function draw(){$('#code').textContent='방 '+T.code;$('#lockChip').innerHTML=D.state.locked?'<span class="chip lock">제출 마감됨 · 학생 수정 불가</span>':'<span class="chip open">제출 열림 · 학생이 아직 고칠 수 있음</span>';
+ const R=rows();
+ $('#side').innerHTML=`<button class="ov ${cur==='__ov'?'on':''}" onclick="sel('__ov')">한눈에 보기 · ${R.filter(x=>x.s?.status==='final').length}/${R.length}명 최종</button>`+R.map(x=>{const c=comp(x.r);const t=gradeTotal(x.g);
+  return `<div class="st ${cur===x.id?'on':''}" onclick="sel('${x.id}')"><span class="nm">${esc(x.name)}</span><span class="sc">${t!==''?t+'점':''}</span><span class="mt">${tagOf(x.s)}${c?`<span class="bars4" title="지표·득실·수정·AI 작성 정도">${bar(c.a)}${bar(c.b)}${bar(c.c)}${bar(c.d)}</span>`:''}${x.r?fmt(chars(x.r))+'자':''}</span></div>`}).join('');
+ if(cur!=='__ov'&&!R.some(x=>x.id===cur))cur='__ov';
+ $('#view').innerHTML=cur==='__ov'?overview(R):reportHTML(R.find(x=>x.id===cur),R);window.scrollTo(0,0)}
+function sel(id){cur=id;sessionStorage.setItem('repCur',id);draw()}
+function step(k){const R=rows();const ids=['__ov',...R.map(x=>x.id)];const i=ids.indexOf(cur);sel(ids[Math.max(0,Math.min(ids.length-1,i+k))])}
+document.addEventListener('keydown',e=>{if(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;if(e.key==='ArrowDown'||e.key==='ArrowRight'||e.key==='j'){e.preventDefault();step(1)}if(e.key==='ArrowUp'||e.key==='ArrowLeft'||e.key==='k'){e.preventDefault();step(-1)}});
+
+function overview(R){const cell=x=>x==null?'<td class="c none">-</td>':`<td class="c ${x>=1?'full':x>0?'part':'none'}">${x>=1?'완성':x>0?Math.round(x*100)+'%':'빈칸'}</td>`;
+ const fin=R.filter(x=>x.s?.status==='final').length,dr=R.filter(x=>x.s&&x.s.status!=='final').length,no=R.filter(x=>!x.s).length;
+ return `<div class="sheet"><div class="rh"><div><h2>한눈에 보기</h2><div class="tp">최종 제출 <b>${fin}</b>명 · 초안만 <b>${dr}</b>명 · 제출 없음 <b>${no}</b>명</div></div><div class="meta">${D.state.locked?'제출 마감됨':'제출 열림'}</div></div>
+ <p class="muted">칸은 채점 영역별로 <b>얼마나 썼는지</b>만 보여 줍니다(빈칸 여부·검증 건수). 내용의 질은 학생을 눌러 직접 읽어 판단하세요. 행을 누르면 그 학생 보고서가 열립니다. ↑↓ 키로 학생을 넘길 수 있습니다.</p>
+ <table class="ovt"><tr><th>학번 이름</th><th>상태</th><th>제출 시각</th><th>주제</th><th class="n">지표<br>비교 8</th><th class="n">구조<br>득실 6</th><th class="n">비교<br>수정 6</th><th class="n">AI<br>검증 5</th><th class="n">검증<br>건수</th><th class="n">AI<br>링크</th><th class="n">글자</th><th class="n">점수</th></tr>
+ ${R.map(x=>{const c=comp(x.r);const t=gradeTotal(x.g);const nl=(x.r?.ai?.links||[]).filter(l=>has(l.url)).length;
+  return `<tr onclick="sel('${x.id}')"><td><b>${esc(x.name)}</b></td><td>${tagOf(x.s)}</td><td class="n">${x.s?when(x.s.ts):''}</td><td>${esc(x.r?.topic||'')}</td>${c?cell(c.a)+cell(c.b)+cell(c.c)+cell(c.d):'<td class="c none" colspan="4">제출 없음</td>'}<td class="c">${x.r?validChecks(x.r).length:''}</td><td class="c ${x.r&&!nl?'none':''}">${x.r?nl:''}</td><td class="n">${x.r?fmt(chars(x.r)):''}</td><td class="n"><b>${t!==''?t:''}</b></td></tr>`}).join('')}</table>
+ <p class="muted" style="margin-top:12px">점수는 선생님 화면 「채점·구술」 탭에서 저장한 값입니다. 게임 수익률은 점수가 아닙니다.</p></div>`}
+
+const QA=(q,v,ip)=>`<div class="q">${q}${ip?`<span class="ip">${ip}</span>`:''}</div>${has(v)?`<p class="a">${esc(String(v).trim())}</p>`:'<p class="a empty">(비어 있음)</p>'}`;
+function vClass(v){return /틀림|치우침|없음/.test(v||'')?'bad':v==='맞음'?'good':''}
+function reportHTML(x,R){if(!x)return '';const r=x.r,s=x.s,g=x.g||{};const idx=R.indexOf(x);
+ const nav=`<div class="navb"><button onclick="step(-1)">◀ ${idx>0?esc(R[idx-1].name):'한눈에 보기'}</button><button onclick="step(1)" ${idx>=R.length-1?'disabled':''}>${idx<R.length-1?esc(R[idx+1].name):''} ▶</button></div>`;
+ if(!r)return `<div class="sheet"><div class="rh"><div><h2>${esc(x.name)}</h2><div class="tp">제출된 보고서가 없습니다.</div></div></div><p class="muted">초안 자동 저장도 없었습니다. 접속 단계: ${x.pl.stage??'-'}</p></div>${nav}`;
+ return sheetHTML(x)+nav}
+function sheetHTML(x){const r=x.r,s=x.s,g=x.g||{};const i=r.issue||{},c=r.compare||{},f=r.reflect||{};const t=gradeTotal(x.g);
+ const gs=k=>g[k]?`<span class="gs">${g[k]}점</span>`:'';
+ const fin=['97','08'].map(k=>{const w=worth(r.final?.[k]||x.pl.games?.[k],k);return w==null?'':`${k==='97'?'1997':'2008'} <b>${fmt(w)}</b>만원 (${w>=10000?'+':''}${fmt((w/10000-1)*100)}%)`}).filter(Boolean).join('<br>');
+ const checks=(r.ai?.checks||[]).filter(cc=>has(cc.claim)||has(cc.src));
+ return `<article class="sheet">
+ <div class="rh"><div><h2>${esc(x.name)}</h2><div class="tp">ECOS 주제 <b>${esc(r.topic||'-')}</b> · ${s.status==='final'?'최종 제출':'초안(자동 저장)만 있음'} ${when(s.ts)}</div></div>
+  <div class="meta">${t!==''?`<div class="grd">${t}<small style="font-size:14px">/25</small></div>`:'<div class="muted">미채점</div>'}<div style="margin-top:6px">${fin}</div><div class="muted">게임 평가액 · 점수 아님</div></div></div>
+
+ <section class="area"><h3>1. 지표 비교 <span class="pt">8점</span>${gs('a')}</h3>
+  ${QA('1997년과 2008년, 한국 정부의 대응은 어떻게 달랐고 지표는 어떻게 움직였나',c.crisis,'3점')}
+  ${QA('한국과 태국 비교: 같은 점과 다른 점',c.country,'2점')}
+  ${QA('근거 위치 목록 (지표 번호·연도·국가·값)',c.where,'2점')}
+  ${QA('내 ECOS 통계와 실제 코스피 비교가 더해 주는 것',c.mine,'1점')}</section>
+
+ <section class="area"><h3>2. 구조와 득실 <span class="pt">6점</span>${gs('b')}</h3>
+  ${QA('추적 쟁점',i.issue)}${QA('무역·금융 구조로 본 원인',i.cause,'쟁점과 함께 2점')}
+  <div class="cols"><div>${QA('대안 A',i.altA)}</div><div>${QA('대안 B',i.altB)}</div></div>
+  <div class="q">이해관계자별 득실표<span class="ip">2점</span></div>
+  <table><tr><th style="width:22%">이해관계자</th><th>대안 A</th><th>대안 B</th></tr>${STAKE.map((st,k)=>`<tr><td><b>${st}</b></td><td>${esc(i.table?.['a'+k]||'')}</td><td>${esc(i.table?.['b'+k]||'')}</td></tr>`).join('')}</table>
+  ${QA('저울질 결과: 지지 대안·부담 주체·부담 줄이는 방법',i.choice,'2점')}</section>
+
+ <section class="area"><h3>3. 실제와 비교한 해석 수정 <span class="pt">6점</span>${gs('c')}</h3>
+  ${['97','08'].map(k=>`<div class="q">${k==='97'?'1997':'2008'} 게임 후 <span class="ip">2점</span></div><div class="trio"><div>${QA('수정 전 (게임 중 판단)',f[k]?.before)}</div><div>${QA(k==='97'?'실제 코스피와 비교':'코스피·S&P 500과 비교',f[k]?.real)}</div><div>${QA('수정 후',f[k]?.after)}</div></div>`).join('')}
+  ${QA('추적 로그 2회차: 수정 전 → 수정 후 → 바꾼 근거',i.log2,'2점')}</section>
+
+ <section class="area"><h3>4. AI로 찾은 정보 검증 <span class="pt">5점</span>${gs('d')}</h3>
+  ${checks.length?`<table><tr><th style="width:28%">AI가 준 정보</th><th style="width:10%">판정</th><th>직접 확인한 원자료</th><th>보고서에 쓴 내용</th></tr>${checks.map(cc=>`<tr><td>${esc(cc.claim)}${has(cc.use)?`<br><span class="muted">쓰려던 곳: ${esc(cc.use)}</span>`:''}</td><td class="v ${vClass(cc.v)}">${esc(cc.v||'-')}</td><td>${esc(cc.src)}</td><td>${esc(cc.fix)}</td></tr>`).join('')}</table>`:'<p class="a empty">(검증 기록 없음)</p>'}
+  <div class="q">AI 대화 기록 링크<span class="ip">1점</span></div>
+  ${(r.ai?.links||[]).filter(l=>has(l.url)).map(l=>`<div class="lk"><b>${esc(l.tool||'AI')}</b> · <a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.url)}</a>${has(l.what)?`<p class="a" style="margin-top:6px">${esc(l.what)}</p>`:''}</div>`).join('')||'<p class="a empty">(링크 없음)</p>'}
+  ${has(r.ai?.own)?QA('직접 입력 여부',r.ai.own):''}
+  ${g.q?.length||has(g.oral)?`<div class="q">구술 메모 (선생님)</div><p class="a">${esc(g.oral||'')}</p>`:''}</section>
+
+ <details class="apx" open><summary>부록 · 내 자료 수정과 게임 판단 기록 (채점 근거 확인용)</summary>
+  <div class="cols"><div>${QA('발표 슬라이드에서 고친 것',r.fix?.after)}${has(r.fix?.before)?QA('고치기 전 문제',r.fix.before):''}</div><div>${QA('위기 신호',r.fix?.evidence)}${QA('투자 전략 한 줄',r.strategy?.basis)}</div></div>
+  <table><tr><th>라운드</th><th class="n">보유 ${CO.map(x=>x[0]).join('·')}</th><th>근거</th><th>메모</th></tr>${(r.logs||[]).map(l=>`<tr><td class="n">${l.game==='97'?'1997':'2008'} R${l.round+1}</td><td class="n">${(l.q||[]).join(' · ')}</td><td>${esc(l.ind)}</td><td>${esc(l.why||'')}</td></tr>`).join('')}</table>
+  ${has(g.memo)?`<div class="q">채점 메모 (선생님)</div><p class="a">${esc(g.memo)}</p>`:''}</details>
+ </article>`}
+
+function printOne(){if(cur==='__ov'){alert('왼쪽에서 학생을 먼저 고르세요. 「한눈에 보기」 표는 그대로 인쇄됩니다.');}document.body.classList.remove('pall');print()}
+function printAll(){const R=rows().filter(x=>x.r);$('#printAll').innerHTML=R.map(sheetHTML).join('');document.body.classList.add('pall');setTimeout(()=>{print();document.body.classList.remove('pall')},300)}
+load(true);
+</script>
+</body>
+</html>

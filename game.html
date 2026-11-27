@@ -468,7 +468,7 @@ let fxK='',fxP='';
 setInterval(poll,2500);
 
 /* ---------- 온라인: 마감 배너·초안 자동 저장 ---------- */
-function lockBanner(){let b=document.getElementById('lockbar');const on=!!LIVE?.state?.locked;if(on&&!b){b=document.createElement('div');b.id='lockbar';b.className='lockbar';b.textContent='제출이 마감되었습니다. 지금부터는 고칠 수 없습니다. Meet에서 선생님 안내를 기다리세요.';document.body.prepend(b)}if(!on&&b)b.remove();const sb=document.getElementById('send');if(sb)sb.disabled=on}
+function lockBanner(){let b=document.getElementById('lockbar');const on=!!LIVE?.state?.locked;if(on&&!b){b=document.createElement('div');b.id='lockbar';b.className='lockbar';b.textContent='보고서 제출이 마감되었습니다. 지금부터는 고칠 수 없습니다. 선생님이 받은 보고서는 안전하게 저장되어 있습니다.';document.body.prepend(b)}if(!on&&b)b.remove();const sb=document.getElementById('send');if(sb)sb.disabled=on;if(S.stage>=4)document.querySelectorAll('[data-b]').forEach(el=>{if(el.tagName==='SELECT')el.disabled=on;else el.readOnly=on});['addChk','addLink'].forEach(id=>{const x=document.getElementById(id);if(x)x.disabled=on})}
 let lastDraft='';async function autoDraft(){if(!S.pid||S.stage<4||LIVE?.state?.locked)return;const r=JSON.stringify(reportObj());if(r===lastDraft)return;try{await api(`/rooms/${S.room}/submit`,{pid:S.pid,report:reportObj(),draft:true});lastDraft=r;const el=document.getElementById('autosave');if(el)el.textContent='자동 저장됨 '+new Date().toLocaleTimeString('ko-KR')}catch(e){}}
 setInterval(autoDraft,40000);
 const POLICY=[

@@ -184,6 +184,7 @@ function openScreen(){window.open(`screen.html?room=${T.code}`,'twoCrisisScreen'
 function onlineBar(){const st=D.state;const live=D.players.filter(p=>D.now-p.seen<30000).length;const fin=D.submissions.filter(s=>s.status==='final').length,dr=D.submissions.filter(s=>s.status==='draft').length;
  return `<div class="onl"><button class="ghost" onclick="copyLink()">학생 링크 복사 (Meet 채팅용)</button><button onclick="openScreen()">Meet 공유 화면 열기</button>
  <span>접속 중 <b>${live}</b>/${D.players.length}</span><span>보고서 최종 <b>${fin}</b> · 초안 ${dr}</span>
+ <button onclick="window.open('reports.html?room=${T.code}','twoCrisisReports')">보고서 모아보기</button>
  <button class="${st.locked?'':'warnb'}" onclick="act('${st.locked?'unlock':'lock'}')">${st.locked?'제출 마감 풀기':'보고서 제출 마감 (124분)'}</button>
  <span class="nos">⚠ 이 선생님 화면은 Meet로 공유하지 마세요. 공유는 「발표 시작 → 창」에서 「Meet 공유 화면」 창이나 「공유용 슬라이드 창」만.</span></div>`}
 function presence(pl){const ago=Math.round((D.now-pl.seen)/1000);const on=pl.seen&&ago<30;return `<span class="dot ${on?'on':''}"></span>${on?'접속':pl.seen?Math.floor(ago/60)+'분 전':'-'} · ${pl.stage!=null?STG[pl.stage]||'':''}`}
@@ -242,7 +243,7 @@ function gradeCsv(){const IK=Object.values(ITEMS).flatMap(a=>a.it);const rows=[[
 
 function L(l,v){return `<p><b>${l}</b><br>${esc(v).replace(/\n/g,'<br>')}</p>`}
 function repTab(){const subs=[...D.submissions].sort((a,b)=>a.name.localeCompare(b.name));
- return `<div class="card"><h2>제출물 (${subs.length}/${D.players.length})</h2><div class="row"><button class="ghost" onclick="csv()">AI 대화 링크 목록 CSV 받기</button></div>
+ return `<div class="card"><h2>제출물 (${subs.length}/${D.players.length})</h2><div class="row"><button onclick="window.open('reports.html?room=${T.code}','twoCrisisReports')">보고서 깔끔하게 모아보기 · PDF</button><button class="ghost" onclick="csv()">AI 대화 링크 목록 CSV 받기</button></div>
  <table style="margin-top:12px"><tr><th>학번 이름</th><th>상태 · 시각</th><th>AI 대화 기록 링크</th></tr>${subs.map(s=>`<tr><td>${esc(s.name)}</td><td>${s.status==='final'?'<b class="y">최종</b>':'초안(자동 저장)'} · ${new Date(s.ts).toLocaleString('ko-KR')}</td><td>${(s.report.ai?.links||[]).map(l=>`<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.tool||'링크')}</a>`).join(' · ')||'<span class="no">없음</span>'}</td></tr>`).join('')}</table>
  ${subs.map(s=>{const r=s.report;return `<details><summary>${esc(s.name)} · 보고서 펼치기</summary><div class="rep">
   <h4>내 자료</h4>${L('주제',r.topic)}${L('슬라이드에서 고친 것',r.fix?.after)}${L('위기 신호',r.fix?.evidence)}
